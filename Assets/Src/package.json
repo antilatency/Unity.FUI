@@ -1,0 +1,15 @@
+{
+  "name": "com.antilatency.fui",
+  "displayName": "FUI",
+  "version": "1.0.0",
+  "author": "Antilatency",
+  "homepage": "https://antilatency.com",
+  "description": "FUI",
+  "keywords": [
+    "Antilatency",
+    "FUI"
+  ],
+  "dependencies": {
+    "com.unity.textmeshpro": "3.x.x"
+  }
+}
