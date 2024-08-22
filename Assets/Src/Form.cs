@@ -122,16 +122,17 @@ namespace FUI {
         };
 
 
-        public static Positioner Gravity(Vector2 normalizedPosition, Vector2? size) {
+        public static Positioner Gravity(Vector2 normalizedPosition, float? width = null, float? height = null) {
             return (rectTransform, borders, sizeGetter) => {
                 rectTransform.anchorMin = normalizedPosition;
                 rectTransform.anchorMax = normalizedPosition;
+                var size = rectTransform.sizeDelta;
 
-                rectTransform.offsetMin = Vector2.zero;
-                rectTransform.offsetMax = Vector2.zero;
-
-                if (size.HasValue)
-                    rectTransform.sizeDelta = size.Value;
+                if (width.HasValue)
+                    size.x = width.Value;
+                if (height.HasValue)
+                    size.y = height.Value;
+                rectTransform.sizeDelta = size;
 
                 rectTransform.pivot = normalizedPosition;
 

@@ -14,7 +14,9 @@ public class DialogTestForm : Form {
             );
 
 
-        Rectangle(Color.red, Gravity(G, Vector2.one * 100));
+        using (GroupBackground(Gravity(G, 100, 100), Color.red)) {
+            Button("Ok", () => { }, PushDown(32));
+        };
 
     }
 }
