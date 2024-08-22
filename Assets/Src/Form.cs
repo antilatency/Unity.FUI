@@ -122,7 +122,7 @@ namespace FUI {
         };
 
 
-        public static Positioner NormalizedPositionFixedSize(Vector2 normalizedPosition, Vector2 size) {
+        public static Positioner Gravity(Vector2 normalizedPosition, Vector2? size) {
             return (rectTransform, borders, sizeGetter) => {
                 rectTransform.anchorMin = normalizedPosition;
                 rectTransform.anchorMax = normalizedPosition;
@@ -130,7 +130,8 @@ namespace FUI {
                 rectTransform.offsetMin = Vector2.zero;
                 rectTransform.offsetMax = Vector2.zero;
 
-                rectTransform.sizeDelta = size;
+                if (size.HasValue)
+                    rectTransform.sizeDelta = size.Value;
 
                 rectTransform.pivot = normalizedPosition;
 
@@ -659,7 +660,10 @@ namespace FUI {
 
 
 
-        public float Slider(float value, Positioner positioner, Color? backgroundColor = null, Color? handleColor = null) {
+        public float Slider(float value, Positioner? positioner = null, Color? backgroundColor = null, Color? handleColor = null) {
+            if (positioner == null)
+                positioner = DefaultControlPositioner;
+
             var background = CreateControl(Library.Rectangle, "c4b537e2-a35a-4ab1-9f57-d253dda79a36", x=> {
                 x.gameObject.AddComponent<Gears.Slider>();
             });
