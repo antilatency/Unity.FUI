@@ -24,69 +24,89 @@ internal class DebugForm : Form {
     public int TestInt;
     public bool TestBool;
 
+    [Serializable]
+    public class Item {
+        public string Name;
+        public string Icon;
+        public Color Color;
 
+        public Item(string name, string icon, Color color) {
+            Name = name;
+            Icon = icon;
+            Color = color;
+        }
+    }
+
+    public List<Item> Items;
+
+    public struct ListItemRelocation {
+        public int StartIndex;
+    }
 
     protected override void Build() {
 
-        (string Name, Vector2 hueSaturation)[] colorShortcuts = new[] { 
-            ("R",new Vector2(0.0f, 0.9f)),
-            ("G",new Vector2(0.33f, 0.9f)),
-            ("B",new Vector2(0.66f, 0.9f)),
-            ("T",new Vector2(0.1f, 0.2f)),
-            ("D",new Vector2(0.55f, 0.2f)),
+        Item[] palette = new Item[] { 
+            new Item("Lemon","\uf094", new Color(1f,1f,0.3f)),
+            new Item("Carrot","\uf787", new Color(1f,0.6f,0.2f)),
+            new Item("Pepper","\uf816", new Color(1f,0.0f,0.1f)),
         };
 
 
 
         using (GroupBackground(Fill)) {
 
-            TestFloat = Slider(TestFloat, PushUp());
+            using (GroupBackground(PushLeft(50),Theme.Instance.PanelBackgroundColor)) {
 
-            if (ExpandableGroupHeader("Open me", PushUp())) {
-                using (Group(PushUp())) {
-                    Padding(20, 4, 4, 4);
-                    Label("Opened");
-                    TestBool = LabeledCheckbox("LabeledCheckbox", TestBool);
-                }
+                for (int i = 0; i < palette.Length; i++) {
+                    var item = palette[i];
+                    IconButtonFontAwesome(item.Icon, 16, item.Color, () => { Items.Add(item); }, PushUp(50));
+                }                
             }
 
-
-            using (DraggableGroup(() => 8, PushUp(50))) {
-                Rectangle(Color.red, Fill);
+            void Swap(int i) {
+                var temp = Items[i];
+                Items[i] = Items[i+1];
+                Items[i + 1] = temp;
             }
 
-
-
+            const int buttonSize = 24;
             using (ScrollRectVertical(Fill)) {
                 Padding(4);
-                TestInt = LabeledInputField("Count", TestInt);
-                for (int i = 0; i < TestInt; i++) {
 
-                    using (Group(PushUp(20))) {
+                for (int i = 0; i < Items.Count; i++) {
+                    int index = i;
+                    var item = Items[i];
+                    using (GroupBackground(PushUp(24), Theme.Instance.PanelBackgroundColor, 4)) {
+                        GapLeft(4);
+                        IconFontAwesome(item.Icon, 16, item.Color, PushLeft(20));
+                        GapLeft(10);
 
+                        IconButtonFontAwesome("\uf2ed", 12, () => { Items.RemoveAt(index); }, PushRight(buttonSize));                        
+                        GapRight(10);
 
-                        Button("ClickMe", () => Debug.Log("clicked"), PushRight());
+                        if (i == (Items.Count - 1))
+                            GapRight(buttonSize);
+                        else
+                            IconButtonFontAwesome("\uf063", 12, () => { Swap(index); }, PushRight(buttonSize));//Down
+
+                        if (i == 0)
+                            GapRight(buttonSize);
+                        else
+                            IconButtonFontAwesome("\uf062", 12, () => { Swap(index-1); }, PushRight(buttonSize));//Up
+                        
+
+                        Label(item.Name, Fill);
+                        /*Button("ClickMe", () => Debug.Log("clicked"), PushRight());
                         Button("Delete", () => Debug.Log("clicked"), Color.red, PushRight());
 
                         IconButtonFontAwesome("\uf00c", 16, Color.white, () => Debug.Log("clicked"), PushRight(64));
-                        Label("Hello 6546546", Fill);
+                        */
                     }
-                    GapTop(2);
-                    testEnum = Dropdown(testEnum, PushUp());
-                    GapTop(5);
+                    GapTop(4);
                 }
-                //Button("ClickMe", new Color(0.5f, 0.5f, 0.5f, 1), () => Debug.Log("clicked"), PushUp());
-                GapTop(1);
-                TestFloat = InputField(TestFloat, PushUp());
-                GapTop(1);
-                TestFloat = LabeledInputField("double", TestFloat);
-            }
-
-                
+            }              
 
         }
-
-
 
     }
 }

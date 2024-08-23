@@ -10,21 +10,20 @@ using UnityEngine.UI;
 
 namespace FUI {
 #nullable enable
-    //using Positioner = System.Action<UnityEngine.RectTransform, Form.Borders, System.Func<UnityEngine.Vector2>?>;
+
 
     public abstract class Form : MonoBehaviour {
 
-        public delegate void Positioner(UnityEngine.RectTransform rectTransform, Form.Borders borders, System.Func<UnityEngine.Vector2>? sizeGetter);
-
-        public ControlsLibrary Library = null!;
-
-        public enum Direction {
-            Left,
-            Right,
-            Up,
-            Down,
-            Fill
+        public PrefabLibrary library = null!;
+        public PrefabLibrary Library {
+            get {
+                if (library == null)
+                    library = Resources.Load<PrefabLibrary>("FUI.PrefabLibrary");
+                return library;
+            }
         }
+
+        public delegate void Positioner(UnityEngine.RectTransform rectTransform, Borders borders, System.Func<UnityEngine.Vector2>? sizeGetter);
 
 
         [Serializable]
@@ -869,10 +868,11 @@ namespace FUI {
         }
 
 
-        public Disposable GroupBackground(Positioner positioner, Color? color = null, Action<RoundedRectangle>? initializer = null, string? guid = null, Action<RoundedRectangle>? updater = null) {
+        public Disposable GroupBackground(Positioner positioner, Color? color = null, float radius = 0, Action<RoundedRectangle>? initializer = null, string? guid = null, Action<RoundedRectangle>? updater = null) {
             CheckInitializerGuid(initializer, guid);
             var group = CreateControl(Library.Rectangle, guid ?? "96a0ce8e-c73f-405b-8dc9-274581969441", initializer);
             group.color = color.GetValueOrDefault(Theme.Instance.WindowBackgroundColor);
+            group.SetAllCorners(radius);
             var groupRectTransform = (RectTransform)group.transform;
             updater?.Invoke(group);
             BeginControls(GetChildrenContainer(groupRectTransform));

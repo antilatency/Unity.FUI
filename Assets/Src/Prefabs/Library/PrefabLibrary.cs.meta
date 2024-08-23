@@ -1,0 +1,28 @@
+fileFormatVersion: 2
+guid: b7113b5e54a4f3f43aa5b4e82ea4c68c
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - InputField: {instanceID: 0}
+  - CheckBox: {instanceID: 0}
+  - LabeledCheckBox: {instanceID: 0}
+  - LabeledInputField: {instanceID: 0}
+  - LabeledInputFieldInteger: {instanceID: 0}
+  - LabeledInputFieldDouble: {instanceID: 0}
+  - LabeledDropdown: {instanceID: 0}
+  - Label: {instanceID: 0}
+  - VerticalPanel: {instanceID: 0}
+  - ListDropArea: {instanceID: 0}
+  - DraggableVerticalPanel: {instanceID: 0}
+  - HorizontalLayoutGroup: {instanceID: 0}
+  - Button: {instanceID: 0}
+  - ExpandableVerticalPanel: {instanceID: 0}
+  - ColorPickerHueSaturation: {instanceID: 0}
+  - Rectangle: {instanceID: 0}
+  - Empty: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

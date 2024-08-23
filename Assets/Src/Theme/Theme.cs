@@ -8,7 +8,7 @@ namespace FUI {
         public static Theme Instance {
             get {
                 if (_instance == null) {
-                    _instance = Resources.Load<Theme>("Theme");
+                    _instance = Resources.Load<Theme>("FUI.DefaultTheme");
                 }
                 return _instance;
             }
