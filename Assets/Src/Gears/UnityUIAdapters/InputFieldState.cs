@@ -17,7 +17,11 @@
 
         public void OnValueChanged(string value) {
             NewUserInput = true;
-            FormToNotify?.MakeDirty();
+            NotifyForm();
+        }
+
+        public void OnEndEdit(string value) {
+            NotifyForm();
         }
     }
 }

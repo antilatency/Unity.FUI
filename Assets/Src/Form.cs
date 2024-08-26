@@ -50,9 +50,9 @@ namespace FUI {
         public static Form Current = null!;
 
         [NonSerialized]
-        private bool UpToDate = false;
-        public void MakeDirty() {
-            UpToDate = false;
+        private int UpdateIterationsRequired = 1;
+        public void MakeDirty(int extraIterations = 0) {
+            UpdateIterationsRequired += 1 + extraIterations;
         }
 
         public PrefabLibrary library = null!;
@@ -183,7 +183,7 @@ namespace FUI {
 
 
         public void RebuildIfNeeded() {
-            if (!Lazy || !UpToDate)
+            if (!Lazy || UpdateIterationsRequired>0)
                 Rebuild();
         }
 
@@ -198,7 +198,7 @@ namespace FUI {
                 Current = null;
                 
             }
-            UpToDate = true;
+            UpdateIterationsRequired--;
             if (Stack.Count != 0)
                 throw new InvalidOperationException("The stack is not empty after control operations.");
         }
@@ -364,10 +364,10 @@ namespace FUI {
             throw new InvalidOperationException($"Unsupported type: {typeof(T)}");
         }
 
-        public T InputField<T>(T value, Positioner positioner, Func<string, T>? fromString = null) {
+        public T InputField<T>(T value, Positioner positioner, Func<string, T>? fromString = null, int numExtraIterations = 0) {
 
             var transform = Element(Library.InputField.gameObject
-                , M.SetFormToNotify()
+                , M.SetFormToNotify(numExtraIterations)
                 );
             var input = transform.GetComponent<InputFieldState>();
 
@@ -401,19 +401,19 @@ namespace FUI {
 
         
 
-        public T Dropdown<T>(T value, Positioner? positioner = null) where T : struct {
+        public T Dropdown<T>(T value, Positioner? positioner = null, int numExtraIterations = 0) where T : struct {
             int intValue = Convert.ToInt32(value);
             string[] options = Enum.GetNames(typeof(T));
-            int selectedValue = Dropdown(intValue, options, positioner);
+            int selectedValue = Dropdown(intValue, options, positioner, numExtraIterations);
             return (T)Enum.ToObject(typeof(T), selectedValue);
         }
 
-        public int Dropdown(int value, string[] options, Positioner? positioner = null) {
+        public int Dropdown(int value, string[] options, Positioner? positioner = null, int numExtraIterations = 0) {
             if (positioner == null)
                 positioner = DefaultControlPositioner;
 
             var element = Element(Library.Dropdown
-                , M.SetFormToNotify()
+                , M.SetFormToNotify(numExtraIterations)
                 );
             positioner(element, CurrentBorders, () => new Vector2(40, Theme.Instance.LineHeight));
 

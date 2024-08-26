@@ -88,11 +88,15 @@ namespace FUI {
                 null
                 );
 
-        public static Modifier SetFormToNotify() =>
+        public static Modifier SetFormToNotify(int NumExtraIterations) =>
             new Modifier(
                 "SetFormToNotify",
-                x => x.GetComponent<AbstractUserInputNotifier>().FormToNotify = Form.Current,
-                null
+                null,
+                x => {
+                    var notifier = x.GetComponent<AbstractUserInputNotifier>();
+                    notifier.SetFormToNotify(Form.Current);
+                    notifier.ExtraIterations = NumExtraIterations;
+                }
                 );
 
         public static Modifier DisableRaycastTarget() =>

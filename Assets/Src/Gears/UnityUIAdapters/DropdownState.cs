@@ -18,7 +18,7 @@ namespace FUI.Gears {
 
         public void OnValueChanged(int value) {
             NewUserInput = true;
-            FormToNotify?.MakeDirty();
+            NotifyForm();
         }
     }
 }

@@ -10,13 +10,13 @@ internal class ColorPickerForm : Form {
     public string Hint;
     public Vector2 HueSaturation;
 
-    static Vector2 ColorPickerHueSaturation(Vector2 value, Positioner positioner) {
+    static Vector2 ColorPickerHueSaturation(Vector2 value, Positioner positioner, int numExtraIterations = 0) {
         var form = Form.Current;
 
         var background = form.Element(null
             ,M.AddComponent<RoundedRectangle>()
             ,M.AddComponent<Slider>()
-            ,M.SetFormToNotify()
+            ,M.SetFormToNotify(numExtraIterations)
             ,M.SetCustomShader("UI/HueSaturationRect")
         );
 

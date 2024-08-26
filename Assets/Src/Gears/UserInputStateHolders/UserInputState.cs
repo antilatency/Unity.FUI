@@ -16,7 +16,7 @@
         public void UserInput(T value) {
             _value = value;
             NewUserInput = true;
-            FormToNotify?.MakeDirty();
+            NotifyForm();
         }
     }
 }

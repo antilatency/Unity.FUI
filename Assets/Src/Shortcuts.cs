@@ -18,41 +18,41 @@ namespace FUI {
             return result;
         }
 
-        public static T LabeledInputField<T>(string label, T value, Positioner? positioner = null, Func<string, T>? fromString = null) where T : notnull {
+        public static T LabeledInputField<T>(string label, T value, Positioner? positioner = null, Func<string, T>? fromString = null, int numExtraIterations = 0) where T : notnull {
             var form = Form.Current;
             using (Labeled(label, positioner)) {
-                return form.InputField(value, P.Fill, fromString);
+                return form.InputField(value, P.Fill, fromString, numExtraIterations);
             }
         }
 
-        public static T LabeledDropdown<T>(string label, T value, Positioner? positioner = null) where T : struct {
+        public static T LabeledDropdown<T>(string label, T value, Positioner? positioner = null, int numExtraIterations = 0) where T : struct {
             var form = Form.Current;
             using (Labeled(label, positioner)) {
-                return form.Dropdown(value, P.Fill);
+                return form.Dropdown(value, P.Fill, numExtraIterations);
             }
         }
-        public static int LabeledDropdown(string label, int value, string[] options, Positioner? positioner = null) {
+        public static int LabeledDropdown(string label, int value, string[] options, Positioner? positioner = null, int numExtraIterations = 0) {
             var form = Form.Current;
             using (Labeled(label, positioner)) {
-                return form.Dropdown(value, options, P.Fill);
+                return form.Dropdown(value, options, P.Fill, numExtraIterations);
             }
         }
 
 
-        public static bool LabeledCheckbox(string label, bool value, Positioner? positioner = null) {
+        public static bool LabeledCheckbox(string label, bool value, Positioner? positioner = null, int numExtraIterations = 0) {
             using (Labeled(label, positioner)) {
-                return Checkbox(value, P.Left());
+                return Checkbox(value, P.Left(), numExtraIterations);
             }
         }
 
-        public static bool Checkbox(bool value, Positioner? positioner = null) {
+        public static bool Checkbox(bool value, Positioner? positioner = null, int numExtraIterations = 0) {
             var form = Form.Current;
 
             RectTransform background = form.Element(null
                 , M.AddComponent<RoundedRectangle>()
                 , M.AddComponent<ButtonHighlighter>()
                 , M.AddComponent<BoolUserInputState>()
-                , M.SetFormToNotify()
+                , M.SetFormToNotify(numExtraIterations)
                 , M.AddComponent<PointerClickHandler>()
                 , M.SetRectangleCorners(4)
                 , M.AddClickHandler(x => {

@@ -78,18 +78,28 @@ internal class DebugForm : Form {
                 Button("Button", x => { }, P.Up(20));
                 GapTop(2);
 
-                ColoredButton("Button", x => { },null, P.Up(20));
+                ColoredButton("ColoredButton", x => { },null, P.Up(20));
                 GapTop(2);
 
                 TestBool = LabeledCheckbox("Bool", TestBool);
                 GapTop(2);
-                TestInt = LabeledInputField("Int", TestInt);
+
+                Label(TestInt.ToString());
                 GapTop(2);
+
+                TestInt = LabeledInputField("Int", TestInt, numExtraIterations: 1);   
+                GapTop(2);                
+                
+
                 TestFloat = LabeledInputField("Float", TestFloat);
                 GapTop(2);
                 TestDouble = LabeledInputField("Double", TestDouble);
                 GapTop(2);
+
+
+
                 testEnum = LabeledDropdown("Enum", testEnum);
+                
             }
 
             void Swap(int i) {
