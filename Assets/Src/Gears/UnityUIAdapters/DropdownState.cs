@@ -2,13 +2,11 @@
 using UnityEngine;
 
 namespace FUI.Gears {
-    public class DropdownState : MonoBehaviour {
+    public class DropdownState : AbstractUserInput<int> {
 
         public TMP_Dropdown Target;
 
-        public bool NewUserInput { get; protected set; }
-
-        public int Value {
+        public override int Value {
             set {
                 Target.SetValueWithoutNotify(value);
             }
@@ -20,6 +18,7 @@ namespace FUI.Gears {
 
         public void OnValueChanged(int value) {
             NewUserInput = true;
+            FormToNotify?.MakeDirty();
         }
     }
 }

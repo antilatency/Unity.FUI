@@ -1,6 +1,9 @@
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace FUI{
+
+    [RequireComponent(typeof(CanvasRenderer))]
     public class RoundedRectangle : AbstractRoundedRectangle{
 
         public float TopLeft;

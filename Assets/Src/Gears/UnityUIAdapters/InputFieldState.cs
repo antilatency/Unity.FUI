@@ -1,11 +1,11 @@
-﻿using UnityEngine;
-namespace FUI.Gears {
-    public class InputFieldState : MonoBehaviour {
+﻿namespace FUI.Gears {
+
+    public class InputFieldState : AbstractUserInput<string> {
 
         public TMPro.TMP_InputField Target;
-        public bool NewUserInput { get; protected set; }
+        
 
-        public string Value {
+        public override string Value {
             set {
                 Target.SetTextWithoutNotify(value);
             }
@@ -17,6 +17,7 @@ namespace FUI.Gears {
 
         public void OnValueChanged(string value) {
             NewUserInput = true;
+            FormToNotify?.MakeDirty();
         }
     }
 }

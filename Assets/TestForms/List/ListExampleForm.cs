@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using FUI;
+using static FUI.Shortcuts;
 
 internal class ListExampleForm : Form {
 
@@ -11,6 +12,7 @@ internal class ListExampleForm : Form {
         public string Name;
         public string Icon;
         public Color Color;
+        internal bool Selected;
 
         public Item(string name, string icon, Color color) {
             Name = name;
@@ -35,13 +37,16 @@ internal class ListExampleForm : Form {
 
 
 
-        using (GroupBackground(Fill)) {
+        using (WindowBackground()) {
 
-            using (GroupBackground(PushLeft(50), Theme.Instance.PanelBackgroundColor)) {
+            using (Panel(P.Left(50))) {
 
                 for (int i = 0; i < palette.Length; i++) {
                     var item = palette[i];
-                    IconButtonFontAwesome(item.Icon, 16, item.Color, () => { Items.Add(item); }, PushUp(50));
+                    IconButtonFontAwesome(item.Icon, 16, item.Color, x => {
+                        Items.Add(item);
+                        MakeDirty();
+                    }, P.Up(50));
                 }
             }
 
@@ -51,32 +56,38 @@ internal class ListExampleForm : Form {
                 Items[i + 1] = temp;
             }
 
+
             const int buttonSize = 24;
-            using (ScrollRectVertical(Fill)) {
+            using (ScrollRectVertical(P.Fill)) {
                 Padding(4);
 
                 for (int i = 0; i < Items.Count; i++) {
                     int index = i;
                     var item = Items[i];
-                    using (GroupBackground(PushUp(24), Theme.Instance.PanelBackgroundColor, 4)) {
+                    using (Panel(P.Up(24))) {
                         GapLeft(4);
-                        IconFontAwesome(item.Icon, 16, item.Color, PushLeft(20));
+                        IconFontAwesome(item.Icon, 16, item.Color, P.Left(20));
                         GapLeft(10);
 
-                        IconButtonFontAwesome("\uf2ed", 12, () => { Items.RemoveAt(index); }, PushRight(buttonSize));//Delete
+                        using (TempPaddingVertical(2, 2)) {
+                            item.Selected = Checkbox(item.Selected, P.Left(20));
+                        }
+
+                        GapLeft(10);
+
+                        IconButtonFontAwesome("\uf2ed", 12, x => { Items.RemoveAt(index); MakeDirty(); }, P.Right(buttonSize));//Delete
                         GapRight(10);
 
                         if (i == (Items.Count - 1))
                             GapRight(buttonSize);
                         else
-                            IconButtonFontAwesome("\uf063", 12, () => { Swap(index); }, PushRight(buttonSize));//Down
+                            IconButtonFontAwesome("\uf063", 12, x => { Swap(index); MakeDirty(); }, P.Right(buttonSize));//Down
 
                         if (i == 0)
                             GapRight(buttonSize);
                         else
-                            IconButtonFontAwesome("\uf062", 12, () => { Swap(index - 1); }, PushRight(buttonSize));//Up
-
-                        Label(item.Name, Fill);
+                            IconButtonFontAwesome("\uf062", 12, x => { Swap(index - 1); MakeDirty(); }, P.Right(buttonSize));//Up
+                        Label(item.Name, P.Fill);
                     }
                     GapTop(4);
                 }

@@ -155,6 +155,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 692c463bfee2ece43ab87194028590c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Lazy: 0
   library: {fileID: 0}
   Items: []
 --- !u!114 &228518237
@@ -315,7 +316,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
@@ -351,11 +352,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65c08707ea23d404f822fffe33b58423, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Lazy: 0
   library: {fileID: 0}
   TestText: 
   TestDouble: 0
   TestFloat: 0
-  TestInt: 0
+  TestInt: 2000
   TestBool: 0
   Items: []
 --- !u!1 &569052563
@@ -390,6 +392,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f2dcb49835277f4a90a24620ea3de18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Lazy: 0
   library: {fileID: 0}
   G: {x: 0, y: 0}
 --- !u!114 &569052565
@@ -573,6 +576,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d3e98e0df4dc934091e54899cb62cf6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Lazy: 0
   library: {fileID: 0}
   Hint: 
   HueSaturation: {x: 0, y: 0}

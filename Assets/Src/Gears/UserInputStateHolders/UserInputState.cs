@@ -1,11 +1,9 @@
-﻿using UnityEngine;
-namespace FUI.Gears {
-    public class UserInputState<T> : MonoBehaviour {
+﻿namespace FUI.Gears {
+    public class UserInputState<T> : AbstractUserInput<T> {
 
         private T _value;
-        public bool NewUserInput { get; protected set; }
 
-        public T Value {
+        public override T Value {
             set {
                 _value = value;
             }
@@ -18,6 +16,7 @@ namespace FUI.Gears {
         public void UserInput(T value) {
             _value = value;
             NewUserInput = true;
+            FormToNotify?.MakeDirty();
         }
     }
 }

@@ -1,4 +1,6 @@
 using FUI;
+using static FUI.Shortcuts;
+
 using UnityEngine;
 
 public class DialogTestForm : Form {
@@ -6,7 +8,7 @@ public class DialogTestForm : Form {
     public Vector2 G;
 
     protected override void Build() {
-        Rectangle(Theme.Instance.WindowBackgroundColor, Fill);
+        Rectangle(P.Fill, Theme.Instance.WindowBackgroundColor);
 
         G = new Vector2(
             Slider(G.x,null, Color.black),
@@ -14,9 +16,7 @@ public class DialogTestForm : Form {
             );
 
 
-        using (GroupBackground(Gravity(G, 100, 100), Color.red)) {
-            Button("Ok", () => { }, PushDown(32));
-        };
+        Rectangle(P.Gravity(G, 100, 100), Color.red);
 
     }
 }

@@ -12,7 +12,9 @@ public abstract class AbstractHighlighter : MonoBehaviour {
     public Graphic Graphic;
 
     protected virtual void OnEnable() {
-        CheckComponent(ref Graphic);
+        if (!Graphic) 
+            Graphic = GetComponent<Graphic>();
+
     }
 
     protected void CheckComponent<T>(ref T component) where T: Component{

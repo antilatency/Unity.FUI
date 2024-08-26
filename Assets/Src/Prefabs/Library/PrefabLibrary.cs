@@ -1,7 +1,5 @@
-using FUI.Gears;
-using TMPro;
+
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace FUI {
 
@@ -9,18 +7,12 @@ namespace FUI {
     public class PrefabLibrary : ScriptableObject {
 
 
-        public InputFieldState InputField;
-        public TMP_Dropdown Dropdown;
-        public TMP_Text Label;
+        public GameObject InputField;
+        public GameObject Dropdown;
+        public GameObject Label;
 
-        public RectTransform Empty;
-        public RoundedRectangle Rectangle;
+        public GameObject FontAwesomeIcon;
 
-
-        public TMP_Text FontAwesomeIconBrands;
-        public TMP_Text FontAwesomeIconRegular;
-        public TMP_Text FontAwesomeIconSolid;
-
-        public ScrollRect ScrollRect;
+        public GameObject ScrollRect;
     }
 }
