@@ -125,7 +125,7 @@ namespace FUI {
                     gameObject = InstantiatePrefab(original, stackItem.Root);
                 } else {
                     gameObject = new GameObject("fuiElement", typeof(RectTransform));
-                    gameObject.transform.SetParent(stackItem.Root);
+                    gameObject.transform.SetParent(stackItem.Root, false);
                     
                 }
                 result = (RectTransform)gameObject.transform;
