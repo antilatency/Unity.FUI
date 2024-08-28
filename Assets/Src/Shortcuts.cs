@@ -96,6 +96,7 @@ namespace FUI {
                     var input = x.GetComponent<BoolUserInputState>();
                     input.UserInput(!input.Value);
                 })
+                ,M.SetFormToNotify(0)
             );
 
             var userInputState = background.GetComponent<BoolUserInputState>();
@@ -114,16 +115,18 @@ namespace FUI {
 
             IconFontAwesome(result ? caretDown : caretRight, Theme.Instance.LineHeight * 0.8f, P.Left(Theme.Instance.LineHeight));
 
-            var labelElement = form.Element(P.Fill, form.Library.Label
+            Label(label,P.RigidFill);
+            
+            /*var labelElement = form.Element(P.Fill, form.Library.Label
                 , M.SetText(label)
                 , M.SetColor(Theme.Instance.LabelColor)
-                );
+                );*/
 
             var innerBorders = form.CurrentBorders;
             form.EndControls();
 
             (positioner?? Form.DefaultControlPositioner) (background, form.CurrentBorders, () => {
-                var width = labelElement.GetComponent<TMP_Text>().GetPreferredValues().x + innerBorders.GetRigidSize().x + 4;
+                var width = innerBorders.GetRigidSize().x;
                 return new Vector2(width, Theme.Instance.LineHeight);
             });
 

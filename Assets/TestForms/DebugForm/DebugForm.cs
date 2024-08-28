@@ -57,10 +57,10 @@ internal class DebugForm : Form {
         };
 
 
-        using (WindowBackground()) {
+        using (WindowBackground()){
 
             
-            
+
 
             using (Panel(P.Left(50))) {
 
@@ -74,7 +74,11 @@ internal class DebugForm : Form {
 
             GapTop(4);
             using (TempPaddingHorizontal(4, 4)) {
-
+                if (ExpandableGroupHeader("ExpandableGroupHeader")){
+                    Label("Expanded");
+                }
+                GapTop(2);
+                
                 Button("Button", x => { }, P.Up(20));
                 GapTop(2);
 

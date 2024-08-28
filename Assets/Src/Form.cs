@@ -198,7 +198,7 @@ namespace FUI {
                 Current = null;
                 
             }
-            UpdateIterationsRequired--;
+            UpdateIterationsRequired  = Math.Max(UpdateIterationsRequired-1, 0);
             if (Stack.Count != 0)
                 throw new InvalidOperationException("The stack is not empty after control operations.");
         }
