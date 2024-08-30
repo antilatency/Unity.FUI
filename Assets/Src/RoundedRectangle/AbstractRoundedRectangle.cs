@@ -3,7 +3,15 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace FUI{
-    public abstract class AbstractRoundedRectangle : MaskableGraphic{
+
+    public class TexturedGraphic : MaskableGraphic {
+
+        public Texture Texture = null;
+        public override Texture mainTexture => Texture;
+    }
+
+
+    public abstract class AbstractRoundedRectangle : TexturedGraphic {
         public int Segments = 4;
 
         protected abstract override void OnPopulateMesh(VertexHelper vh);

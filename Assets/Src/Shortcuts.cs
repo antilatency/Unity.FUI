@@ -6,7 +6,7 @@ using UnityEngine;
 namespace FUI {
 #nullable enable
 
-    public static class Shortcuts {
+    public static partial class Shortcuts {
         public static void Label(string value, Positioner? positioner = null) {
             Form.Current.LabelModifiable(positioner??Form.DefaultControlPositioner, M.SetText(value));
         }

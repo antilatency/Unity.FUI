@@ -33,6 +33,8 @@ namespace FUI {
                 );
         }
 
+
+
         public static Modifier SetColor(Color color, bool mutable = true)
             => MakeSetter(mutable, x => { x.GetComponent<Graphic>().color = color; });
 
@@ -68,11 +70,15 @@ namespace FUI {
                 );
         
         
-        public static Modifier SetCustomShader(string shaderName) =>
+        public static Modifier SetCustomShader(string shaderName, params (string name, object value)[] parameters) =>
             new Modifier(
                 "SetCustomShader",
                 x => x.AddComponent<CustomShader>(),
-                x => x.GetComponent<CustomShader>().ShaderName = shaderName
+                x => {
+                    var component = x.GetComponent<CustomShader>();
+                    component.ShaderName = shaderName;
+                    component.SetParameters(parameters);
+                }
                 );
 
 

@@ -25,6 +25,9 @@ internal class DebugForm : Form {
     public int TestInt;
     public bool TestBool;
 
+    public Texture TestTexture;
+    public Texture TestTexture2;
+
     [Serializable]
     public class Item {
         public string Name;
@@ -57,9 +60,9 @@ internal class DebugForm : Form {
         };
 
 
-        using (WindowBackground()){
 
-            
+
+        using (WindowBackground()){
 
 
             using (Panel(P.Left(50))) {
@@ -68,6 +71,10 @@ internal class DebugForm : Form {
                     var item = palette[i];
                     IconButtonFontAwesome(item.Icon, 16, item.Color, x => { Items.Add(item); }, P.Up(50));
                 }
+
+
+                Image_ToSRGB_IgnoreAlpha(P.Up(50), TestTexture);
+                Image_ToSRGB_IgnoreAlpha(P.Up(50), TestTexture2, -Vector3.one);
             }
 
             

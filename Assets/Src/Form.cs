@@ -181,9 +181,8 @@ namespace FUI {
             });
         }
 
-
         public void RebuildIfNeeded() {
-            if (!Lazy || UpdateIterationsRequired>0)
+           if (!Lazy || UpdateIterationsRequired>0)
                 Rebuild();
         }
 
