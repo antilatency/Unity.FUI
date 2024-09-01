@@ -1,7 +1,7 @@
 ﻿namespace FUI.Gears {
     public class UserInputState<T> : AbstractUserInput<T> {
 
-        private T _value;
+        protected T _value;
 
         public override T Value {
             set {

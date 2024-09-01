@@ -55,8 +55,8 @@ namespace FUI {
                 , M.SetFormToNotify(numExtraIterations)
                 , M.AddComponent<PointerClickHandler>()
                 , M.SetRectangleCorners(4)
-                , M.AddClickHandler(x => {
-                    var input = x.GetComponent<BoolUserInputState>();
+                , M.AddClickHandlerEx((go,e) => {
+                    var input = go.GetComponent<BoolUserInputState>();
                     input.UserInput(!input.Value);
                 })
             );
@@ -92,8 +92,8 @@ namespace FUI {
                 , M.SetRectangleCorners(4)
                 , M.AddComponent<ButtonHighlighter>()
                 , M.AddComponent<BoolUserInputState>()
-                , M.AddClickHandler(x => {
-                    var input = x.GetComponent<BoolUserInputState>();
+                , M.AddClickHandlerEx((go,e) => {
+                    var input = go.GetComponent<BoolUserInputState>();
                     input.UserInput(!input.Value);
                 })
                 ,M.SetFormToNotify(0)
@@ -138,7 +138,7 @@ namespace FUI {
             var form = Form.Current;
             var element = form.Element(null
                 , M.AddComponent<RoundedRectangle>()
-                , M.SetRectangleCorners(4)
+                , M.SetRectangleCorners(radius)
                 , M.SetColor(color)
                 );
             positioner(element, form.CurrentBorders, () => new Vector2(100, 100));
@@ -218,10 +218,10 @@ namespace FUI {
             positioner(iconElement, form.CurrentBorders, () => new Vector2(size, size));
         }
 
-        public static void IconButtonFontAwesome(string icon, float size, Action<GameObject> action, Positioner positioner) {
+        public static void IconButtonFontAwesome(string icon, float size, Action action, Positioner positioner) {
             IconButtonFontAwesome(icon, size, Theme.Instance.LabelColor, action, positioner);
         }
-        public static void IconButtonFontAwesome(string icon, float size, Color color, Action<GameObject> action, Positioner positioner) {
+        public static void IconButtonFontAwesome(string icon, float size, Color color, Action action, Positioner positioner) {
             var form = Form.Current;
             var background = form.Element(null
                 ,M.AddComponent<RoundedRectangle>()
@@ -255,7 +255,7 @@ namespace FUI {
 
 
 
-        public static void ColoredButton(string text, Action<GameObject> action, Color? color = null, Positioner? positioner = null) {
+        public static void ColoredButton(string text, Action action, Color? color = null, Positioner? positioner = null) {
             var form = Form.Current;
 
             var backgroundColor = color ?? Theme.Instance.PrimaryColor;
@@ -282,7 +282,7 @@ namespace FUI {
             }
         }
 
-        public static void Button(string text, Action<GameObject> action, Positioner? positioner = null) {
+        public static void Button(string text, Action action, Positioner? positioner = null) {
             var form = Form.Current;
             using (form.Group(positioner ?? P.Up(Theme.Instance.LineHeight)
                     , M.AddComponent<RoundedRectangle>()
@@ -300,7 +300,31 @@ namespace FUI {
             }
         }
 
+        public static Disposable ZoomPanViewport(Positioner positioner, Vector2 contentSize) {
+            var form = Form.Current;
+            var background = form.Element(null
+                , M.AddComponent<RoundedRectangle>()
+                , M.AddMask(false)
+                , M.AddClickHandlerEx((go, e) => {
+                    if (e.clickCount == 2) {
+                        var component = go.GetComponent<ZoomPanViewport>();
+                        component.IntScale = 0;
+                        component.ViewportCenterInContent = Vector2.zero;
+                    }
+                })
+                , M.AddZoomPanViewport(contentSize)
+            );
 
+            positioner(background, form.CurrentBorders, () => contentSize);
+
+            var content = background.GetComponent<ZoomPanViewport>().Content;
+            form.BeginControls(content);
+
+            return new Disposable(() => {
+                form.EndControls();
+            });
+
+        }
 
     }
 }

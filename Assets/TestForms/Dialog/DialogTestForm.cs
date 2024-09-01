@@ -16,7 +16,7 @@ public class DialogTestForm : Form {
             );
 
 
-        Rectangle(P.Gravity(G, 100, 100), Color.red);
+        Rectangle(P.Absolute(Vector2.zero, 100, 100, G), Color.red);
 
     }
 }

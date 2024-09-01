@@ -4,14 +4,8 @@ using UnityEngine.UI;
 
 namespace FUI{
 
-    public class TexturedGraphic : MaskableGraphic {
 
-        public Texture Texture = null;
-        public override Texture mainTexture => Texture;
-    }
-
-
-    public abstract class AbstractRoundedRectangle : TexturedGraphic {
+    public abstract class AbstractRoundedRectangle : MaskableGraphic {
         public int Segments = 4;
 
         protected abstract override void OnPopulateMesh(VertexHelper vh);

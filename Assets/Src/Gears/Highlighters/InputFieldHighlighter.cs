@@ -9,7 +9,7 @@ namespace FUI.Gears {
         protected Color EditingColor => Theme.Instance.InputColorEditing;
 
         HoveredState hoveredState;
-        TMP_InputField input;
+        FUI_InputField input;
 
         protected override void OnEnable() {
             base.OnEnable();

@@ -69,7 +69,7 @@ internal class DebugForm : Form {
 
                 for (int i = 0; i < palette.Length; i++) {
                     var item = palette[i];
-                    IconButtonFontAwesome(item.Icon, 16, item.Color, x => { Items.Add(item); }, P.Up(50));
+                    IconButtonFontAwesome(item.Icon, 16, item.Color, () => { Items.Add(item); }, P.Up(50));
                 }
 
 
@@ -86,10 +86,10 @@ internal class DebugForm : Form {
                 }
                 GapTop(2);
                 
-                Button("Button", x => { }, P.Up(20));
+                Button("Button", () => { }, P.Up(20));
                 GapTop(2);
 
-                ColoredButton("ColoredButton", x => { },null, P.Up(20));
+                ColoredButton("ColoredButton", () => { },null, P.Up(20));
                 GapTop(2);
 
                 TestBool = LabeledCheckbox("Bool", TestBool);
@@ -131,18 +131,18 @@ internal class DebugForm : Form {
                         IconFontAwesome(item.Icon, 16, item.Color, P.Left(20));
                         GapLeft(10);
 
-                        IconButtonFontAwesome("\uf2ed", 12, x => { Items.RemoveAt(index); }, P.Right(buttonSize));                        
+                        IconButtonFontAwesome("\uf2ed", 12, () => { Items.RemoveAt(index); }, P.Right(buttonSize));                        
                         GapRight(10);
 
                         if (i == (Items.Count - 1))
                             GapRight(buttonSize);
                         else
-                            IconButtonFontAwesome("\uf063", 12, x => { Swap(index); }, P.Right(buttonSize));//Down
+                            IconButtonFontAwesome("\uf063", 12, () => { Swap(index); }, P.Right(buttonSize));//Down
 
                         if (i == 0)
                             GapRight(buttonSize);
                         else
-                            IconButtonFontAwesome("\uf062", 12, x => { Swap(index-1); }, P.Right(buttonSize));//Up
+                            IconButtonFontAwesome("\uf062", 12, () => { Swap(index-1); }, P.Right(buttonSize));//Up
                         
 
                         Label(item.Name, P.Fill);
