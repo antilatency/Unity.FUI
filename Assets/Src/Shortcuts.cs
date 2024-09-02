@@ -122,12 +122,11 @@ namespace FUI {
                 , M.SetColor(Theme.Instance.LabelColor)
                 );*/
 
-            var innerBorders = form.CurrentBorders;
-            form.EndControls();
+
+            var innerSize = form.EndControls();
 
             (positioner?? Form.DefaultControlPositioner) (background, form.CurrentBorders, () => {
-                var width = innerBorders.GetRigidSize().x;
-                return new Vector2(width, Theme.Instance.LineHeight);
+                return new Vector2(innerSize.x, Theme.Instance.LineHeight);
             });
 
             return result;
@@ -159,6 +158,17 @@ namespace FUI {
                     , M.AddComponent<RoundedRectangle>()
                     , M.SetColor(Theme.Instance.WindowBackgroundColor)
                     );
+        }
+
+
+        public static T SubForm<T>(Positioner positioner) where T : Form {
+            var form = Form.Current;
+            var subform = form.Element(null
+                , M.AddComponent<T>()
+            );
+            var result = subform.GetComponent<T>();
+            positioner(subform, form.CurrentBorders, () => result.RigidSize);
+            return result;
         }
 
 

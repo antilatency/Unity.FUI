@@ -21,7 +21,7 @@ internal class ListExampleForm : Form {
         }
     }
 
-    public List<Item> Items;
+    public List<Item> Items = new();
 
     public struct ListItemRelocation {
         public int StartIndex;

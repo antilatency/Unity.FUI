@@ -27,15 +27,20 @@ public class ZoomPanForm : Form {
                 Rectangle(P.Absolute(Vector2.zero, 50, null, Vector2.one, Vector2.one - Vector2.one), Color.blue);
                 Rectangle(P.Absolute(Vector2.zero, 50, null, Vector2.right, Vector2.one - Vector2.right), Color.white);
 
-                using (Group(P.Absolute(Vector2.zero, 100, null, Vector2.right))) {
+                using (Group(P.Absolute(Vector2.zero, 100, null, Vector2.zero))) {
                     Label("Text");
                     Label("Text1");
                     Label("Text2");
                     Label("Text3");
                 }
 
+                var subForm = SubForm<ListExampleForm>(P.Absolute(Vector2.zero, 300, 200, Vector2.right));
+
+                
                 TestFloat = LabeledInputField("input", TestFloat);
                 Button("Button", () => { });
+
+                Label($"subForm Num Items = {subForm.Items?.Count ?? 0}");
             }
 
         }  

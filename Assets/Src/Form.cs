@@ -50,6 +50,9 @@ namespace FUI {
         public static Form Current = null!;
 
         [NonSerialized]
+        public Vector2 RigidSize = Vector2.zero;
+
+        [NonSerialized]
         private int UpdateIterationsRequired = 1;
         public void MakeDirty(int extraIterations = 0) {
             UpdateIterationsRequired += 1 + extraIterations;
@@ -64,12 +67,6 @@ namespace FUI {
             }
         }
 
-        
-
-
-        
-
-
         public class StackItem {
             public int FirstNotValidatedControlIndex = 0;
             public RectTransform Root;
@@ -79,8 +76,6 @@ namespace FUI {
 
             }
         }
-
-
 
         public RectTransform Element(GameObject? original = null, params Modifier[] modifiers) {
             var stackItem = Stack.Peek();
@@ -164,9 +159,8 @@ namespace FUI {
             var group = Element(null, modifiers);
             BeginControls(group);
             return new Disposable(() => {
-                var innerBorders = CurrentBorders;
-                EndControls();
-                positioner(group, CurrentBorders, innerBorders.GetRigidSize);
+                 var innerSize = EndControls();
+                positioner(group, CurrentBorders, ()=> innerSize);
             });
         }
 
@@ -193,7 +187,7 @@ namespace FUI {
                 Build();
             }
             finally {
-                EndControls();
+                RigidSize = EndControls();
                 Current = null;
                 
             }
@@ -223,7 +217,7 @@ namespace FUI {
             Stack.Push(newItem);
         }
 
-        public void EndControls() {
+        public Vector2 EndControls() {
             var stackItem = Stack.Pop();
             var t = stackItem.Root;
             var index = stackItem.FirstNotValidatedControlIndex;
@@ -234,6 +228,7 @@ namespace FUI {
                 DestroyImmediate(child.gameObject);
                 count--;
             }
+            return stackItem.Borders.GetRigidSize();
         }
 
 
@@ -249,78 +244,6 @@ namespace FUI {
 
             return created;
         }
-
-
-/*        public T CreateSubControl<T>(Transform parent, T original, Action<T>? initializer = null, string guid = "") where T : UnityEngine.Object {
-            var objectRefs = parent.GetComponents<ObjectRef>();
-            var objectRef = objectRefs.FirstOrDefault(x => x.Guid == guid && x.TypeName == typeof(T).FullName);
-            if (objectRef)
-                return (T)objectRef.Value;
-
-            var created = InstantiatePrefab(original, parent);
-            initializer?.Invoke(created);
-            objectRef = parent.gameObject.AddComponent<ObjectRef>();
-            objectRef.Value = created;
-            objectRef.Guid = guid;
-            objectRef.TypeName = typeof(T).FullName;
-            return created;
-        }
-
-
-
-
-
-
-        public T CreateControl<T>(T original, string guid, Action<T>? initializer = null) where T : UnityEngine.Object {
-
-            var stackItem = Stack.Peek();
-            var parent = stackItem.Root;
-            var index = stackItem.FirstNotValidatedControlIndex;
-
-            //var currentChildren = Enumerable.Range(index, parent.childCount - index).Select(x => parent.GetChild(x)).ToList();
-
-            int FindIndex() {
-                for (int i = stackItem.FirstNotValidatedControlIndex; i < parent.childCount; i++) {
-                    var child = parent.GetChild(i);
-                    if (child.GetComponent<Mark>()?.Value == guid) {
-                        return i;
-                    }
-                }
-                return -1;
-            }
-
-            var indexFound = FindIndex();
-
-            if (indexFound > -1) {
-                var numElementsToDelete = indexFound - stackItem.FirstNotValidatedControlIndex;
-                for (int i = 0; i < numElementsToDelete; i++) {
-                    var child = parent.GetChild(stackItem.FirstNotValidatedControlIndex);
-                    DestroyImmediate(child.gameObject);
-                }
-                var result = parent.GetChild(stackItem.FirstNotValidatedControlIndex).GetComponent<T>();
-                stackItem.FirstNotValidatedControlIndex++;
-                return result;
-
-            } else {
-
-                T created = InstantiatePrefab(original, stackItem.Root);
-                initializer?.Invoke(created);
-
-                GameObject gameObject;
-                if (created is GameObject g) gameObject = g;
-                else if (created is Component c) gameObject = c.gameObject;
-                else throw new InvalidOperationException($"The object of type {typeof(T).FullName} is not a GameObject or a Component.");
-
-                gameObject.AddComponent<Mark>().Value = guid;
-                gameObject.transform.SetSiblingIndex(index);
-
-
-                stackItem.FirstNotValidatedControlIndex++;
-                return created;
-            }
-
-        }*/
-
 
         public void GapLeft(float pixels = 0, float fraction = 0) {
             CurrentBorders.Left.Increment(pixels, fraction);
@@ -462,9 +385,7 @@ namespace FUI {
             BeginControls(content);
 
             return new Disposable(() => {
-                var innerBorders = CurrentBorders;
-                EndControls();
-                var innerSize = innerBorders.GetRigidSize();
+                var innerSize = EndControls();
                 content.sizeDelta = new Vector2(0, innerSize.y);
                 positioner(element, CurrentBorders, () => innerSize);
             });
