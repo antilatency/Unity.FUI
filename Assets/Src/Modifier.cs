@@ -80,13 +80,15 @@ namespace FUI {
             new Modifier(
                 "AddPressedHoveredHighlighter",
                 x => {
-                    var highlighter = x.AddComponent<ConfigurablePressedHoveredHighlighter>();
+                    x.AddComponent<ConfigurablePressedHoveredHighlighter>();
+                },
+                x => {
+                    var highlighter = x.GetComponent<ConfigurablePressedHoveredHighlighter>();
                     highlighter.initialColor = color;
                     highlighter.pressedColor = pressedColor;
                     highlighter.hoveredColor = hoveredColor;
-                },
-                null
-                );
+                }
+            );
 
         public static Modifier SetFormToNotify(int NumExtraIterations) =>
             new Modifier(
