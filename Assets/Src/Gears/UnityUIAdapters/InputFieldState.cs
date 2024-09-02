@@ -2,7 +2,7 @@
 
     public class InputFieldState : AbstractUserInput<string> {
 
-        public TMPro.TMP_InputField Target;
+        public FUI.FUI_InputField Target;
         
 
         public override string Value {

@@ -2,7 +2,7 @@
 
 namespace FUI {
 #nullable enable
-    public delegate void Positioner(UnityEngine.RectTransform rectTransform, Borders borders, System.Func<UnityEngine.Vector2>? sizeGetter);
+    public delegate void Positioner(UnityEngine.RectTransform rectTransform, Borders borders, System.Func<UnityEngine.Vector2> sizeGetter);
 
     public static class P {
         public static Positioner Left(float? size = null, float fraction = 0) {
@@ -83,21 +83,33 @@ namespace FUI {
 
 
 
-        public static Positioner Gravity(Vector2 normalizedPosition, float? width = null, float? height = null) {
+        public static Positioner Absolute(Vector2 position, float? width = null, float? height = null, Vector2? pivotAndAnchor = null) {
+            return Absolute(position, width, height, pivotAndAnchor, pivotAndAnchor);
+        }
+        public static Positioner Absolute(Vector2 position, float? width = null, float? height = null, Vector2? anchor = null, Vector2? pivot = null) {
             return (rectTransform, borders, sizeGetter) => {
-                rectTransform.anchorMin = normalizedPosition;
-                rectTransform.anchorMax = normalizedPosition;
-                var size = rectTransform.sizeDelta;
+                var vectorHalf = new Vector2(0.5f, 0.5f);
+                pivot ??= vectorHalf;
+                anchor ??= vectorHalf;
 
+                Vector2 size = default;
+                if (width == null || height == null) {
+                    size = sizeGetter();
+                }
                 if (width.HasValue)
                     size.x = width.Value;
                 if (height.HasValue)
                     size.y = height.Value;
+
+                rectTransform.anchorMin = anchor.Value;
+                rectTransform.anchorMax = anchor.Value;
+                rectTransform.pivot = pivot.Value;
                 rectTransform.sizeDelta = size;
-
-                rectTransform.pivot = normalizedPosition;
-
+                rectTransform.anchoredPosition = position;
             };
         }
+
+
+
     }
 }

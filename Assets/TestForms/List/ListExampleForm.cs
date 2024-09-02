@@ -43,7 +43,7 @@ internal class ListExampleForm : Form {
 
                 for (int i = 0; i < palette.Length; i++) {
                     var item = palette[i];
-                    IconButtonFontAwesome(item.Icon, 16, item.Color, x => {
+                    IconButtonFontAwesome(item.Icon, 16, item.Color, () => {
                         Items.Add(item);
                         MakeDirty();
                     }, P.Up(50));
@@ -75,18 +75,18 @@ internal class ListExampleForm : Form {
 
                         GapLeft(10);
 
-                        IconButtonFontAwesome("\uf2ed", 12, x => { Items.RemoveAt(index); MakeDirty(); }, P.Right(buttonSize));//Delete
+                        IconButtonFontAwesome("\uf2ed", 12, () => { Items.RemoveAt(index); MakeDirty(); }, P.Right(buttonSize));//Delete
                         GapRight(10);
 
                         if (i == (Items.Count - 1))
                             GapRight(buttonSize);
                         else
-                            IconButtonFontAwesome("\uf063", 12, x => { Swap(index); MakeDirty(); }, P.Right(buttonSize));//Down
+                            IconButtonFontAwesome("\uf063", 12, () => { Swap(index); MakeDirty(); }, P.Right(buttonSize));//Down
 
                         if (i == 0)
                             GapRight(buttonSize);
                         else
-                            IconButtonFontAwesome("\uf062", 12, x => { Swap(index - 1); MakeDirty(); }, P.Right(buttonSize));//Up
+                            IconButtonFontAwesome("\uf062", 12, () => { Swap(index - 1); MakeDirty(); }, P.Right(buttonSize));//Up
                         Label(item.Name, P.Fill);
                     }
                     GapTop(4);

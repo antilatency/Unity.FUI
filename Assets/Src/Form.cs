@@ -181,9 +181,8 @@ namespace FUI {
             });
         }
 
-
         public void RebuildIfNeeded() {
-            if (!Lazy || UpdateIterationsRequired>0)
+           if (!Lazy || UpdateIterationsRequired>0)
                 Rebuild();
         }
 
@@ -372,7 +371,7 @@ namespace FUI {
             var input = transform.GetComponent<InputFieldState>();
 
             positioner(transform, CurrentBorders, () => {
-                var textSize = input.GetComponent<TMP_InputField>().textComponent.GetPreferredValues("Hello");
+                var textSize = input.GetComponent<FUI_InputField>().textComponent.GetPreferredValues("Hello");
                 return textSize + new Vector2(16, 4);
             });
 
@@ -388,7 +387,7 @@ namespace FUI {
             }
 
             var selected = EventSystem.current.currentSelectedGameObject == input.gameObject;
-            var editing = input.GetComponent<TMP_InputField>().isFocused && selected;
+            var editing = input.GetComponent<FUI_InputField>().isFocused && selected;
 
             if (!editing) {
                 input.Value = value?.ToString()??"";

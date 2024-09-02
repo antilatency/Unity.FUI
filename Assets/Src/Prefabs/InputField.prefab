@@ -117,7 +117,7 @@ MonoBehaviour:
   m_enableKerning: 1
   m_enableExtraPadding: 1
   checkPaddingRequired: 0
-  m_isRichText: 0
+  m_isRichText: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -279,8 +279,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7470138233718299221}
+  - component: {fileID: 1041636700584810475}
   - component: {fileID: 7153808760537704430}
-  - component: {fileID: 9018363355069719113}
   - component: {fileID: 532584340638021186}
   - component: {fileID: 8075234321781976920}
   - component: {fileID: 3963924608757763720}
@@ -314,7 +314,7 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &7153808760537704430
+--- !u!114 &1041636700584810475
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -323,21 +323,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6424039125497029795}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Padding: {x: 0, y: 0, z: 0, w: 0}
-  m_Softness: {x: 0, y: 0}
---- !u!114 &9018363355069719113
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6424039125497029795}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2da0c512f12947e489f739169773d7ca, type: 3}
+  m_Script: {fileID: 11500000, guid: 207ef7c5e435c0a469121aed629be9d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
@@ -421,7 +407,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 3963924608757763720}
-        m_TargetAssemblyTypeName: InputFieldState, Assembly-CSharp
+        m_TargetAssemblyTypeName: FUI.Gears.InputFieldState, FUI
         m_MethodName: OnValueChanged
         m_Mode: 0
         m_Arguments:
@@ -442,14 +428,28 @@ MonoBehaviour:
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0
-  m_RichText: 0
-  m_GlobalFontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_OnFocusSelectAll: 0
+  m_RichText: 1
+  m_GlobalFontAsset: {fileID: 0}
+  m_OnFocusSelectAll: 1
   m_ResetOnDeActivation: 1
   m_RestoreOriginalTextOnEscape: 1
   m_isRichTextEditingAllowed: 0
   m_LineLimit: 0
   m_InputValidator: {fileID: 0}
+--- !u!114 &7153808760537704430
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6424039125497029795}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding: {x: 0, y: 0, z: 0, w: 0}
+  m_Softness: {x: 0, y: 0}
 --- !u!222 &532584340638021186
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -493,7 +493,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   FormToNotify: {fileID: 0}
-  Target: {fileID: 9018363355069719113}
+  ExtraIterations: 0
+  Target: {fileID: 1041636700584810475}
 --- !u!114 &3232187439572878691
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -506,7 +507,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 761ebe50c4551d545a4719b785eca2cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Graphic: {fileID: 0}
+  Graphic: {fileID: 8075234321781976920}
 --- !u!1 &9040840454279441643
 GameObject:
   m_ObjectHideFlags: 0

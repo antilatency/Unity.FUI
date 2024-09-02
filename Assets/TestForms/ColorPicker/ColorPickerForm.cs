@@ -86,7 +86,7 @@ internal class ColorPickerForm : Form {
                     if (i > 0) GapLeft(gap);
 
                     var shortcut = colorShortcuts[i];
-                    ColoredButton(shortcut.Name, x => {
+                    ColoredButton(shortcut.Name, () => {
                         HueSaturation = shortcut.hueSaturation;
                         Hint = shortcut.Name;
                         MakeDirty();

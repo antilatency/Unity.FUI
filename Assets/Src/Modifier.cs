@@ -2,6 +2,7 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace FUI {
@@ -23,7 +24,7 @@ namespace FUI {
     }
 
 
-    public static class M {
+    public static partial class M {
 
         private static Modifier MakeSetter(bool mutable, Modifier.Procedure action, [System.Runtime.CompilerServices.CallerMemberName] string id = "") {
             return new Modifier(
@@ -32,6 +33,8 @@ namespace FUI {
                 mutable ? action : null
                 );
         }
+
+
 
         public static Modifier SetColor(Color color, bool mutable = true)
             => MakeSetter(mutable, x => { x.GetComponent<Graphic>().color = color; });
@@ -60,19 +63,37 @@ namespace FUI {
                 null
                 );
 
-        public static Modifier AddClickHandler(Action<GameObject> click) =>
+        public static Modifier AddMask(bool showMaskGraphic) =>
+            new Modifier(
+                $"AddMask",
+                x => x.AddComponent<Mask>(),
+                x => x.GetComponent<Mask>().showMaskGraphic = showMaskGraphic
+                );
+
+
+        public static Modifier AddClickHandler(Action click) =>
             new Modifier(
                 "AddClickHandler",
                 x => x.AddComponent<PointerClickHandler>(),
                 x => x.GetComponent<PointerClickHandler>().OnClick = click
                 );
-        
-        
-        public static Modifier SetCustomShader(string shaderName) =>
+
+        public static Modifier AddClickHandlerEx(Action<GameObject, PointerEventData> click) =>
+            new Modifier(
+                "AddClickHandlerEx",
+                x => x.AddComponent<PointerClickHandlerEx>(),
+                x => x.GetComponent<PointerClickHandlerEx>().OnClick = click
+                );
+
+        public static Modifier SetCustomShader(string shaderName, params (string name, object value)[] parameters) =>
             new Modifier(
                 "SetCustomShader",
                 x => x.AddComponent<CustomShader>(),
-                x => x.GetComponent<CustomShader>().ShaderName = shaderName
+                x => {
+                    var component = x.GetComponent<CustomShader>();
+                    component.ShaderName = shaderName;
+                    component.SetParameters(parameters);
+                }
                 );
 
 
