@@ -20,13 +20,24 @@ namespace FUI.Gears {
                     Material material = new Material(shader);
                     var graphic = GetComponent<Graphic>();
                     graphic.material = material;
+                    
+                    //A very dirty way to update material parameters, all because Unity uses a material from its private cache for MaskableGraphic.
+                    //When changing the base material, it will still use its own copy of the material from the cache, which prevents us from changing the parameters.
+                    graphic.canvasRenderer.materialCount = 1;
+                    graphic.canvasRenderer.SetMaterial(material, 0);
                 }                
             }
         }
 
         public void SetParameters((string name, object value)[] parameters) {
             var graphic = GetComponent<Graphic>();
-            var material = graphic.material;
+            
+            //A very dirty way to update material parameters, all because Unity uses a material from its private cache for MaskableGraphic.
+            //When changing the base material, it will still use its own copy of the material from the cache, which prevents us from changing the parameters.
+            var material = graphic.canvasRenderer.GetMaterial();
+            if (material == null){
+                return;
+            }
 
             foreach (var (name, value) in parameters) {
                 if (value is Texture texture) {
