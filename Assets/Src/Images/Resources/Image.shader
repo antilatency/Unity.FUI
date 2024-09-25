@@ -110,7 +110,7 @@ Shader "FUI/Image" {
 #endif
 
                 #ifdef UNITY_UI_CLIP_RECT
-                color.a *= UnityGet2DClipping(In.worldPosition.xy, _ClipRect);
+                color.a *= UnityGet2DClipping(input.worldPosition.xy, _ClipRect);
                 #endif
 
                 #ifdef UNITY_UI_ALPHACLIP
