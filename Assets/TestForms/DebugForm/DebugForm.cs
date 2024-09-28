@@ -110,7 +110,9 @@ internal class DebugForm : Form {
 
 
                 testEnum = LabeledDropdown("Enum", testEnum);
-                
+                GapTop(2);
+                LabelModifiable(P.Up(Theme.Instance.LineHeight), M.SetText("The quick brown fox jumps over the lazy dog"), M.SetTextOverflow(TMPro.TextOverflowModes.Linked));
+
             }
 
             void Swap(int i) {

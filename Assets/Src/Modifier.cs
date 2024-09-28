@@ -54,7 +54,10 @@ namespace FUI {
                 x.GetComponent<TMP_Text>().horizontalAlignment = horizontalAlignment;
                 x.GetComponent<TMP_Text>().verticalAlignment = verticalAlignment;
             });
-
+        public static Modifier SetTextOverflow(TextOverflowModes overflowMode, bool mutable = true)
+            => MakeSetter(mutable, x => {
+                x.GetComponent<TMP_Text>().overflowMode = overflowMode;
+            });
 
         public static Modifier AddComponent<T>() where T : Component =>
             new Modifier(
