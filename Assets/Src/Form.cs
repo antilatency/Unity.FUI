@@ -55,7 +55,7 @@ namespace FUI {
         [NonSerialized]
         private int UpdateIterationsRequired = 1;
         public void MakeDirty(int extraIterations = 0) {
-            UpdateIterationsRequired += 1 + extraIterations;
+            UpdateIterationsRequired = Math.Max(UpdateIterationsRequired, 1 + extraIterations);
         }
 
         public PrefabLibrary library = null!;
