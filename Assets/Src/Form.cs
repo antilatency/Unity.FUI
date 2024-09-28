@@ -52,8 +52,7 @@ namespace FUI {
         [NonSerialized]
         public Vector2 RigidSize = Vector2.zero;
 
-        [NonSerialized]
-        private int UpdateIterationsRequired = 1;
+        public int UpdateIterationsRequired { get; private set; } = 1;
         public void MakeDirty(int extraIterations = 0) {
             UpdateIterationsRequired = Math.Max(UpdateIterationsRequired, 1 + extraIterations);
         }
@@ -181,17 +180,18 @@ namespace FUI {
         }
 
         public void Rebuild() {
+            var prewCurrent = Current;
             Current = this;
+            UpdateIterationsRequired = Math.Max(UpdateIterationsRequired - 1, 0);
             BeginControls();
             try {
                 Build();
             }
             finally {
                 RigidSize = EndControls();
-                Current = null;
-                
+                Current = prewCurrent;                
             }
-            UpdateIterationsRequired  = Math.Max(UpdateIterationsRequired-1, 0);
+            
             if (Stack.Count != 0)
                 throw new InvalidOperationException("The stack is not empty after control operations.");
         }
