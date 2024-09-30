@@ -69,7 +69,7 @@ internal class DebugForm : Form {
 
                 for (int i = 0; i < palette.Length; i++) {
                     var item = palette[i];
-                    IconButtonFontAwesome(item.Icon, 16, item.Color, () => { Items.Add(item); }, P.Up(50));
+                    IconButtonFontAwesome(item.Icon, 16, item.Color, () => { Items.Add(item); MakeDirty(); }, P.Up(50));
                 }
 
 
@@ -113,6 +113,10 @@ internal class DebugForm : Form {
                 GapTop(2);
                 LabelModifiable(P.Up(Theme.Instance.LineHeight), M.SetText("The quick brown fox jumps over the lazy dog"), M.SetTextOverflow(TMPro.TextOverflowModes.Linked));
 
+
+                LabelModifiable(P.Up(Theme.Instance.LineHeight), M.SetText("Red text"), M.SetColor(Color.red));
+                LabelModifiable(P.Up(Theme.Instance.LineHeight), M.SetText("Bold text"), M.SetFontStyle(TMPro.FontStyles.Bold));
+
             }
 
             void Swap(int i) {
@@ -133,18 +137,18 @@ internal class DebugForm : Form {
                         IconFontAwesome(item.Icon, 16, item.Color, P.Left(20));
                         GapLeft(10);
 
-                        IconButtonFontAwesome("\uf2ed", 12, () => { Items.RemoveAt(index); }, P.Right(buttonSize));                        
+                        IconButtonFontAwesome("\uf2ed", 12, () => { Items.RemoveAt(index); MakeDirty(); }, P.Right(buttonSize));                        
                         GapRight(10);
 
                         if (i == (Items.Count - 1))
                             GapRight(buttonSize);
                         else
-                            IconButtonFontAwesome("\uf063", 12, () => { Swap(index); }, P.Right(buttonSize));//Down
+                            IconButtonFontAwesome("\uf063", 12, () => { Swap(index); MakeDirty(); }, P.Right(buttonSize));//Down
 
                         if (i == 0)
                             GapRight(buttonSize);
                         else
-                            IconButtonFontAwesome("\uf062", 12, () => { Swap(index-1); }, P.Right(buttonSize));//Up
+                            IconButtonFontAwesome("\uf062", 12, () => { Swap(index-1); MakeDirty(); }, P.Right(buttonSize));//Up
                         
 
                         Label(item.Name, P.Fill);

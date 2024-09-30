@@ -45,6 +45,9 @@ namespace FUI {
         public static Modifier SetText(string text, bool mutable = true)
             => MakeSetter(mutable, x => { x.GetComponent<TMP_Text>().text = text; });
 
+        public static Modifier SetFontStyle(FontStyles fontStyle, bool mutable = true)
+            => MakeSetter(mutable, x => { x.GetComponent<TMP_Text>().fontStyle = fontStyle; });
+
         public static Modifier SetFontSize(float fontSize, bool mutable = true)
             => MakeSetter(mutable, x => { x.GetComponent<TMP_Text>().fontSize = fontSize; });
 
