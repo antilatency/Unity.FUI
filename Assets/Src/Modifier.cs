@@ -76,7 +76,12 @@ namespace FUI {
                 x => x.GetComponent<Mask>().showMaskGraphic = showMaskGraphic
                 );
 
-
+        public static Modifier AddDraggable(Action<GameObject, PointerEventData> dragAction) =>
+            new Modifier(
+                "AddDraggable",
+                x => x.AddComponent<Draggable>(),
+                x => x.GetComponent<Draggable>().DragAction = dragAction
+                );
         public static Modifier AddClickHandler(Action click) =>
             new Modifier(
                 "AddClickHandler",

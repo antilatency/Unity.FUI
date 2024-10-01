@@ -99,15 +99,19 @@ internal class DebugForm : Form {
                 GapTop(2);
 
                 TestInt = LabeledInputField("Int", TestInt, numExtraIterations: 1);   
-                GapTop(2);                
+                GapTop(2);
+
+
+                TestFloat = ClampMakeDirty(
+                    LabeledInputFieldSpinbox("Float",TestFloat,0.001f, null, "0.###")
+                    ,0
+                    ,1);
+
+                GapTop(2);
+                TestDouble = LabeledInputFieldSpinbox("Double", TestDouble, 0.1f, null, "0.###");
+                GapTop(2);
+
                 
-
-                TestFloat = LabeledInputField("Float", TestFloat);
-                GapTop(2);
-                TestDouble = LabeledInputField("Double", TestDouble);
-                GapTop(2);
-
-
 
                 testEnum = LabeledDropdown("Enum", testEnum);
                 GapTop(2);

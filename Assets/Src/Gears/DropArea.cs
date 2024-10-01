@@ -20,7 +20,7 @@ namespace FUI.Gears {
         protected virtual void Update() {
 
 
-            if (Draggable.CurrentlyDragging != null && AcceptPredicate(Draggable.CurrentlyDragging)) {
+            if (DraggableObject.CurrentlyDragging != null && AcceptPredicate(DraggableObject.CurrentlyDragging)) {
                 CatchGraphic.enabled = true;
                 if (hovered)
                     ColorGraphic.color = HoverColor;
@@ -42,8 +42,8 @@ namespace FUI.Gears {
         }
 
         public void OnDrop(PointerEventData eventData) {
-            if (AcceptPredicate(Draggable.CurrentlyDragging)) {
-                DropAction(Draggable.CurrentlyDragging);
+            if (AcceptPredicate(DraggableObject.CurrentlyDragging)) {
+                DropAction(DraggableObject.CurrentlyDragging);
             }
 
         }
