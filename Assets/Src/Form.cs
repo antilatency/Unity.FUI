@@ -181,13 +181,13 @@ namespace FUI {
                 return;
 
             var i = MaxIterationsPerUpdate;
-            while (UpdateIterationsRequired > 0) {
+            do {
                 Rebuild();
                 i--;
                 if (i <= 0) {
                     return;
                 }
-            }
+            } while (UpdateIterationsRequired > 0);
 
            /*if (!Lazy || UpdateIterationsRequired>0)
                 Rebuild();*/
