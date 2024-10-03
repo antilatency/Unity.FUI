@@ -75,6 +75,16 @@ internal class DebugForm : Form {
 
                 Image_ToSRGB_IgnoreAlpha(P.Up(50), TestTexture);
                 Image_ToSRGB_IgnoreAlpha(P.Up(50), TestTexture2, -Vector3.one);
+
+                using (Group(P.Up(50))) {
+                    Circle(P.Fill, Color.black,numSegments:32);
+                    Padding(4);
+                    Circle(P.Fill, Color.white, TestFloat, numSegments: 32);
+                }
+
+                    
+
+
             }
 
             
@@ -120,6 +130,8 @@ internal class DebugForm : Form {
 
                 LabelModifiable(P.Up(Theme.Instance.LineHeight), M.SetText("Red text"), M.SetColor(Color.red));
                 LabelModifiable(P.Up(Theme.Instance.LineHeight), M.SetText("Bold text"), M.SetFontStyle(TMPro.FontStyles.Bold));
+
+
 
             }
 

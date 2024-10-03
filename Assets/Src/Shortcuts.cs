@@ -223,6 +223,17 @@ namespace FUI {
         }
 
 
+        public static void Circle(Positioner positioner, Color color, float angle = 1, float startAngle = 0, int numSegments = 64) {
+            var form = Form.Current;
+            var element = form.Element(null
+                , M.AddCircle(angle,startAngle,numSegments)
+                , M.SetColor(color)
+                );
+            positioner(element, form.CurrentBorders, () => new Vector2(100, 100));
+        }
+
+
+
         public static Disposable Panel(Positioner positioner, float radius = 0) {
             var form = Form.Current;
             return form.Group(positioner

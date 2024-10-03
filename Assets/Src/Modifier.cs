@@ -76,6 +76,20 @@ namespace FUI {
                 x => x.GetComponent<Mask>().showMaskGraphic = showMaskGraphic
                 );
 
+
+        public static Modifier AddCircle(float angle = 1, float startAngle = 0, int numSegments = 64) =>
+            new Modifier(
+                $"AddCircle",
+                x => x.gameObject.AddComponent<Circle>(),
+                x=> {
+                    var circle = x.GetComponent<Circle>();
+                    circle.NumSegments = numSegments;
+                    circle.StartAngle = startAngle;
+                    circle.Angle = angle;
+                }
+                );
+
+
         public static Modifier AddDraggable(Action<GameObject, PointerEventData> dragAction) =>
             new Modifier(
                 "AddDraggable",
