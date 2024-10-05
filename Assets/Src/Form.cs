@@ -1,6 +1,7 @@
 ﻿using FUI.Gears;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -46,16 +47,16 @@ namespace FUI {
 
     public abstract class Form : MonoBehaviour {
         public bool Lazy = false;
-
+        public int MaxIterationsPerUpdate = 8;
         public static Form Current = null!;
 
         [NonSerialized]
         public Vector2 RigidSize = Vector2.zero;
 
         [NonSerialized]
-        private int UpdateIterationsRequired = 1;
+        public int UpdateIterationsRequired = 1;
         public void MakeDirty(int extraIterations = 0) {
-            UpdateIterationsRequired += 1 + extraIterations;
+            UpdateIterationsRequired = Math.Max(UpdateIterationsRequired, 1 + extraIterations);
         }
 
         public PrefabLibrary library = null!;
@@ -176,22 +177,35 @@ namespace FUI {
         }
 
         public void RebuildIfNeeded() {
-           if (!Lazy || UpdateIterationsRequired>0)
+            if (Lazy && UpdateIterationsRequired == 0)
+                return;
+
+            var i = MaxIterationsPerUpdate;
+            do {
                 Rebuild();
+                i--;
+                if (i <= 0) {
+                    return;
+                }
+            } while (UpdateIterationsRequired > 0);
+
+           /*if (!Lazy || UpdateIterationsRequired>0)
+                Rebuild();*/
         }
 
         public void Rebuild() {
+            var prewCurrent = Current;
             Current = this;
+            UpdateIterationsRequired = Math.Max(UpdateIterationsRequired - 1, 0);
             BeginControls();
             try {
                 Build();
             }
             finally {
                 RigidSize = EndControls();
-                Current = null;
-                
+                Current = prewCurrent;                
             }
-            UpdateIterationsRequired  = Math.Max(UpdateIterationsRequired-1, 0);
+            
             if (Stack.Count != 0)
                 throw new InvalidOperationException("The stack is not empty after control operations.");
         }
@@ -245,6 +259,19 @@ namespace FUI {
             return created;
         }
 
+        public float ClampMakeDirty(float value, float min, float max) {
+            if (value < min) {
+                MakeDirty();
+                return min;
+            }
+            if (value > max) {
+                MakeDirty();
+                return max;
+            }
+            return value;
+        }
+
+
         public void GapLeft(float pixels = 0, float fraction = 0) {
             CurrentBorders.Left.Increment(pixels, fraction);
         }
@@ -286,7 +313,7 @@ namespace FUI {
             throw new InvalidOperationException($"Unsupported type: {typeof(T)}");
         }
 
-        public T InputField<T>(T value, Positioner positioner, Func<string, T>? fromString = null, int numExtraIterations = 0) {
+        public T InputField<T>(T value, Positioner positioner, string toStringFormat = "", Func<string, T>? fromString = null, int numExtraIterations = 0) {
 
             var transform = Element(Library.InputField.gameObject
                 , M.SetFormToNotify(numExtraIterations)
@@ -313,7 +340,13 @@ namespace FUI {
             var editing = input.GetComponent<FUI_InputField>().isFocused && selected;
 
             if (!editing) {
-                input.Value = value?.ToString()??"";
+                if (value is IFormattable formattable) {
+                    input.Value = formattable.ToString(toStringFormat, CultureInfo.CurrentCulture);
+                } else {
+                    input.Value = value?.ToString();
+                }
+
+                
             }
 
             return value;

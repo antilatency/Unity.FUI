@@ -69,12 +69,22 @@ internal class DebugForm : Form {
 
                 for (int i = 0; i < palette.Length; i++) {
                     var item = palette[i];
-                    IconButtonFontAwesome(item.Icon, 16, item.Color, () => { Items.Add(item); }, P.Up(50));
+                    IconButtonFontAwesome(item.Icon, 16, item.Color, () => { Items.Add(item); MakeDirty(); }, P.Up(50));
                 }
 
 
                 Image_ToSRGB_IgnoreAlpha(P.Up(50), TestTexture);
                 Image_ToSRGB_IgnoreAlpha(P.Up(50), TestTexture2, -Vector3.one);
+
+                using (Group(P.Up(50))) {
+                    Circle(P.Fill, Color.black,numSegments:32);
+                    Padding(4);
+                    Circle(P.Fill, Color.white, TestFloat, numSegments: 32);
+                }
+
+                    
+
+
             }
 
             
@@ -99,18 +109,30 @@ internal class DebugForm : Form {
                 GapTop(2);
 
                 TestInt = LabeledInputField("Int", TestInt, numExtraIterations: 1);   
-                GapTop(2);                
+                GapTop(2);
+
+
+                TestFloat = ClampMakeDirty(
+                    LabeledInputFieldSpinbox("Float",TestFloat,0.001f, null, "0.###")
+                    ,0
+                    ,1);
+
+                GapTop(2);
+                TestDouble = LabeledInputFieldSpinbox("Double", TestDouble, 0.1f, null, "0.###");
+                GapTop(2);
+
                 
-
-                TestFloat = LabeledInputField("Float", TestFloat);
-                GapTop(2);
-                TestDouble = LabeledInputField("Double", TestDouble);
-                GapTop(2);
-
-
 
                 testEnum = LabeledDropdown("Enum", testEnum);
-                
+                GapTop(2);
+                LabelModifiable(P.Up(Theme.Instance.LineHeight), M.SetText("The quick brown fox jumps over the lazy dog"), M.SetTextOverflow(TMPro.TextOverflowModes.Linked));
+
+
+                LabelModifiable(P.Up(Theme.Instance.LineHeight), M.SetText("Red text"), M.SetColor(Color.red));
+                LabelModifiable(P.Up(Theme.Instance.LineHeight), M.SetText("Bold text"), M.SetFontStyle(TMPro.FontStyles.Bold));
+
+
+
             }
 
             void Swap(int i) {
@@ -131,18 +153,18 @@ internal class DebugForm : Form {
                         IconFontAwesome(item.Icon, 16, item.Color, P.Left(20));
                         GapLeft(10);
 
-                        IconButtonFontAwesome("\uf2ed", 12, () => { Items.RemoveAt(index); }, P.Right(buttonSize));                        
+                        IconButtonFontAwesome("\uf2ed", 12, () => { Items.RemoveAt(index); MakeDirty(); }, P.Right(buttonSize));                        
                         GapRight(10);
 
                         if (i == (Items.Count - 1))
                             GapRight(buttonSize);
                         else
-                            IconButtonFontAwesome("\uf063", 12, () => { Swap(index); }, P.Right(buttonSize));//Down
+                            IconButtonFontAwesome("\uf063", 12, () => { Swap(index); MakeDirty(); }, P.Right(buttonSize));//Down
 
                         if (i == 0)
                             GapRight(buttonSize);
                         else
-                            IconButtonFontAwesome("\uf062", 12, () => { Swap(index-1); }, P.Right(buttonSize));//Up
+                            IconButtonFontAwesome("\uf062", 12, () => { Swap(index-1); MakeDirty(); }, P.Right(buttonSize));//Up
                         
 
                         Label(item.Name, P.Fill);

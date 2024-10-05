@@ -45,18 +45,25 @@ namespace FUI {
         public static Modifier SetText(string text, bool mutable = true)
             => MakeSetter(mutable, x => { x.GetComponent<TMP_Text>().text = text; });
 
+        public static Modifier SetFontStyle(FontStyles fontStyle, bool mutable = true)
+            => MakeSetter(mutable, x => { x.GetComponent<TMP_Text>().fontStyle = fontStyle; });
+
         public static Modifier SetFontSize(float fontSize, bool mutable = true)
             => MakeSetter(mutable, x => { x.GetComponent<TMP_Text>().fontSize = fontSize; });
 
+        public static Modifier SetWordWrapping(bool wrapping, bool mutable = true)
+            => MakeSetter(mutable, x => { x.GetComponent<TMP_Text>().enableWordWrapping = wrapping; });
+        
 
         public static Modifier SetTextAlignment(HorizontalAlignmentOptions horizontalAlignment = HorizontalAlignmentOptions.Left, VerticalAlignmentOptions verticalAlignment = VerticalAlignmentOptions.Capline, bool mutable = true)
             => MakeSetter(mutable, x => {
                 x.GetComponent<TMP_Text>().horizontalAlignment = horizontalAlignment;
                 x.GetComponent<TMP_Text>().verticalAlignment = verticalAlignment;
             });
-
-        public static Modifier SetTextWordWrapping(bool wrapping, bool mutable = true)
-            => MakeSetter(mutable, x => { x.GetComponent<TMP_Text>().enableWordWrapping = wrapping; });
+        public static Modifier SetTextOverflow(TextOverflowModes overflowMode, bool mutable = true)
+            => MakeSetter(mutable, x => {
+                x.GetComponent<TMP_Text>().overflowMode = overflowMode;
+            });
 
         public static Modifier AddComponent<T>() where T : Component =>
             new Modifier(
@@ -73,6 +80,25 @@ namespace FUI {
                 );
 
 
+        public static Modifier AddCircle(float angle = 1, float startAngle = 0, int numSegments = 64) =>
+            new Modifier(
+                $"AddCircle",
+                x => x.gameObject.AddComponent<Circle>(),
+                x=> {
+                    var circle = x.GetComponent<Circle>();
+                    circle.NumSegments = numSegments;
+                    circle.StartAngle = startAngle;
+                    circle.Angle = angle;
+                }
+                );
+
+
+        public static Modifier AddDraggable(Action<GameObject, PointerEventData> dragAction) =>
+            new Modifier(
+                "AddDraggable",
+                x => x.AddComponent<Draggable>(),
+                x => x.GetComponent<Draggable>().DragAction = dragAction
+                );
         public static Modifier AddClickHandler(Action click) =>
             new Modifier(
                 "AddClickHandler",

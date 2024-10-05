@@ -18,10 +18,10 @@ namespace FUI {
             return result;
         }
 
-        public static T LabeledInputField<T>(string label, T value, Positioner? positioner = null, Func<string, T>? fromString = null, int numExtraIterations = 0) where T : notnull {
+        public static T LabeledInputField<T>(string label, T value, Positioner? positioner = null, string toStringFormat = "", Func<string, T>? fromString = null, int numExtraIterations = 0) where T : notnull {
             var form = Form.Current;
             using (Labeled(label, positioner)) {
-                return form.InputField(value, P.Fill, fromString, numExtraIterations);
+                return form.InputField(value, P.Fill, toStringFormat, fromString, numExtraIterations);
             }
         }
 
@@ -84,6 +84,85 @@ namespace FUI {
             return result;
         }
 
+
+        public static int LabeledInputFieldSpinbox(string label, int value, int dragStepSize = 1, Positioner? positioner = null, string toStringFormat = "", Func<string, int>? fromString = null, int numExtraIterations = 0) {
+            var form = Form.Current;
+            using (Labeled(label, positioner)) {
+                value = Spinbox(value, dragStepSize, P.Right(Theme.Instance.LineHeight));
+                form.GapRight(2);
+                return form.InputField(value, P.Fill, toStringFormat, fromString, numExtraIterations);
+            }
+        }
+
+        public static float LabeledInputFieldSpinbox(string label, float value, float dragStepSize, Positioner? positioner = null, string toStringFormat = "", Func<string, float>? fromString = null, int numExtraIterations = 0) {
+            var form = Form.Current;
+            using (Labeled(label, positioner)) {
+                value = Spinbox(value, dragStepSize, P.Right(Theme.Instance.LineHeight));
+                form.GapRight(2);
+                return form.InputField(value, P.Fill, toStringFormat, fromString, numExtraIterations);
+            }
+        }
+
+        public static double LabeledInputFieldSpinbox(string label, double value, double dragStepSize, Positioner? positioner = null, string toStringFormat = "", Func<string, double>? fromString = null, int numExtraIterations = 0) {
+            var form = Form.Current;
+            using (Labeled(label, positioner)) {
+                value = Spinbox(value, dragStepSize, P.Right(Theme.Instance.LineHeight));
+                form.GapRight(2);
+                return form.InputField(value, P.Fill, toStringFormat, fromString, numExtraIterations);
+            }
+        }
+
+        public static int Spinbox(int value, int dragStepSize = 1, Positioner? positioner = null, int numExtraIterations = 0) {
+            return Spinbox<int, IntUserInputState>(value, positioner, numExtraIterations, (v, d) => v / dragStepSize * dragStepSize + dragStepSize * d);
+        }
+        public static float Spinbox(float value, float dragStepSize, Positioner? positioner = null, int numExtraIterations = 0) {            
+            return Spinbox<float, FloatUserInputState>(value, positioner, numExtraIterations, (v, d) => {
+                var s = Math.Round(v / dragStepSize + d);
+                return (float)(s * dragStepSize);
+            } );
+        }
+        public static double Spinbox(double value, double dragStepSize, Positioner? positioner = null, int numExtraIterations = 0) {
+            return Spinbox<double, DoubleUserInputState>(value, positioner, numExtraIterations, (v, d) => Math.Round(v / dragStepSize) * dragStepSize + dragStepSize * d);
+        }
+
+
+        public static T Spinbox<T,S>(T value, Positioner? positioner, int numExtraIterations, Func<T,int,T> deltaToValue) where S: UserInputState<T> {
+            var form = Form.Current;
+
+            RectTransform background = form.Element(null
+                , M.AddComponent<RoundedRectangle>()
+                , M.AddComponent<ButtonHighlighter>()
+                , M.AddComponent<S>()
+                , M.SetFormToNotify(numExtraIterations)
+                , M.AddComponent<PointerClickHandler>()
+                , M.SetRectangleCorners(4)
+
+                , M.AddDraggable((go,e) => {
+                    var input = go.GetComponent<S>();
+
+                    var m = Input.GetKey(KeyCode.LeftShift) ? 10 : 1;
+
+                    input.UserInput(deltaToValue(input.Value, Mathf.RoundToInt(m * (e.delta.x + e.delta.y))));
+                })
+            );
+
+            var userInputState = background.GetComponent<S>();
+            T result;
+            if (!userInputState.NewUserInput) {
+                userInputState.Value = value;
+                result = value;
+            } else {
+                result = userInputState.Value;
+            }
+            form.BeginControls(background);
+            IconFontAwesome("\uf424", Theme.Instance.LineHeight * 0.6f, P.Fill);
+            form.EndControls();
+            (positioner ?? Form.DefaultControlPositioner)(background, form.CurrentBorders, () => new Vector2(Theme.Instance.LineHeight, Theme.Instance.LineHeight));
+            return result;
+        }
+
+
+
         public static bool ExpandableGroupHeader(string label, Positioner? positioner = null, bool? opened = null) {
             var form = Form.Current;
 
@@ -144,6 +223,17 @@ namespace FUI {
         }
 
 
+        public static void Circle(Positioner positioner, Color color, float angle = 1, float startAngle = 0, int numSegments = 64) {
+            var form = Form.Current;
+            var element = form.Element(null
+                , M.AddCircle(angle,startAngle,numSegments)
+                , M.SetColor(color)
+                );
+            positioner(element, form.CurrentBorders, () => new Vector2(100, 100));
+        }
+
+
+
         public static Disposable Panel(Positioner positioner, float radius = 0) {
             var form = Form.Current;
             return form.Group(positioner
@@ -172,13 +262,14 @@ namespace FUI {
         }
 
 
-        public static float Slider(float value, Positioner? positioner = null, Color? backgroundColor = null, Color? handleColor = null) {
+        public static float Slider(float value, Positioner? positioner = null, Color? backgroundColor = null, Color? handleColor = null, int numExtraIterations = 0) {
             var form = Form.Current;
 
             var background = form.Element(null
-                ,M.AddComponent<RoundedRectangle>()
-                ,M.AddComponent<Slider>()
-                ,M.SetColor(backgroundColor ?? new Color(0, 0, 0, 0))
+                , M.AddComponent<RoundedRectangle>()
+                , M.AddComponent<Slider>()
+                , M.SetFormToNotify(numExtraIterations)
+                , M.SetColor(backgroundColor ?? new Color(0, 0, 0, 0))
             );
 
 
