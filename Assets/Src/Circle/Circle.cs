@@ -53,7 +53,7 @@ namespace FUI{
                 float angle = (StartAngle + ni * Angle) * 2 * Mathf.PI;
                 var x = Mathf.Cos(angle);
                 var y = Mathf.Sin(angle);
-                positions[i+1] = new Vector2(x, y) * radius;
+                positions[i+1] = center + new Vector2(x, y) * radius;
             }
 
             foreach (var p in positions){
