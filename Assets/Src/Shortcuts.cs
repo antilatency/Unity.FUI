@@ -262,13 +262,14 @@ namespace FUI {
         }
 
 
-        public static float Slider(float value, Positioner? positioner = null, Color? backgroundColor = null, Color? handleColor = null) {
+        public static float Slider(float value, Positioner? positioner = null, Color? backgroundColor = null, Color? handleColor = null, int numExtraIterations = 0) {
             var form = Form.Current;
 
             var background = form.Element(null
-                ,M.AddComponent<RoundedRectangle>()
-                ,M.AddComponent<Slider>()
-                ,M.SetColor(backgroundColor ?? new Color(0, 0, 0, 0))
+                , M.AddComponent<RoundedRectangle>()
+                , M.AddComponent<Slider>()
+                , M.SetFormToNotify(numExtraIterations)
+                , M.SetColor(backgroundColor ?? new Color(0, 0, 0, 0))
             );
 
 
