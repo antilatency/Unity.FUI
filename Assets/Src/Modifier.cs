@@ -55,6 +55,8 @@ namespace FUI {
                 x.GetComponent<TMP_Text>().verticalAlignment = verticalAlignment;
             });
 
+        public static Modifier SetTextWordWrapping(bool wrapping, bool mutable = true)
+            => MakeSetter(mutable, x => { x.GetComponent<TMP_Text>().enableWordWrapping = wrapping; });
 
         public static Modifier AddComponent<T>() where T : Component =>
             new Modifier(
