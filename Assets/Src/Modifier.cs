@@ -51,6 +51,9 @@ namespace FUI {
         public static Modifier SetFontSize(float fontSize, bool mutable = true)
             => MakeSetter(mutable, x => { x.GetComponent<TMP_Text>().fontSize = fontSize; });
 
+        public static Modifier SetWordWrapping(bool wrapping, bool mutable = true)
+            => MakeSetter(mutable, x => { x.GetComponent<TMP_Text>().enableWordWrapping = wrapping; });
+        
 
         public static Modifier SetTextAlignment(HorizontalAlignmentOptions horizontalAlignment = HorizontalAlignmentOptions.Left, VerticalAlignmentOptions verticalAlignment = VerticalAlignmentOptions.Capline, bool mutable = true)
             => MakeSetter(mutable, x => {
