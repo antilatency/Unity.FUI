@@ -63,14 +63,14 @@ namespace FUI {
             });
 
         public static Modifier AddComponent<T>() where T : Component =>
-            new Modifier(
+            new(
                 $"AddComponent<{typeof(T).FullName}>",
                 x => x.gameObject.AddComponent<T>(),
                 null
                 );
 
         public static Modifier AddMask(bool showMaskGraphic) =>
-            new Modifier(
+            new (
                 $"AddMask",
                 x => x.AddComponent<Mask>(),
                 x => x.GetComponent<Mask>().showMaskGraphic = showMaskGraphic
@@ -78,7 +78,7 @@ namespace FUI {
 
 
         public static Modifier AddCircle(float angle = 1, float startAngle = 0, int numSegments = 64) =>
-            new Modifier(
+            new (
                 $"AddCircle",
                 x => x.gameObject.AddComponent<Circle>(),
                 x=> {
@@ -89,29 +89,42 @@ namespace FUI {
                 }
                 );
 
+        public static Modifier AddCircleOutline(float innerThickness = 0, float outerThickness = 0, float angle = 1, float startAngle = 0, int numSegments = 64) =>
+            new(
+                $"AddCircleOutline",
+                x => x.gameObject.AddComponent<CircleOutline>(),
+                x => {
+                    var circle = x.GetComponent<CircleOutline>();
+                    circle.NumSegments = numSegments;
+                    circle.StartAngle = startAngle;
+                    circle.Angle = angle;
+                    circle.InnerThickness = innerThickness;
+                    circle.OuterThickness = outerThickness;
+                }
+                );
 
         public static Modifier AddDraggable(Action<GameObject, PointerEventData> dragAction) =>
-            new Modifier(
+            new (
                 "AddDraggable",
                 x => x.AddComponent<Draggable>(),
                 x => x.GetComponent<Draggable>().DragAction = dragAction
                 );
         public static Modifier AddClickHandler(Action click) =>
-            new Modifier(
+            new (
                 "AddClickHandler",
                 x => x.AddComponent<PointerClickHandler>(),
                 x => x.GetComponent<PointerClickHandler>().OnClick = click
                 );
 
         public static Modifier AddClickHandlerEx(Action<GameObject, PointerEventData> click) =>
-            new Modifier(
+            new (
                 "AddClickHandlerEx",
                 x => x.AddComponent<PointerClickHandlerEx>(),
                 x => x.GetComponent<PointerClickHandlerEx>().OnClick = click
                 );
 
         public static Modifier SetCustomShader(string shaderName, params (string name, object value)[] parameters) =>
-            new Modifier(
+            new (
                 "SetCustomShader",
                 x => x.AddComponent<CustomShader>(),
                 x => {
@@ -123,7 +136,7 @@ namespace FUI {
 
 
         public static Modifier AddPressedHoveredHighlighter(Color color, Color hoveredColor, Color pressedColor) =>
-            new Modifier(
+            new (
                 "AddPressedHoveredHighlighter",
                 x => {
                     x.AddComponent<ConfigurablePressedHoveredHighlighter>();
@@ -137,7 +150,7 @@ namespace FUI {
             );
 
         public static Modifier SetFormToNotify(int NumExtraIterations) =>
-            new Modifier(
+            new (
                 "SetFormToNotify",
                 null,
                 x => {
@@ -148,7 +161,7 @@ namespace FUI {
                 );
 
         public static Modifier DisableRaycastTarget() =>
-            new Modifier(
+            new (
                 "DisableRaycastTarget",
                 x => x.GetComponent<Graphic>().raycastTarget = false,
                 null

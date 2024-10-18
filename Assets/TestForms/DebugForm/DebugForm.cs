@@ -82,7 +82,9 @@ internal class DebugForm : Form {
                     Circle(P.Fill, Color.white, TestFloat, numSegments: 32);
                 }
 
-                    
+
+                //CircleOutline(P.Up(100), Color.white, innerThickness: 1, numSegments: 32);
+                CircleOutlineScreenSpaceThickness(P.Up(100), Color.white, screenSpaceThickness: 1, numSegments: 32);
 
 
             }

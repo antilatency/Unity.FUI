@@ -232,6 +232,24 @@ namespace FUI {
             positioner(element, form.CurrentBorders, () => new Vector2(100, 100));
         }
 
+        public static void CircleOutline(Positioner positioner, Color color, float angle = 1, float startAngle = 0, float innerThickness = 0, float outerThickness = 0, int numSegments = 64) {
+            var form = Form.Current;
+            var element = form.Element(null
+                , M.AddCircleOutline(innerThickness, outerThickness, angle, startAngle, numSegments)
+                , M.SetColor(color)
+                );
+            positioner(element, form.CurrentBorders, () => new Vector2(100, 100));
+        }
+
+        public static void CircleOutlineScreenSpaceThickness(Positioner positioner, Color color, float angle = 1, float startAngle = 0, float innerThickness = 0, float outerThickness = 0, float screenSpaceThickness = 1, int numSegments = 64) {
+            var form = Form.Current;
+            var element = form.Element(null
+                , M.AddCircleOutline(innerThickness, outerThickness, angle, startAngle, numSegments)
+                , M.SetColor(color)
+                , M.SetCustomShader("FUI/ScreenSpaceOffset", ("Thickness", screenSpaceThickness))
+                );
+            positioner(element, form.CurrentBorders, () => new Vector2(100, 100));
+        }
 
 
         public static Disposable Panel(Positioner positioner, float radius = 0) {

@@ -36,7 +36,15 @@ public class ZoomPanForm : Form {
 
                 var subForm = SubForm<ListExampleForm>(P.Absolute(Vector2.zero, 300, 200, Vector2.right));
 
-                
+                CircleOutline(
+                    P.Absolute(new Vector2(-30,50),50,50)
+                    , Color.white, innerThickness: 1, numSegments: 32);
+                CircleOutlineScreenSpaceThickness(
+                    P.Absolute(new Vector2(30, 50), 50, 50)
+                    , Color.white, screenSpaceThickness: 1, numSegments: 32);
+
+
+
                 TestFloat = LabeledInputField("input", TestFloat);
                 Button("Button", () => { });
 

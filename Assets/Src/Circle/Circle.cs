@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FUI{
+namespace FUI {
 
     [RequireComponent(typeof(CanvasRenderer))]
     public class Circle : MaskableGraphic {
@@ -66,7 +66,7 @@ namespace FUI{
             }
 
             for (int i = 0; i < positions.Length - 2; i++){
-                vh.AddTriangle(0, i + 1, i + 2);
+                vh.AddTriangle(0, i + 2, i + 1);
             }
             //vh.AddTriangle(0, positions.Length-1, 1);
         }

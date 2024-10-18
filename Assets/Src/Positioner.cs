@@ -83,10 +83,11 @@ namespace FUI {
 
 
 
-        public static Positioner Absolute(Vector2 position, float? width = null, float? height = null, Vector2? pivotAndAnchor = null) {
-            return Absolute(position, width, height, pivotAndAnchor, pivotAndAnchor);
-        }
         public static Positioner Absolute(Vector2 position, float? width = null, float? height = null, Vector2? anchor = null, Vector2? pivot = null) {
+
+            if (pivot == null)
+                pivot = anchor;
+
             return (rectTransform, borders, sizeGetter) => {
                 var vectorHalf = new Vector2(0.5f, 0.5f);
                 pivot ??= vectorHalf;
