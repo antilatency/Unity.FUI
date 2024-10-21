@@ -17,123 +17,37 @@ namespace FUI {
 }
 
 namespace FUI.Gears {
+    public class FitPixelSize : BaseAspectFit {
+        public override float? CalcFitScale(Vector2 viewportSize, Vector2 contentSize) {
+            return 1f;
+        }
+    }
 
-    public class ZoomPanViewport : UIBehaviour, IDragHandler, IEndDragHandler,  IScrollHandler {
+    public class ZoomPanViewport : FitInside, IDragHandler, IEndDragHandler,  IScrollHandler {
         public bool Moving { get; private set; } = false;
 
-        [SerializeField]
-        private Vector2 contentSize;
-        public Vector2 ContentSize {
-            get => contentSize;
-            set {
-                if (contentSize != value) {
-                    contentSize = value;
-                    if (content != null) {
-                        content.sizeDelta = contentSize;
-                        UpdateFitScale();
-                        
-                    }
-                }
-            }
-        }
-
-
-        public RectTransform? content;
-
-        public RectTransform Content {
-            get {
-                if (!content) {
-                    var go = new GameObject("Content");
-                    go.transform.SetParent(transform, false);
-                    content = go.AddComponent<RectTransform>();                    
-                    content.anchoredPosition = Vector2.zero;
-                    content.anchorMin = Vector2.one * 0.5f;
-                    content.anchorMax = Vector2.one * 0.5f;
-                    content.sizeDelta = contentSize;
-                    ApplyContentScale();
-                    ApplyContentPosition();
-                }
-                return content!;
-            }
-        }
-
-        
-        public float FitScale = 1;
-        void UpdateFitScale() {
-            if (ContentSize.x == 0 || ContentSize.y == 0)
-                return;
-            var scale2d = ViewportSize / ContentSize;
-            FitScale = Mathf.Min(scale2d.x, scale2d.y);
-            ApplyContentScale();
-        }
-
-        private Vector2 viewportSize;
-        public Vector2 ViewportSize {
-            get => viewportSize;
-            set {
-                if (viewportSize != value) {
-                    viewportSize = value;
-                    UpdateFitScale();
-                    
-                }
-            }
-        }
-        void ReacquireViewportSize() { 
-            ViewportSize = ((RectTransform)transform).rect.size;
-        }
-
         private int intScale;
-        public float Scale => Mathf.Pow(1.1f, IntScale);
-
-        public int IntScale { get => intScale;
+        public int IntScale {
+            get => intScale;
             set {
                 if (intScale != value) {
                     intScale = value;
-                    ApplyContentScale();
+                    Scale = Mathf.Pow(1.1f, IntScale);
                 }
             }
-        }        
-
-        void ApplyContentScale() {
-            if (content == null) return;
-            content.localScale = Vector3.one * FitScale * Scale;
-            ApplyContentPosition();
         }
 
-
-        protected override void OnEnable() {
-            ReacquireViewportSize();
-        }
-
-        protected override void OnRectTransformDimensionsChange() {
-            ReacquireViewportSize();
-        }
-
-
-        void ApplyContentPosition() {
-            if (content == null) return;
-            content.localPosition = -viewportCenterInContent * contentSize * (FitScale*Scale);
-        }
-        [SerializeField]
-        private Vector2 viewportCenterInContent;
-        public Vector2 ViewportCenterInContent {
-            get => viewportCenterInContent;
-            set {
-                if (viewportCenterInContent != value) {
-                    viewportCenterInContent = value;
-                    ApplyContentPosition();
-                }
-            }
-        
-        }
 
         public void Move(Vector2 deltaXY) {
+            if (ContentSize.x == 0 || ContentSize.y == 0 || FitScale==0 || Scale==0)
+                return;
+
             ViewportCenterInContent -= deltaXY / ContentSize / (FitScale * Scale);
         }
        
 
         private Vector2 GetMousePositionInContent(PointerEventData eventData) {
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(content, eventData.position, eventData.pressEventCamera, out var localPoint);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(_content, eventData.position, eventData.pressEventCamera, out var localPoint);
 
             return localPoint / ContentSize;
         }
