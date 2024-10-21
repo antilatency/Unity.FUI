@@ -17,11 +17,6 @@ namespace FUI {
 }
 
 namespace FUI.Gears {
-    public class FitPixelSize : BaseAspectFit {
-        public override float? CalcFitScale(Vector2 viewportSize, Vector2 contentSize) {
-            return 1f;
-        }
-    }
 
     public class ZoomPanViewport : FitInside, IDragHandler, IEndDragHandler,  IScrollHandler {
         public bool Moving { get; private set; } = false;
