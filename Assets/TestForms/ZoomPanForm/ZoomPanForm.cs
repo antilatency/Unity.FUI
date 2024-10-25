@@ -41,7 +41,7 @@ public class ZoomPanForm : Form {
                     , Color.white, innerThickness: 1, numSegments: 32);
                 CircleOutlineScreenSpaceThickness(
                     P.Absolute(new Vector2(30, 50), 50, 50)
-                    , Color.white, screenSpaceThickness: 1, numSegments: 32);
+                    , Color.red, screenSpaceThickness: 1, numSegments: 64);
 
 
 

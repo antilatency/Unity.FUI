@@ -85,12 +85,11 @@ namespace FUI {
             for (int i = 0; i < positions.Length; i++) {
                 Vector2 p = positions[i];
                 Vector2 n = normals[i];
-                var uv = (p - rect.position) / rect.size;
+
                 vh.AddVert(new UIVertex() {
                     position = p,
                     color = color,
-                    uv0 = uv,
-                    normal = n,
+                    uv0 = n,
                 });
             }
 

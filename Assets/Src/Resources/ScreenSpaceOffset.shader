@@ -60,15 +60,12 @@ Shader "FUI/ScreenSpaceOffset" {
             struct VertexInput {
                 float4 vertex   : POSITION;
                 float4 color    : COLOR;
-                float3 normal   : NORMAL;
-                float2 texcoord : TEXCOORD0;
+                float2 normal : TEXCOORD0;
             };
 
             struct FragmentInput {
                 float4 vertex   : SV_POSITION;
-                fixed4 color : COLOR;
-
-                float2 texcoord  : TEXCOORD0;
+                float4 color : COLOR;
                 float4 worldPosition : TEXCOORD1;
             };
 
@@ -85,16 +82,16 @@ Shader "FUI/ScreenSpaceOffset" {
                 float2 screenSize = _ScreenParams.xy;
 
                 float2 pixelPosition = output.vertex * screenSize;
-                float2 pixelPositionOffseted = UnityObjectToClipPos(v.vertex + v.normal) * screenSize;
+                float2 pixelPositionOffseted = UnityObjectToClipPos(v.vertex + float4(v.normal,0,0)) * screenSize;
                 float2 screenSpaceNormal = pixelPosition - pixelPositionOffseted;
                 float d = length(screenSpaceNormal);
 
 
                 output.vertex.xy += normalize(screenSpaceNormal) * Thickness / screenSize;
 
-                output.texcoord = v.texcoord;
 
-                output.color = float4(v.normal,1);
+
+                output.color = v.color;
 
                 return output;
             }
@@ -113,7 +110,7 @@ Shader "FUI/ScreenSpaceOffset" {
                 clip(color.a - 0.001);
                 #endif
 
-                return 1;
+                return color;
             }
         ENDCG
         }
