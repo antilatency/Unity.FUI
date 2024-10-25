@@ -80,19 +80,16 @@ Shader "FUI/ScreenSpaceOffset" {
                 output.vertex = UnityObjectToClipPos(v.vertex);
 
                 float2 screenSize = _ScreenParams.xy;
+                float2 invScreenSize = _ScreenParams.zw -1;
 
                 float2 pixelPosition = output.vertex * screenSize;
                 float2 pixelPositionOffseted = UnityObjectToClipPos(v.vertex + float4(v.normal,0,0)) * screenSize;
-                float2 screenSpaceNormal = pixelPosition - pixelPositionOffseted;
+                float2 screenSpaceNormal = pixelPositionOffseted - pixelPosition;
                 float d = length(screenSpaceNormal);
 
-
-                output.vertex.xy += normalize(screenSpaceNormal) * Thickness / screenSize;
-
-
+                output.vertex.xy += normalize(screenSpaceNormal) * Thickness * invScreenSize;
 
                 output.color = v.color;
-
                 return output;
             }
 
