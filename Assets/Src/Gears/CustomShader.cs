@@ -44,10 +44,14 @@ namespace FUI.Gears {
                     material.SetTexture(name, texture);
                 } else if (value is Vector4 vector4) {
                     material.SetVector(name, vector4);
+                } else if (value is float valueAsFloat) {
+                    material.SetFloat(name, valueAsFloat);
                 } else if (value is bool valueAsBool) {
                     material.SetInt(name, valueAsBool ? 1 : 0);
                     if (valueAsBool) material.EnableKeyword(name);
                     else material.DisableKeyword(name);
+                } else {
+                    Debug.LogError($"CustomShader.SetParameters parameter type {value.GetType().FullName} is not supported.");
                 }
             }
         }
