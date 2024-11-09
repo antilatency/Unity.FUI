@@ -418,6 +418,23 @@ namespace FUI {
                     );
             }
         }
+        
+        public static void DisabledButton(string text, Positioner? positioner = null) {
+            var form = Form.Current;
+            using (form.Group(positioner ?? P.Up(Theme.Instance.LineHeight)
+                       , M.AddComponent<RoundedRectangle>()
+                       , M.SetRectangleCorners(4)
+                       , M.SetColor(Theme.Instance.ButtonColor * 0.75f)
+                   )
+                  ) {
+                form.Padding(10, 10, 0, 0);
+                form.LabelModifiable(P.Fill
+                    , M.SetText(text)
+                    , M.SetColor(Theme.Instance.LabelColor * 0.75f)
+                    , M.SetTextAlignment(TMPro.HorizontalAlignmentOptions.Center)
+                );
+            }
+        }
 
         public static Disposable ZoomPanViewport(Positioner positioner, Vector2 contentSize) {
             var form = Form.Current;
