@@ -190,7 +190,7 @@ GameObject:
   - component: {fileID: 176937947}
   - component: {fileID: 176937946}
   m_Layer: 5
-  m_Name: MD
+  m_Name: RichText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
