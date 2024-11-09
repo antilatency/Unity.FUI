@@ -169,7 +169,8 @@ namespace FUI {
         public void LabelModifiable(Positioner positioner, params Modifier[] modifiers) {
             var result = Element(Form.Current.Library.Label, modifiers);
             positioner?.Invoke(result, Form.Current.CurrentBorders, () => {
-                var size = result.GetComponent<TMP_Text>().GetPreferredValues();
+                var component = result.GetComponent<TMP_Text>();
+                var size = component.GetPreferredValues();
                 size.x = Mathf.Ceil(size.x);
                 size.y = Mathf.Ceil(size.y);
                 return size;

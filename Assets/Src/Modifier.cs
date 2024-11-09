@@ -45,6 +45,9 @@ namespace FUI {
         public static Modifier SetText(string text, bool mutable = true)
             => MakeSetter(mutable, x => { x.GetComponent<TMP_Text>().text = text; });
 
+
+
+
         public static Modifier SetFontStyle(FontStyles fontStyle, bool mutable = true)
             => MakeSetter(mutable, x => { x.GetComponent<TMP_Text>().fontStyle = fontStyle; });
 
@@ -53,7 +56,11 @@ namespace FUI {
 
         public static Modifier SetWordWrapping(bool wrapping, bool mutable = true)
             => MakeSetter(mutable, x => { x.GetComponent<TMP_Text>().enableWordWrapping = wrapping; });
-        
+
+
+        public static Modifier SetRichTextEnabled(bool richText, bool mutable = true)
+            => MakeSetter(mutable, x => { x.GetComponent<TMP_Text>().richText = richText; });
+
 
         public static Modifier SetTextAlignment(HorizontalAlignmentOptions horizontalAlignment = HorizontalAlignmentOptions.Left, VerticalAlignmentOptions verticalAlignment = VerticalAlignmentOptions.Capline, bool mutable = true)
             => MakeSetter(mutable, x => {
