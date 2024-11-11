@@ -251,6 +251,28 @@ namespace FUI {
             positioner(element, form.CurrentBorders, () => new Vector2(100, 100));
         }
 
+        public static void CubicSpline(
+            Positioner positioner,
+            Color color,
+            Vector2 pointA, Vector2 tangentA,
+            Vector2 pointB, Vector2 tangentB,
+            
+            
+            float innerThickness = 0,
+            float outerThickness = 0,
+            int numSegments = 64
+        ) {
+            var form = Form.Current;
+            var element = form.Element(
+                null,
+                M.AddCubicSpline(pointA, tangentA, pointB, tangentB, innerThickness, outerThickness, numSegments),
+                M.SetColor(color)
+            );
+            positioner(element, form.CurrentBorders, () => new Vector2(100, 100));
+        }
+
+
+
 
         public static Disposable Panel(Positioner positioner, float radius = 0) {
             var form = Form.Current;

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 #nullable enable
 
 namespace FUI {
@@ -42,7 +43,9 @@ namespace FUI.Gears {
        
 
         private Vector2 GetMousePositionInContent(PointerEventData eventData) {
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(_content, eventData.position, eventData.pressEventCamera, out var localPoint);
+            
+
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(_content, eventData.position, eventData.enterEventCamera, out var localPoint);
 
             return localPoint / ContentSize;
         }

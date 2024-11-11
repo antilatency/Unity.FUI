@@ -17,8 +17,8 @@ namespace FUI
 
         public static void Handle(GameObject g, PointerEventData e) {
             var component = g.GetComponent<TMP_Text>();
-            var canvas = component.canvas;
-            var camera = canvas.worldCamera;
+            //var canvas = component.canvas;
+            var camera = e.pressEventCamera;
             int linkIndex = TMP_TextUtilities.FindIntersectingLink(component, e.position, camera);
             if (linkIndex != -1) {
                 // Link was clicked, get the link ID

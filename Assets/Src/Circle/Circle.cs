@@ -44,7 +44,7 @@ namespace FUI {
             var center = rect.center;
             Vector2 radius = rect.size * 0.5f;
 
-            var segments = Math.Max(NumSegments, 3);
+            var segments = Math.Max(NumSegments, 1);
             var positions = new Vector2[segments+2];
             positions[0] = center;
 

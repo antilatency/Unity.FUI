@@ -113,6 +113,29 @@ namespace FUI {
                 }
                 );
 
+        public static Modifier AddCubicSpline(
+            Vector2 pointA,Vector2 tangentA,
+            Vector2 pointB,Vector2 tangentB,
+            float innerThickness = 0,
+            float outerThickness = 0,
+            int numSegments = 64
+        ) => new(
+            "AddCubicSpline",
+            x => x.gameObject.AddComponent<CubicSpline>(),
+            x => {
+                var spline = x.GetComponent<CubicSpline>();
+                spline.PointA = pointA;
+                spline.TangentA = tangentA;
+                spline.PointB = pointB;                
+                spline.TangentB = tangentB;
+                spline.NumSegments = numSegments;
+                spline.InnerThickness = innerThickness;
+                spline.OuterThickness = outerThickness;
+            }
+        );
+
+
+
         public static Modifier AddDraggable(Action<GameObject, PointerEventData> dragAction) =>
             new (
                 "AddDraggable",
