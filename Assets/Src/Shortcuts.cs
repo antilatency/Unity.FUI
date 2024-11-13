@@ -11,7 +11,7 @@ namespace FUI {
             Form.Current.LabelModifiable(positioner??Form.DefaultControlPositioner, M.SetText(value));
         }
 
-        private static Disposable Labeled(string label, Positioner? positioner = null) {
+        public static Disposable Labeled(string label, Positioner? positioner = null) {
             var form = Form.Current;
             Disposable result = form.Group(positioner ?? Form.DefaultControlPositioner);
             Label(label, P.Left(0, 0.5f));
