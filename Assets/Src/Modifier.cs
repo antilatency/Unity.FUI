@@ -24,14 +24,15 @@ namespace FUI {
     }
 
 
-    public static partial class M {
+    public static partial class M{
 
-        private static Modifier MakeSetter(bool mutable, Modifier.Procedure action, [System.Runtime.CompilerServices.CallerMemberName] string id = "") {
+        private static Modifier MakeSetter(bool mutable, Modifier.Procedure action,
+            [System.Runtime.CompilerServices.CallerMemberName] string id = ""){
             return new Modifier(
                 id,
                 mutable ? null : action,
                 mutable ? action : null
-                );
+            );
         }
 
 
@@ -62,44 +63,46 @@ namespace FUI {
             => MakeSetter(mutable, x => { x.GetComponent<TMP_Text>().richText = richText; });
 
 
-        public static Modifier SetTextAlignment(HorizontalAlignmentOptions horizontalAlignment = HorizontalAlignmentOptions.Left, VerticalAlignmentOptions verticalAlignment = VerticalAlignmentOptions.Capline, bool mutable = true)
+        public static Modifier SetTextAlignment(
+            HorizontalAlignmentOptions horizontalAlignment = HorizontalAlignmentOptions.Left,
+            VerticalAlignmentOptions verticalAlignment = VerticalAlignmentOptions.Capline, bool mutable = true)
             => MakeSetter(mutable, x => {
                 x.GetComponent<TMP_Text>().horizontalAlignment = horizontalAlignment;
                 x.GetComponent<TMP_Text>().verticalAlignment = verticalAlignment;
             });
+
         public static Modifier SetTextOverflow(TextOverflowModes overflowMode, bool mutable = true)
-            => MakeSetter(mutable, x => {
-                x.GetComponent<TMP_Text>().overflowMode = overflowMode;
-            });
+            => MakeSetter(mutable, x => { x.GetComponent<TMP_Text>().overflowMode = overflowMode; });
 
         public static Modifier AddComponent<T>() where T : Component =>
             new(
                 $"AddComponent<{typeof(T).FullName}>",
                 x => x.gameObject.AddComponent<T>(),
                 null
-                );
+            );
 
         public static Modifier AddMask(bool showMaskGraphic) =>
-            new (
+            new(
                 $"AddMask",
                 x => x.AddComponent<Mask>(),
                 x => x.GetComponent<Mask>().showMaskGraphic = showMaskGraphic
-                );
+            );
 
 
         public static Modifier AddCircle(float angle = 1, float startAngle = 0, int numSegments = 64) =>
-            new (
+            new(
                 $"AddCircle",
                 x => x.gameObject.AddComponent<Circle>(),
-                x=> {
+                x => {
                     var circle = x.GetComponent<Circle>();
                     circle.NumSegments = numSegments;
                     circle.StartAngle = startAngle;
                     circle.Angle = angle;
                 }
-                );
+            );
 
-        public static Modifier AddCircleOutline(float innerThickness = 0, float outerThickness = 0, float angle = 1, float startAngle = 0, int numSegments = 64) =>
+        public static Modifier AddCircleOutline(float innerThickness = 0, float outerThickness = 0, float angle = 1,
+            float startAngle = 0, int numSegments = 64) =>
             new(
                 $"AddCircleOutline",
                 x => x.gameObject.AddComponent<CircleOutline>(),
@@ -111,11 +114,11 @@ namespace FUI {
                     circle.InnerThickness = innerThickness;
                     circle.OuterThickness = outerThickness;
                 }
-                );
+            );
 
         public static Modifier AddCubicSpline(
-            Vector2 pointA,Vector2 tangentA,
-            Vector2 pointB,Vector2 tangentB,
+            Vector2 pointA, Vector2 tangentA,
+            Vector2 pointB, Vector2 tangentB,
             float innerThickness = 0,
             float outerThickness = 0,
             int numSegments = 64
@@ -126,7 +129,7 @@ namespace FUI {
                 var spline = x.GetComponent<CubicSpline>();
                 spline.PointA = pointA;
                 spline.TangentA = tangentA;
-                spline.PointB = pointB;                
+                spline.PointB = pointB;
                 spline.TangentB = tangentB;
                 spline.NumSegments = numSegments;
                 spline.InnerThickness = innerThickness;
@@ -137,26 +140,48 @@ namespace FUI {
 
 
         public static Modifier AddDraggable(Action<GameObject, PointerEventData> dragAction) =>
-            new (
+            new(
                 "AddDraggable",
                 x => x.AddComponent<Draggable>(),
                 x => x.GetComponent<Draggable>().DragAction = dragAction
-                );
+            );
+
         public static Modifier AddClickHandler(Action click) =>
-            new (
+            new(
                 "AddClickHandler",
                 x => x.AddComponent<PointerClickHandler>(),
                 x => x.GetComponent<PointerClickHandler>().OnClick = click
-                );
+            );
 
         public static Modifier AddClickHandlerEx(Action<GameObject, PointerEventData> click) =>
-            new (
+            new(
                 "AddClickHandlerEx",
                 x => x.AddComponent<PointerClickHandlerEx>(),
                 x => x.GetComponent<PointerClickHandlerEx>().OnClick = click
-                );
+            );
 
-        public static Modifier SetCustomShader(string shaderName, params (string name, object value)[] parameters) =>
+        public static Modifier AddPressReleaseHandler(Action onPress, Action onRelease) =>
+            new(
+                "AddPressReleaseHandler",
+                x => x.AddComponent<PointerPressReleaseHandler>(),
+                x => {
+                    x.GetComponent<PointerPressReleaseHandler>().OnPress = onPress;
+                    x.GetComponent<PointerPressReleaseHandler>().OnRelease = onRelease;
+                }
+            );
+        
+        public static Modifier AddPressReleaseHandlerEx(Action<GameObject, PointerEventData> onPress, Action<GameObject, PointerEventData> onRelease) =>
+            new(
+                "AddPressReleaseHandlerEx",
+                x => x.AddComponent<PointerPressReleaseHandlerEx>(),
+                x => {
+                    x.GetComponent<PointerPressReleaseHandlerEx>().OnPress = onPress;
+                    x.GetComponent<PointerPressReleaseHandlerEx>().OnRelease = onRelease;
+                }
+            );
+    
+
+    public static Modifier SetCustomShader(string shaderName, params (string name, object value)[] parameters) =>
             new (
                 "SetCustomShader",
                 x => x.AddComponent<CustomShader>(),
@@ -165,7 +190,7 @@ namespace FUI {
                     component.ShaderName = shaderName;
                     component.SetParameters(parameters);
                 }
-                );
+            );
 
 
         public static Modifier AddPressedHoveredHighlighter(Color color, Color hoveredColor, Color pressedColor) =>
