@@ -1,12 +1,12 @@
 using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
-
+#nullable enable
 namespace FUI.Gears{
     public class PointerPressReleaseHandlerEx : MonoBehaviour, IPointerDownHandler, IPointerUpHandler{
         
-        public Action<GameObject, PointerEventData> OnPress = null;
-        public Action<GameObject,PointerEventData> OnRelease = null;
+        public Action<GameObject, PointerEventData>? OnPress;
+        public Action<GameObject,PointerEventData?>? OnRelease;
         private bool _pressed;
         
         void IPointerDownHandler.OnPointerDown(PointerEventData eventData){
