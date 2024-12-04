@@ -42,6 +42,9 @@ namespace FUI {
 
         public static Modifier SetRectangleCorners(float radius = 4, bool mutable = true)
             => MakeSetter(mutable, x => { x.GetComponent<RoundedRectangle>().SetAllCorners(radius); });
+        
+        public static Modifier SetRectangleCorners(float topLeft, float topRight, float bottomLeft, float bottomRight, bool mutable = true)
+            => MakeSetter(mutable, x => { x.GetComponent<RoundedRectangle>().SetCorners(topLeft, topRight, bottomLeft, bottomRight); });
 
         public static Modifier SetText(string text, bool mutable = true)
             => MakeSetter(mutable, x => { x.GetComponent<TMP_Text>().text = text; });
