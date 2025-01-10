@@ -21,5 +21,12 @@ namespace FUI{
             BottomLeft = radius;
             BottomRight = radius;
         }
+
+        public void SetCorners(float topLeft, float topRight, float bottomLeft, float bottomRight){
+            TopLeft = topLeft;
+            TopRight = topRight;
+            BottomLeft = bottomLeft;
+            BottomRight = bottomRight;
+        }
     }
 }

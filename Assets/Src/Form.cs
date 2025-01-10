@@ -272,6 +272,17 @@ namespace FUI {
             return value;
         }
 
+        public double ClampMakeDirty(double value, double min, double max) {
+            if (value < min) {
+                MakeDirty();
+                return min;
+            }
+            if (value > max) {
+                MakeDirty();
+                return max;
+            }
+            return value;
+        }
 
         public void GapLeft(float pixels = 0, float fraction = 0) {
             CurrentBorders.Left.Increment(pixels, fraction);
