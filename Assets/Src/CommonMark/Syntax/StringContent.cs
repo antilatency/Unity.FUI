@@ -145,21 +145,6 @@ namespace CommonMark.Syntax
             }
         }
 
-        /// <summary>
-        /// Writes the data contained in this instance to the given html text writer.
-        /// </summary>
-        internal void WriteTo(Formatters.HtmlTextWriter writer)
-        {
-            var buffer = writer.Buffer;
-            for (var i = 0; i < this._partCounter; i++)
-            {
-                if (buffer.Length < this._parts[i].Length)
-                    buffer = writer.Buffer = new char[this._parts[i].Length];
-
-                this._parts[i].Source.CopyTo(this._parts[i].StartIndex, buffer, 0, this._parts[i].Length);
-                writer.Write(buffer, 0, this._parts[i].Length);
-            }
-        }
 
         /// <summary>
         /// Checks if the first character of the string content matches the given.
