@@ -4,11 +4,16 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-
+#nullable enable
 namespace FUI
 {
     public static class Hyperlink {
+
         public static string Create(string text, Uri uri, Color? color = null) {
+            return Create(text,uri.ToString(),color);
+        }
+
+        public static string Create(string text, string uri, Color? color = null) {
             if (!color.HasValue) {
                 color = Theme.Instance.PrimaryColor;
             }
