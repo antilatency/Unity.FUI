@@ -6,7 +6,7 @@ namespace FUI {
     public class MarkdownConverter {
 
         public Color UrlColor = Theme.Instance.PrimaryColor;
-        public Color SeparatorColor = Theme.Instance.PrimaryColor;
+        public Color SeparatorColor = Color.gray;
 
         int _indent = 0;
         public string Convert(string markdownText) {
@@ -40,7 +40,7 @@ namespace FUI {
             }
             void Separator() {
                 var color = ColorUtility.ToHtmlStringRGBA(SeparatorColor);
-                writer.Write($"<size=2><align=flush><color=#{color}><mark=#{color}>__</mark></color></align></size>");
+                writer.Write($"<size=1><align=flush><color=#{color}><mark=#{color}>__</mark></color></align></size>");
             }
 
             while (block != null) {
@@ -75,9 +75,9 @@ namespace FUI {
                         VerticalSpace(0.5f);
                         ConvertInlineToUnityRichText(block.InlineContent, writer);
                         writer.WriteLine();
-                        VerticalSpace(0.1f);
+                        VerticalSpace(0.2f);
                         Separator();
-                        VerticalSpace(0.5f);
+                        VerticalSpace(0.3f);
                         writer.WriteLine("</b></size>");
                     }
                     break;
