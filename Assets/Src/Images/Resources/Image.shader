@@ -94,6 +94,7 @@ Shader "FUI/Image" {
 
 #ifdef TO_SRGB
             float3 ToSRGB(float3 x) {
+                x = clamp(x,0,1);
                 return lerp(12.92 * x, 1.055 * pow(x, 1.0 / 2.4) - 0.055, x > 0.0031308);
             }
 #endif
