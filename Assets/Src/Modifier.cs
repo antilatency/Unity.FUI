@@ -68,7 +68,7 @@ namespace FUI {
 
         public static Modifier SetTextAlignment(
             HorizontalAlignmentOptions horizontalAlignment = HorizontalAlignmentOptions.Left,
-            VerticalAlignmentOptions verticalAlignment = VerticalAlignmentOptions.Capline, bool mutable = true)
+            VerticalAlignmentOptions verticalAlignment = VerticalAlignmentOptions.Middle, bool mutable = true)
             => MakeSetter(mutable, x => {
                 x.GetComponent<TMP_Text>().horizontalAlignment = horizontalAlignment;
                 x.GetComponent<TMP_Text>().verticalAlignment = verticalAlignment;
