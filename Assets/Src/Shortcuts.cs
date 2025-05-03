@@ -362,46 +362,38 @@ namespace FUI {
         public static void IconButtonFontAwesome(string icon, float size, Action action, Positioner positioner) {
             IconButtonFontAwesome(icon, size, Theme.Instance.LabelColor, action, positioner);
         }
-        public static void IconButtonFontAwesome(string icon, float size, Color color, Action action, Positioner positioner) {
+
+        public static IDisposable TransparentButton(Action action, Positioner positioner){
             var form = Form.Current;
-            var background = form.Element(null
-                ,M.AddComponent<RoundedRectangle>()
-                ,M.AddComponent<TransparentButtonHighlighter>()
-                ,M.AddClickHandler(action)
-                ,M.SetRectangleCorners(4)
+            var group = form.Element(null
+                , M.AddComponent<RoundedRectangle>()
+                , M.AddComponent<TransparentButtonHighlighter>()
+                , M.AddClickHandler(action)
+                , M.SetRectangleCorners(4)
                 );
-            
-
-            form.BeginControls(background);
-            IconFontAwesome(icon, size, color, P.RigidFill);
-
-            form.EndControls();
-
-            positioner(background, form.CurrentBorders, () => new Vector2(size, size));
 
 
-            /*var iconElement = CreateSubControl(background.transform, Library.FontAwesomeIconSolid);
+            form.BeginControls(group);
 
-            var mouseHandler = background.GetComponent<PointerClickHandler>();
-            mouseHandler.OnClick = action;
-
-
-            var text = iconElement.GetComponent<TMP_Text>();
-            text.text = icon;
-            text.fontSize = size;
-            text.color = color;
-
-            positioner(background, CurrentBorders, () => new Vector2(size, size));*/
+            return new Disposable(() =>
+            {
+                var innerSize = form.EndControls();
+                positioner(group, form.CurrentBorders, () => innerSize);
+            });
         }
 
+        public static void IconButtonFontAwesome(string icon, float size, Color color, Action action, Positioner positioner){
+            using (TransparentButton(action, positioner)) {
+                IconFontAwesome(icon, size, color, P.RigidFill);
+            }
 
+        }
 
         public static void ColoredButton(string text, Action action, Color? color = null, Positioner? positioner = null) {
             var form = Form.Current;
 
             var backgroundColor = color ?? Theme.Instance.PrimaryColor;
             var labelColor = backgroundColor.ContrastColor();
-
 
             using (form.Group(positioner ?? P.Up(Theme.Instance.LineHeight)
                     , M.AddComponent<RoundedRectangle>()
