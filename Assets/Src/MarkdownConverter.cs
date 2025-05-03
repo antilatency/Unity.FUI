@@ -7,10 +7,13 @@ namespace FUI {
 
         public Color UrlColor = Theme.Instance.PrimaryColor;
         public Color SeparatorColor = Color.gray;
+        public Color CodeBackgroundColor = Theme.Instance.LabelColor.Alpha(0.25f);
 
         int _indent = 0;
         public string Convert(string markdownText) {
-
+            /*var settings = new CommonMark.CommonMarkSettings {
+                AdditionalFeatures =
+            };*/
             var markdownDocument = CommonMark.CommonMarkConverter.Parse(markdownText);
             _indent = 0;
             var unityText = MarkdownToUnityRichText(markdownDocument);
@@ -136,8 +139,16 @@ namespace FUI {
                     writer.Write("</link></u></color>");
                     break;
 
+
+                    case CommonMark.Syntax.InlineTag.Code: {
+                        var color = ColorUtility.ToHtmlStringRGBA(CodeBackgroundColor);
+                        writer.Write($"<mark=#{color}> {inline.LiteralContent} <size=0>.</size></mark>");
+                    }
+                    break;
+
+
                     default:
-                    Debug.LogWarning($"not implemented inline tag {inline.Tag.ToString()}");
+                    Debug.LogWarning($"not implemented inline tag {inline.Tag}");
                     break;
                 }
 

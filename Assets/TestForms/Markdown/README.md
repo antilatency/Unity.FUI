@@ -26,6 +26,9 @@ This is a **bold text and *italic* text** .
 
 This is a [link to **Google**](https://www.google.com).
 
+`Settings > Tools > Options`
+
+`Settings > Tools > Options`
 
 1. s
 2. 2

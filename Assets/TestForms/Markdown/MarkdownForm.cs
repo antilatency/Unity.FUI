@@ -24,15 +24,17 @@ public class MarkdownForm : Form {
 
         var unityText = new MarkdownConverter().Convert(markdownText);
 
+        using (WindowBackground()) {
 
+            using (ScrollRectVertical(P.Fill)) {
+                Padding(4);
+                LabelModifiable(P.Up()
+                    , M.SetText(unityText)
+                    , M.SetRichTextEnabled(true, false)
+                    , M.SetWordWrapping(true, false)
+                    , M.AddClickHandlerEx(Hyperlink.Handle));
 
-        using (ScrollRectVertical(P.Fill)) {
-            LabelModifiable(P.Up()
-                , M.SetText(unityText)
-                , M.SetRichTextEnabled(true, false)
-                , M.SetWordWrapping(true,false)
-                , M.AddClickHandlerEx(Hyperlink.Handle));
-
+            }
         }
     }
 }
