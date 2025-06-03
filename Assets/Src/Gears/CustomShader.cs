@@ -44,7 +44,9 @@ namespace FUI.Gears {
                     material.SetTexture(name, texture);
                 } else if (value is Vector4 vector4) {
                     material.SetVector(name, vector4);
-                } else if (value is float valueAsFloat) {
+                } else if (value is Vector3 vector3) {
+                    material.SetVector(name, vector3);
+                }else if (value is float valueAsFloat) {
                     material.SetFloat(name, valueAsFloat);
                 } else if (value is bool valueAsBool) {
                     material.SetInt(name, valueAsBool ? 1 : 0);
