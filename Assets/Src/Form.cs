@@ -385,8 +385,10 @@ namespace FUI {
         public T Dropdown<T>(T value, Positioner? positioner = null, int numExtraIterations = 0) where T : struct {
             int intValue = Convert.ToInt32(value);
             string[] options = Enum.GetNames(typeof(T));
+            var values = (T[])Enum.GetValues(typeof(T));
+                
             int selectedValue = Dropdown(intValue, options, positioner, numExtraIterations);
-            return (T)Enum.ToObject(typeof(T), selectedValue);
+            return values[selectedValue];
         }
 
         public int Dropdown(int value, string[] options, Positioner? positioner = null, int numExtraIterations = 0) {
