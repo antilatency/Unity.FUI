@@ -260,7 +260,21 @@ namespace FUI {
             return created;
         }
 
-        public float ClampMakeDirty(float value, float min, float max) {
+        public T ClampMakeDirty<T>(T value, T min, T max) where T : IComparable<T> {
+            if (value.CompareTo(min) < 0)
+            {
+                MakeDirty();
+                return min;
+            }
+            if (value.CompareTo(max) > 0)
+            {
+                MakeDirty();
+                return max;
+            }
+            return value;
+        }
+
+        /*public float ClampMakeDirty(float value, float min, float max) {
             if (value < min) {
                 MakeDirty();
                 return min;
@@ -282,7 +296,7 @@ namespace FUI {
                 return max;
             }
             return value;
-        }
+        }*/
 
         public void GapLeft(float pixels = 0, float fraction = 0) {
             CurrentBorders.Left.Increment(pixels, fraction);
