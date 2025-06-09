@@ -386,8 +386,22 @@ namespace FUI {
             int intValue = Convert.ToInt32(value);
             string[] options = Enum.GetNames(typeof(T));
             var values = (T[])Enum.GetValues(typeof(T));
+            var valueIndex = Array.IndexOf(values, value);
+            if (valueIndex == -1) {
+                //find the closest value
+                valueIndex = 0;
+                var diff = Math.Abs(Convert.ToInt32(values[0]) - intValue);
+                for (int i = 1; i < values.Length; i++) {
+                    var v = Convert.ToInt32(values[i]);
+                    var newDiff = Math.Abs(v - intValue);
+                    if (newDiff < diff) {
+                        diff = newDiff;
+                        valueIndex = i;
+                    }
+                }            
+            }
                 
-            int selectedValue = Dropdown(intValue, options, positioner, numExtraIterations);
+            int selectedValue = Dropdown(valueIndex, options, positioner, numExtraIterations);
             return values[selectedValue];
         }
 
