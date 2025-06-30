@@ -1,17 +1,22 @@
-﻿using UnityEngine;
+﻿using FUI.Gears;
+
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+
+using static UnityEngine.EventSystems.PointerEventData;
 #nullable enable
 
 namespace FUI {
     public static partial class M {
-        public static Modifier AddZoomPanViewport(Vector2 contentSize) =>
+        public static Modifier AddZoomPanViewport(Vector2 contentSize, InputButtonMask allowedButtons = InputButtonMask.All) =>
             new Modifier(
                 "AddZoomPanViewport",
                 x => x.AddComponent<Gears.ZoomPanViewport>(),
                 x => {
                     var component = x.GetComponent<Gears.ZoomPanViewport>();
                     component.ContentSize = contentSize;
+                    component.AllowedButtons = allowedButtons;
                 }
                 );
     }
@@ -19,8 +24,9 @@ namespace FUI {
 
 namespace FUI.Gears {
 
-    public class ZoomPanViewport : FitInside, IDragHandler, IEndDragHandler,  IScrollHandler {
-        public bool Moving { get; private set; } = false;
+    public class ZoomPanViewport : FitInside, IDragHandler, IScrollHandler {
+
+        public InputButtonMask AllowedButtons = InputButtonMask.All;
 
         private int intScale;
         public int IntScale {
@@ -43,22 +49,21 @@ namespace FUI.Gears {
        
 
         private Vector2 GetMousePositionInContent(PointerEventData eventData) {
-            
-
             RectTransformUtility.ScreenPointToLocalPointInRectangle(_content, eventData.position, eventData.enterEventCamera, out var localPoint);
-
             return localPoint / ContentSize;
         }
 
 
         void IDragHandler.OnDrag(PointerEventData eventData) {
-            Move(eventData.delta);
+            Draggable.HandleDragWithAllowedButtons(
+                gameObject,
+                eventData,
+                AllowedButtons,
+                (g,e) => {
+                    Move(e.delta);
+                }
+            );            
         }
-
-        void IEndDragHandler.OnEndDrag(PointerEventData eventData) {
-            Moving = false;
-        }
-
 
         void IScrollHandler.OnScroll(PointerEventData eventData) {
             var a = GetMousePositionInContent(eventData);

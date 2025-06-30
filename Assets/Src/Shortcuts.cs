@@ -450,7 +450,7 @@ namespace FUI {
             }
         }
 
-        public static Disposable ZoomPanViewport(Positioner positioner, Vector2 contentSize) {
+        public static Disposable ZoomPanViewport(Positioner positioner, Vector2 contentSize, InputButtonMask allowedButtons = InputButtonMask.All) {
             var form = Form.Current;
             var background = form.Element(null
                 , M.AddComponent<RoundedRectangle>()
@@ -462,7 +462,7 @@ namespace FUI {
                         component.ViewportCenterInContent = Vector2.zero;
                     }
                 })
-                , M.AddZoomPanViewport(contentSize)
+                , M.AddZoomPanViewport(contentSize, allowedButtons)
             );
 
             positioner(background, form.CurrentBorders, () => contentSize);

@@ -142,11 +142,14 @@ namespace FUI {
 
 
 
-        public static Modifier AddDraggable(Action<GameObject, PointerEventData> dragAction) =>
+        public static Modifier AddDraggable(Action<GameObject, PointerEventData> dragAction, InputButtonMask allowedButtons = InputButtonMask.All) =>
             new(
                 "AddDraggable",
                 x => x.AddComponent<Draggable>(),
-                x => x.GetComponent<Draggable>().DragAction = dragAction
+                x => {
+                    x.GetComponent<Draggable>().DragAction = dragAction;
+                    x.GetComponent<Draggable>().AllowedButtons = allowedButtons;
+                }
             );
 
         public static Modifier AddClickHandler(Action click) =>
