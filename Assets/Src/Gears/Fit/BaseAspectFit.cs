@@ -1,35 +1,35 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+
+using UnityEngine;
 using UnityEngine.EventSystems;
+#nullable enable
 
 namespace FUI.Gears {
     public abstract class BaseAspectFit : UIBehaviour {
+
+        bool _dirty = true;
+        protected void MarkDirty() {
+            if (!_dirty) {
+                _dirty = true;
+            }
+        }
+
+        private void SetValue<T>(ref T field, T value) {
+            if (!EqualityComparer<T>.Default.Equals(field, value)) {
+                field = value;
+                MarkDirty();
+            }
+        }
+
         [SerializeField]
         private Vector2 _contentSize;
         public Vector2 ContentSize {
             get => _contentSize;
-            set {
-                if (_contentSize != value) {
-                    _contentSize = value;
-                    if (_content != null) {
-                        _content.sizeDelta = _contentSize;
-                        UpdateFitScale();
-
-                    }
-                }
-            }
+            set => SetValue(ref _contentSize, value);
         }
 
-        private Vector2 _viewportSize;
-        public Vector2 ViewportSize {
-            get => _viewportSize;
-            protected set {
-                if (_viewportSize != value) {
-                    _viewportSize = value;
-                    UpdateFitScale();
-
-                }
-            }
-        }
+        //private Vector2 _viewportSize;
+        public Vector2 ViewportSize => ((RectTransform)transform).rect.size;
 
         public RectTransform? _content;
 
@@ -42,73 +42,58 @@ namespace FUI.Gears {
                     _content.anchoredPosition = Vector2.zero;
                     _content.anchorMin = Vector2.one * 0.5f;
                     _content.anchorMax = Vector2.one * 0.5f;
-                    _content.sizeDelta = _contentSize;
-                    ApplyContentScaleAndPosition();
+                    MarkDirty();
                 }
                 return _content!;
             }
         }
 
-        protected float FitScale = 1;
-
-        public abstract float? CalcFitScale(Vector2 viewportSize, Vector2 contentSize);
-
-
-        void UpdateFitScale() {
-            FitScale = CalcFitScale(ViewportSize, ContentSize) ?? FitScale;            
-            ApplyContentScaleAndPosition();
-        }
-
-        void ReacquireViewportSize() {
-            ViewportSize = ((RectTransform)transform).rect.size;
-        }
-
-        
-        private float _scale = 1;
-        public float Scale {
-            get => _scale;
-            set {
-                if (_scale == value) return;
-                _scale = value;
-                ApplyContentScaleAndPosition();
+        protected virtual float FitScale { 
+            get {
+                if (ContentSize.x == 0 || ContentSize.y == 0)
+                    return 1f;
+                var scale2d = ViewportSize / ContentSize;
+                return Mathf.Min(scale2d.x, scale2d.y);
             }
-        }
-
-
-        
-
-        void ApplyContentScaleAndPosition() {
-            if (_content == null) return;
-            _content.localScale = Vector3.one * FitScale * Scale;
-            ApplyContentPosition();
-        }
-
-
-        protected override void OnEnable() {
-            ReacquireViewportSize();
-        }
-
-        protected override void OnRectTransformDimensionsChange() {
-            ReacquireViewportSize();
-        }
-
-
-        void ApplyContentPosition() {
-            if (_content == null) return;
-            _content.localPosition = -viewportCenterInContent * _contentSize * (FitScale * Scale);
         }
 
         [SerializeField]
-        private Vector2 viewportCenterInContent;
+        private Vector2 _viewportCenterInContent;
         public Vector2 ViewportCenterInContent {
-            get => viewportCenterInContent;
-            set {
-                if (viewportCenterInContent != value) {
-                    viewportCenterInContent = value;
-                    ApplyContentPosition();
-                }
-            }
+            get => _viewportCenterInContent;
+            set => SetValue(ref _viewportCenterInContent, value);
+        }
 
+        private float _scale = 1;
+        public float Scale {
+            get => _scale;
+            set => SetValue(ref _scale, value);
+        }
+
+        protected override void OnEnable() {
+            MarkDirty();
+        }
+
+        protected override void OnRectTransformDimensionsChange() {
+            MarkDirty();
+        }
+
+
+        
+
+        void Update() {
+            if (!_dirty) return;            
+            
+
+            var content = Content;
+
+            content.sizeDelta = _contentSize;
+            content.localScale = Vector3.one * FitScale * _scale;
+            content.localPosition = -_viewportCenterInContent * _contentSize * (FitScale * _scale);
+
+            _dirty = false;
+
+            //Debug.Log($"ViewportSize: {ViewportSize}, ContentSize: {ContentSize}, FitScale: {FitScale}, Scale: {Scale}, ContentPosition: {_content?.localPosition}");
         }
 
         

@@ -20,10 +20,6 @@ namespace FUI {
 
 namespace FUI.Gears {
     public class FitPixelSize : BaseAspectFit {
-        public override float? CalcFitScale(Vector2 viewportSize, Vector2 contentSize) {
-            return 1f;
-        }
+        protected override float FitScale => 1f;
     }
-
-
 }

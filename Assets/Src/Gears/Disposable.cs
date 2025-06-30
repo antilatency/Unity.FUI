@@ -10,15 +10,9 @@ namespace FUI.Gears {
         public void Dispose() {
             disposeAction();
         }
-
-
-
         public static Disposable<T> Create<T>(T value, Action<T> disposeAction) {
             return new Disposable<T>(value, disposeAction);
         }
-        /*public static Disposable Create(Action disposeAction) {
-            return new Disposable(disposeAction);
-        }*/
     }
 
     public class Disposable<T> : IDisposable {
@@ -34,6 +28,9 @@ namespace FUI.Gears {
             disposeAction(Value);
         }
 
-
+        public static implicit operator T(Disposable<T> disposable) {
+            return disposable.Value;
+        }
+        
     }
 }
