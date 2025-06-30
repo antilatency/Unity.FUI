@@ -14,7 +14,7 @@ namespace FUI.Gears {
             }
         }
 
-        private void SetValue<T>(ref T field, T value) {
+        protected void SetValue<T>(ref T field, T value) {
             if (!EqualityComparer<T>.Default.Equals(field, value)) {
                 field = value;
                 MarkDirty();
