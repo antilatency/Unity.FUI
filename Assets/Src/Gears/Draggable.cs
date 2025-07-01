@@ -25,7 +25,7 @@ namespace FUI.Gears {
                 DragAction
             );
         }
-        
+
         public static void HandleDragWithAllowedButtons(
             GameObject gameObject,
             PointerEventData eventData,

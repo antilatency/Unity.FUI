@@ -8,7 +8,7 @@ namespace FUI {
 
     public static partial class Shortcuts {
         public static void Label(string value, Positioner? positioner = null) {
-            Form.Current.LabelModifiable(positioner??Form.DefaultControlPositioner, M.SetText(value));
+            Form.Current.LabelModifiable(positioner ?? Form.DefaultControlPositioner, M.SetText(value));
         }
 
         public static Disposable Labeled(string label, Positioner? positioner = null) {
@@ -55,7 +55,7 @@ namespace FUI {
                 , M.SetFormToNotify(numExtraIterations)
                 , M.AddComponent<PointerClickHandler>()
                 , M.SetRectangleCorners(4)
-                , M.AddClickHandlerEx((go,e) => {
+                , M.AddClickHandlerEx((go, e) => {
                     var input = go.GetComponent<BoolUserInputState>();
                     input.UserInput(!input.Value);
                 })
@@ -67,7 +67,8 @@ namespace FUI {
             if (!userInputState.NewUserInput) {
                 userInputState.Value = value;
                 result = value;
-            } else {
+            }
+            else {
                 result = userInputState.Value;
             }
 
@@ -79,7 +80,7 @@ namespace FUI {
 
             form.EndControls();
 
-            (positioner??Form.DefaultControlPositioner)(background, form.CurrentBorders, () => new Vector2(Theme.Instance.LineHeight, Theme.Instance.LineHeight));
+            (positioner ?? Form.DefaultControlPositioner)(background, form.CurrentBorders, () => new Vector2(Theme.Instance.LineHeight, Theme.Instance.LineHeight));
 
             return result;
         }
@@ -115,18 +116,18 @@ namespace FUI {
         public static int Spinbox(int value, int dragStepSize = 1, Positioner? positioner = null, int numExtraIterations = 0) {
             return Spinbox<int, IntUserInputState>(value, positioner, numExtraIterations, (v, d) => v / dragStepSize * dragStepSize + dragStepSize * d);
         }
-        public static float Spinbox(float value, float dragStepSize, Positioner? positioner = null, int numExtraIterations = 0) {            
+        public static float Spinbox(float value, float dragStepSize, Positioner? positioner = null, int numExtraIterations = 0) {
             return Spinbox<float, FloatUserInputState>(value, positioner, numExtraIterations, (v, d) => {
                 var s = Math.Round(v / dragStepSize + d);
                 return (float)(s * dragStepSize);
-            } );
+            });
         }
         public static double Spinbox(double value, double dragStepSize, Positioner? positioner = null, int numExtraIterations = 0) {
             return Spinbox<double, DoubleUserInputState>(value, positioner, numExtraIterations, (v, d) => Math.Round(v / dragStepSize) * dragStepSize + dragStepSize * d);
         }
 
 
-        public static T Spinbox<T,S>(T value, Positioner? positioner, int numExtraIterations, Func<T,int,T> deltaToValue) where S: UserInputState<T> {
+        public static T Spinbox<T, S>(T value, Positioner? positioner, int numExtraIterations, Func<T, int, T> deltaToValue) where S : UserInputState<T> {
             var form = Form.Current;
 
             RectTransform background = form.Element(null
@@ -137,7 +138,7 @@ namespace FUI {
                 , M.AddComponent<PointerClickHandler>()
                 , M.SetRectangleCorners(4)
 
-                , M.AddDraggable((go,e) => {
+                , M.AddDraggable((go, e) => {
                     var input = go.GetComponent<S>();
 
                     var m = Input.GetKey(KeyCode.LeftShift) ? 10 : 1;
@@ -151,7 +152,8 @@ namespace FUI {
             if (!userInputState.NewUserInput) {
                 userInputState.Value = value;
                 result = value;
-            } else {
+            }
+            else {
                 result = userInputState.Value;
             }
             form.BeginControls(background);
@@ -171,11 +173,11 @@ namespace FUI {
                 , M.SetRectangleCorners(4)
                 , M.AddComponent<ButtonHighlighter>()
                 , M.AddComponent<BoolUserInputState>()
-                , M.AddClickHandlerEx((go,e) => {
+                , M.AddClickHandlerEx((go, e) => {
                     var input = go.GetComponent<BoolUserInputState>();
                     input.UserInput(!input.Value);
                 })
-                ,M.SetFormToNotify(0)
+                , M.SetFormToNotify(0)
             );
 
             var userInputState = background.GetComponent<BoolUserInputState>();
@@ -183,7 +185,8 @@ namespace FUI {
             bool result;
             if (!userInputState.NewUserInput && opened.HasValue) {
                 result = opened.Value;
-            } else {
+            }
+            else {
                 result = userInputState.Value;
             }
 
@@ -194,8 +197,8 @@ namespace FUI {
 
             IconFontAwesome(result ? caretDown : caretRight, Theme.Instance.LineHeight * 0.8f, P.Left(Theme.Instance.LineHeight));
 
-            Label(label,P.RigidFill);
-            
+            Label(label, P.RigidFill);
+
             /*var labelElement = form.Element(P.Fill, form.Library.Label
                 , M.SetText(label)
                 , M.SetColor(Theme.Instance.LabelColor)
@@ -204,7 +207,7 @@ namespace FUI {
 
             var innerSize = form.EndControls();
 
-            (positioner?? Form.DefaultControlPositioner) (background, form.CurrentBorders, () => {
+            (positioner ?? Form.DefaultControlPositioner)(background, form.CurrentBorders, () => {
                 return new Vector2(innerSize.x, Theme.Instance.LineHeight);
             });
 
@@ -226,7 +229,7 @@ namespace FUI {
         public static void Circle(Positioner positioner, Color color, float angle = 1, float startAngle = 0, int numSegments = 64) {
             var form = Form.Current;
             var element = form.Element(null
-                , M.AddCircle(angle,startAngle,numSegments)
+                , M.AddCircle(angle, startAngle, numSegments)
                 , M.SetColor(color)
                 );
             positioner(element, form.CurrentBorders, () => new Vector2(100, 100));
@@ -256,8 +259,8 @@ namespace FUI {
             Color color,
             Vector2 pointA, Vector2 tangentA,
             Vector2 pointB, Vector2 tangentB,
-            
-            
+
+
             float innerThickness = 0,
             float outerThickness = 0,
             int numSegments = 64
@@ -280,11 +283,11 @@ namespace FUI {
                     , M.AddComponent<RoundedRectangle>()
                     , M.SetRectangleCorners(radius)
                     , M.SetColor(Theme.Instance.PanelBackgroundColor)
-                    );                    
+                    );
         }
         public static Disposable WindowBackground(Positioner? positioner = null) {
             var form = Form.Current;
-            return form.Group(positioner?? P.Fill
+            return form.Group(positioner ?? P.Fill
                     , M.AddComponent<RoundedRectangle>()
                     , M.SetColor(Theme.Instance.WindowBackgroundColor)
                     );
@@ -313,7 +316,7 @@ namespace FUI {
             );
 
 
-            (positioner?? Form.DefaultControlPositioner)(background, form.CurrentBorders, () => new Vector2(80, Theme.Instance.LineHeight));
+            (positioner ?? Form.DefaultControlPositioner)(background, form.CurrentBorders, () => new Vector2(80, Theme.Instance.LineHeight));
 
 
             form.BeginControls(background);
@@ -363,7 +366,7 @@ namespace FUI {
             IconButtonFontAwesome(icon, size, Theme.Instance.LabelColor, action, positioner);
         }
 
-        public static IDisposable TransparentButton(Action action, Positioner positioner){
+        public static IDisposable TransparentButton(Action action, Positioner positioner) {
             var form = Form.Current;
             var group = form.Element(null
                 , M.AddComponent<RoundedRectangle>()
@@ -375,14 +378,13 @@ namespace FUI {
 
             form.BeginControls(group);
 
-            return new Disposable(() =>
-            {
+            return new Disposable(() => {
                 var innerSize = form.EndControls();
                 positioner(group, form.CurrentBorders, () => innerSize);
             });
         }
 
-        public static void IconButtonFontAwesome(string icon, float size, Color color, Action action, Positioner positioner){
+        public static void IconButtonFontAwesome(string icon, float size, Color color, Action action, Positioner positioner) {
             using (TransparentButton(action, positioner)) {
                 IconFontAwesome(icon, size, color, P.RigidFill);
             }
@@ -432,7 +434,7 @@ namespace FUI {
                     );
             }
         }
-        
+
         public static void DisabledButton(string text, Positioner? positioner = null) {
             var form = Form.Current;
             using (form.Group(positioner ?? P.Up(Theme.Instance.LineHeight)
@@ -475,6 +477,7 @@ namespace FUI {
             });
 
         }
+
 
     }
 }

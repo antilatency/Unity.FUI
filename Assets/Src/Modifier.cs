@@ -152,6 +152,16 @@ namespace FUI {
                 }
             );
 
+        public static Modifier AddPointerEventReceiver(Func<GameObject, PointerEventData, bool> handler) =>
+            new(
+                "AddPointerEventReceiver",
+                x => x.AddComponent<PointerEventReceiver>(),
+                x => {
+                    var receiver = x.GetComponent<PointerEventReceiver>();
+                    receiver.Handler = handler;
+                }
+            );
+
         public static Modifier AddClickHandler(Action click) =>
             new(
                 "AddClickHandler",
