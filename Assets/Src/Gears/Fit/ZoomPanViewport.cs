@@ -66,10 +66,12 @@ namespace FUI.Gears {
         }
 
         void IScrollHandler.OnScroll(PointerEventData eventData) {
-            var a = GetMousePositionInContent(eventData);
+            var cursorInContent = GetMousePositionInContent(eventData);
+            var scale = Scale;
             IntScale += Mathf.RoundToInt(eventData.scrollDelta.y);
-            var b = GetMousePositionInContent(eventData);
-            ViewportCenterInContent += a - b;
+            var newScale = Scale;
+
+            ViewportCenterInContent += (1 - scale/newScale) * (cursorInContent - ViewportCenterInContent);
         }
     }
 

@@ -46,7 +46,7 @@ namespace FUI {
 
 
     public abstract class Form : MonoBehaviour {
-        public bool Lazy = false;
+        public bool Lazy = true;
         public int MaxIterationsPerUpdate = 8;
         public static Form Current = null!;
 
