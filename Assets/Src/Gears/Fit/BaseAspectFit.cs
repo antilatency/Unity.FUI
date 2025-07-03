@@ -70,6 +70,8 @@ namespace FUI.Gears {
             set => SetValue(ref _scale, value);
         }
 
+        public float CombinedScale => FitScale * _scale;
+
         protected override void OnEnable() {
             MarkDirty();
         }
@@ -78,18 +80,19 @@ namespace FUI.Gears {
             MarkDirty();
         }
 
-
+        void UpdateContentTransform() { 
+            var content = Content;
+            content.sizeDelta = _contentSize;
+            float scale = CombinedScale;
+            content.localScale = Vector3.one * scale;
+            content.localPosition = -_viewportCenterInContent * _contentSize * scale;
+        }
         
 
         void Update() {
             if (!_dirty) return;            
             
-
-            var content = Content;
-
-            content.sizeDelta = _contentSize;
-            content.localScale = Vector3.one * FitScale * _scale;
-            content.localPosition = -_viewportCenterInContent * _contentSize * (FitScale * _scale);
+            UpdateContentTransform();            
 
             _dirty = false;
 

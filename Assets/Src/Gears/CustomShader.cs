@@ -42,17 +42,25 @@ namespace FUI.Gears {
             foreach (var (name, value) in parameters) {
                 if (value is Texture texture) {
                     material.SetTexture(name, texture);
-                } else if (value is Vector4 vector4) {
+                }
+                else if (value is Vector4 vector4) {
                     material.SetVector(name, vector4);
-                } else if (value is Vector3 vector3) {
+                }
+                else if (value is Vector3 vector3) {
                     material.SetVector(name, vector3);
-                }else if (value is float valueAsFloat) {
+                }
+                else if (value is float valueAsFloat) {
                     material.SetFloat(name, valueAsFloat);
-                } else if (value is bool valueAsBool) {
+                }
+                else if (value is bool valueAsBool) {
                     material.SetInt(name, valueAsBool ? 1 : 0);
                     if (valueAsBool) material.EnableKeyword(name);
                     else material.DisableKeyword(name);
-                } else {
+                }
+                else if (value is Matrix4x4 valueAsMatrix) {
+                    material.SetMatrix(name, valueAsMatrix);
+                }
+                else {
                     Debug.LogError($"CustomShader.SetParameters parameter type {value.GetType().FullName} is not supported.");
                 }
             }
