@@ -34,7 +34,7 @@ namespace FUI.Gears {
             
             //A very dirty way to update material parameters, all because Unity uses a material from its private cache for MaskableGraphic.
             //When changing the base material, it will still use its own copy of the material from the cache, which prevents us from changing the parameters.
-            var material = graphic.canvasRenderer.GetMaterial();
+            var material = graphic.canvasRenderer.GetMaterial() ?? graphic.material;
             if (material == null){
                 return;
             }
