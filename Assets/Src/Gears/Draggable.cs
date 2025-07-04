@@ -5,27 +5,11 @@ using UnityEngine.EventSystems;
 
 
 namespace FUI.Gears {
-    public class Draggable : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler, IInitializePotentialDragHandler {
+
+    public class Draggable : MonoBehaviour, IDragHandler, IInitializePotentialDragHandler {
 
 
-        [DllImport("User32.Dll")]
-        public static extern long SetCursorPos(int x, int y);
-
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool GetCursorPos(out POINT lpPoint);
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct POINT {
-            public int X;
-            public int Y;
-
-            public POINT(int x, int y) {
-                this.X = x;
-                this.Y = y;
-            }
-        }
-
+        public InputButtonMask AllowedButtons = InputButtonMask.All;
 
         public Action<GameObject, PointerEventData> DragAction;
 
@@ -33,19 +17,32 @@ namespace FUI.Gears {
             eventData.useDragThreshold = false;
         }
 
-
-
-        void IBeginDragHandler.OnBeginDrag(PointerEventData eventData) {
-            //Cursor.lockState = CursorLockMode.Locked;
-        }
-
         void IDragHandler.OnDrag(PointerEventData eventData) {
-            DragAction?.Invoke(gameObject,eventData);
-            //SetCursorPos(0, 0);
+            HandleDragWithAllowedButtons(
+                gameObject,
+                eventData,
+                AllowedButtons,
+                DragAction
+            );
         }
 
-        void IEndDragHandler.OnEndDrag(PointerEventData eventData) {
-            //Cursor.lockState = CursorLockMode.None;
+        public static void HandleDragWithAllowedButtons(
+            GameObject gameObject,
+            PointerEventData eventData,
+            InputButtonMask allowedButtons,
+            Action<GameObject, PointerEventData> dragAction
+        ) {
+            if (((int)allowedButtons & (1 << (int)eventData.button)) != 0) {
+                dragAction?.Invoke(gameObject, eventData);
+            }
+            else {
+                var parent = gameObject.transform.parent;
+                ExecuteEvents.ExecuteHierarchy(
+                    parent.gameObject,
+                    eventData,
+                    ExecuteEvents.dragHandler
+                );
+            }
         }
 
     }

@@ -1,0 +1,16 @@
+using UnityEngine;
+using FUI;
+using FUI.Gears;
+using static FUI.Shortcuts;
+
+#nullable enable
+
+public class @ClassName : Form {
+	
+    protected override void Build() {
+
+        using (WindowBackground()) {
+			
+		}
+	}
+}

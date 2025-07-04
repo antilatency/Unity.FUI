@@ -34,7 +34,7 @@ namespace FUI.Gears {
             
             //A very dirty way to update material parameters, all because Unity uses a material from its private cache for MaskableGraphic.
             //When changing the base material, it will still use its own copy of the material from the cache, which prevents us from changing the parameters.
-            var material = graphic.canvasRenderer.GetMaterial();
+            var material = graphic.canvasRenderer.GetMaterial() ?? graphic.material;
             if (material == null){
                 return;
             }
@@ -42,17 +42,25 @@ namespace FUI.Gears {
             foreach (var (name, value) in parameters) {
                 if (value is Texture texture) {
                     material.SetTexture(name, texture);
-                } else if (value is Vector4 vector4) {
+                }
+                else if (value is Vector4 vector4) {
                     material.SetVector(name, vector4);
-                } else if (value is Vector3 vector3) {
+                }
+                else if (value is Vector3 vector3) {
                     material.SetVector(name, vector3);
-                }else if (value is float valueAsFloat) {
+                }
+                else if (value is float valueAsFloat) {
                     material.SetFloat(name, valueAsFloat);
-                } else if (value is bool valueAsBool) {
+                }
+                else if (value is bool valueAsBool) {
                     material.SetInt(name, valueAsBool ? 1 : 0);
                     if (valueAsBool) material.EnableKeyword(name);
                     else material.DisableKeyword(name);
-                } else {
+                }
+                else if (value is Matrix4x4 valueAsMatrix) {
+                    material.SetMatrix(name, valueAsMatrix);
+                }
+                else {
                     Debug.LogError($"CustomShader.SetParameters parameter type {value.GetType().FullName} is not supported.");
                 }
             }

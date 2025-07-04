@@ -11,7 +11,9 @@ internal class DebugForm : Form {
     //public ArtNetLightingDeviceDefinition.Model Data = new();
 
     public enum TestEnum { 
-        A,B,C
+        A = 2,
+        B = 4,
+        C = 8,
     }
     TestEnum testEnum;
 
@@ -121,11 +123,11 @@ internal class DebugForm : Form {
 
                 GapTop(2);
                 TestDouble = LabeledInputFieldSpinbox("Double", TestDouble, 0.1f, null, "0.###");
-                GapTop(2);
-
-                
+                GapTop(2);                
 
                 testEnum = LabeledDropdown("Enum", testEnum);
+                Label($"Enum Value: {(int)testEnum}");
+
                 GapTop(2);
                 LabelModifiable(P.Up(Theme.Instance.LineHeight), M.SetText("The quick brown fox jumps over the lazy dog"), M.SetTextOverflow(TMPro.TextOverflowModes.Linked));
 

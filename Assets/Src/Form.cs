@@ -46,7 +46,7 @@ namespace FUI {
 
 
     public abstract class Form : MonoBehaviour {
-        public bool Lazy = false;
+        public bool Lazy = true;
         public int MaxIterationsPerUpdate = 8;
         public static Form Current = null!;
 
@@ -260,7 +260,21 @@ namespace FUI {
             return created;
         }
 
-        public float ClampMakeDirty(float value, float min, float max) {
+        public T ClampMakeDirty<T>(T value, T min, T max) where T : IComparable<T> {
+            if (value.CompareTo(min) < 0)
+            {
+                MakeDirty();
+                return min;
+            }
+            if (value.CompareTo(max) > 0)
+            {
+                MakeDirty();
+                return max;
+            }
+            return value;
+        }
+
+        /*public float ClampMakeDirty(float value, float min, float max) {
             if (value < min) {
                 MakeDirty();
                 return min;
@@ -282,7 +296,7 @@ namespace FUI {
                 return max;
             }
             return value;
-        }
+        }*/
 
         public void GapLeft(float pixels = 0, float fraction = 0) {
             CurrentBorders.Left.Increment(pixels, fraction);
@@ -371,8 +385,24 @@ namespace FUI {
         public T Dropdown<T>(T value, Positioner? positioner = null, int numExtraIterations = 0) where T : struct {
             int intValue = Convert.ToInt32(value);
             string[] options = Enum.GetNames(typeof(T));
-            int selectedValue = Dropdown(intValue, options, positioner, numExtraIterations);
-            return (T)Enum.ToObject(typeof(T), selectedValue);
+            var values = (T[])Enum.GetValues(typeof(T));
+            var valueIndex = Array.IndexOf(values, value);
+            if (valueIndex == -1) {
+                //find the closest value
+                valueIndex = 0;
+                var diff = Math.Abs(Convert.ToInt32(values[0]) - intValue);
+                for (int i = 1; i < values.Length; i++) {
+                    var v = Convert.ToInt32(values[i]);
+                    var newDiff = Math.Abs(v - intValue);
+                    if (newDiff < diff) {
+                        diff = newDiff;
+                        valueIndex = i;
+                    }
+                }            
+            }
+                
+            int selectedValue = Dropdown(valueIndex, options, positioner, numExtraIterations);
+            return values[selectedValue];
         }
 
         public int Dropdown(int value, string[] options, Positioner? positioner = null, int numExtraIterations = 0) {
