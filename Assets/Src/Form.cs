@@ -12,8 +12,6 @@ using UnityEngine.UI;
 namespace FUI {
 
 
-    
-
 
     [Serializable]
     public struct Border {
@@ -55,8 +53,8 @@ namespace FUI {
 
         [NonSerialized]
         public int UpdateIterationsRequired = 1;
-        public void MakeDirty(int extraIterations = 0) {
-            UpdateIterationsRequired = Math.Max(UpdateIterationsRequired, 1 + extraIterations);
+        public void MakeDirty(bool extraIteration = false) {
+            UpdateIterationsRequired = Math.Max(UpdateIterationsRequired, extraIteration ? 2 : 1);
         }
 
         public PrefabLibrary library = null!;
@@ -339,10 +337,10 @@ namespace FUI {
             throw new InvalidOperationException($"Unsupported type: {typeof(T)}");
         }
 
-        public T InputField<T>(T value, Positioner positioner, string toStringFormat = "", Func<string, T>? fromString = null, int numExtraIterations = 0) {
+        public T InputField<T>(T value, Positioner positioner, string toStringFormat = "", Func<string, T>? fromString = null, bool extraIteration = false) {
 
             var transform = Element(Library.InputField.gameObject
-                , M.SetFormToNotify(numExtraIterations)
+                , M.SetFormToNotify(extraIteration)
                 );
             var input = transform.GetComponent<InputFieldState>();
 
@@ -380,37 +378,21 @@ namespace FUI {
 
         public static Positioner DefaultControlPositioner => P.Up(Theme.Instance.LineHeight);
 
-        
+ 
 
-        public T Dropdown<T>(T value, Positioner? positioner = null, int numExtraIterations = 0) where T : struct {
-            int intValue = Convert.ToInt32(value);
-            string[] options = Enum.GetNames(typeof(T));
-            var values = (T[])Enum.GetValues(typeof(T));
-            var valueIndex = Array.IndexOf(values, value);
-            if (valueIndex == -1) {
-                //find the closest value
-                valueIndex = 0;
-                var diff = Math.Abs(Convert.ToInt32(values[0]) - intValue);
-                for (int i = 1; i < values.Length; i++) {
-                    var v = Convert.ToInt32(values[i]);
-                    var newDiff = Math.Abs(v - intValue);
-                    if (newDiff < diff) {
-                        diff = newDiff;
-                        valueIndex = i;
-                    }
-                }            
-            }
-                
-            int selectedValue = Dropdown(valueIndex, options, positioner, numExtraIterations);
-            return values[selectedValue];
+        public T Dropdown<T>(T value, Positioner? positioner = null, bool extraIteration = false) where T : struct, Enum {
+            var helper = new EnumHelper<T>();
+            var optionIndex = helper.ValueToIndex(value);
+            int selectedOptionIndex = Dropdown(optionIndex, helper.Names, positioner, extraIteration);
+            return helper.IndexToValue(selectedOptionIndex);
         }
 
-        public int Dropdown(int value, string[] options, Positioner? positioner = null, int numExtraIterations = 0) {
+        public int Dropdown(int value, string[] options, Positioner? positioner = null, bool extraIteration = false) {
             if (positioner == null)
                 positioner = DefaultControlPositioner;
 
             var element = Element(Library.Dropdown
-                , M.SetFormToNotify(numExtraIterations)
+                , M.SetFormToNotify(extraIteration)
                 );
             positioner(element, CurrentBorders, () => new Vector2(40, Theme.Instance.LineHeight));
 

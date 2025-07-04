@@ -110,6 +110,54 @@ namespace FUI {
             };
         }
 
+        /*
+    void PopulateTabs(Texture[] textures, Action<int> callback, int height = 150, int gap = 4) {
+        int index = 0;
+        float fraction = 1f / textures.Length;
+        float elementGap = gap * (textures.Length + 1) / textures.Length;
+        using (Group(P.Up(height))) {
+            Padding(gap);
+            for (int i = 0; i < textures.Length; i++) {
+                //string? title = textures[i];
+                var texture = textures[i];
+                Image(P.Left(-elementGap, fraction), texture, (g, e) => {
+
+                    if (e.pointerPress == g && e.button == PointerEventData.InputButton.Left) {
+                        callback(i);
+                        return true;
+                    }
+                    return false;
+                });
+                GapLeft(gap);
+            }
+        }
+
+*/
+
+
+        public static Positioner RowElement(int count, float gap = 0, float externalPaddingCompensation = 0) {
+            return (rectTransform, borders, sizeGetter) => {
+
+                float fraction = 1f / count;
+                float gapCompensation = (gap * (count - 1) + externalPaddingCompensation) / count;
+
+                Left(-gapCompensation, fraction)(rectTransform, borders, sizeGetter);
+                borders.Left.Increment(gap, 0);
+            };
+        }
+        
+        public static Positioner ColumnElement(int count, float gap = 0, float externalPaddingCompensation = 0) {
+            return (rectTransform, borders, sizeGetter) => {
+
+                float fraction = 1f / count;
+                float gapCompensation = (gap * (count - 1) + externalPaddingCompensation) / count;
+
+                Down(-gapCompensation, fraction)(rectTransform, borders, sizeGetter);
+                borders.Bottom.Increment(gap, 0);
+            };
+        }
+
+
 
 
     }

@@ -1,5 +1,7 @@
 ﻿using FUI.Gears;
 using System;
+using System.Text.RegularExpressions;
+
 using TMPro;
 using UnityEngine;
 
@@ -18,41 +20,123 @@ namespace FUI {
             return result;
         }
 
-        public static T LabeledInputField<T>(string label, T value, Positioner? positioner = null, string toStringFormat = "", Func<string, T>? fromString = null, int numExtraIterations = 0) where T : notnull {
+        public static T LabeledInputField<T>(string label, T value, Positioner? positioner = null, string toStringFormat = "", Func<string, T>? fromString = null, bool extraIteration = false) where T : notnull {
             var form = Form.Current;
             using (Labeled(label, positioner)) {
-                return form.InputField(value, P.Fill, toStringFormat, fromString, numExtraIterations);
+                return form.InputField(value, P.Fill, toStringFormat, fromString, extraIteration);
             }
         }
 
-        public static T LabeledDropdown<T>(string label, T value, Positioner? positioner = null, int numExtraIterations = 0) where T : struct {
+        public static T LabeledDropdown<T>(string label, T value, Positioner? positioner = null, bool extraIteration = false) where T : struct, Enum {
             var form = Form.Current;
             using (Labeled(label, positioner)) {
-                return form.Dropdown(value, P.Fill, numExtraIterations);
+                return form.Dropdown(value, P.Fill, extraIteration);
             }
         }
-        public static int LabeledDropdown(string label, int value, string[] options, Positioner? positioner = null, int numExtraIterations = 0) {
+        public static int LabeledDropdown(string label, int value, string[] options, Positioner? positioner = null, bool extraIteration = false) {
             var form = Form.Current;
             using (Labeled(label, positioner)) {
-                return form.Dropdown(value, options, P.Fill, numExtraIterations);
+                return form.Dropdown(value, options, P.Fill, extraIteration);
             }
         }
 
 
-        public static bool LabeledCheckbox(string label, bool value, Positioner? positioner = null, int numExtraIterations = 0) {
+
+        public static bool LabeledCheckbox(string label, bool value, Positioner? positioner = null, bool extraIteration = false) {
             using (Labeled(label, positioner)) {
-                return Checkbox(value, P.Left(), numExtraIterations);
+                return Checkbox(value, P.Left(), extraIteration);
             }
         }
 
-        public static bool Checkbox(bool value, Positioner? positioner = null, int numExtraIterations = 0) {
+        public static int ToggleButtonGroup(int value, string[] options, Positioner? positioner = null, float gap = 0, float padding = 0, bool extraIteration = false) {
+
+            var form = Form.Current;
+
+            if (positioner == null)
+                positioner = Form.DefaultControlPositioner;
+
+            using (form.Group(positioner)) {
+                form.Padding(padding, padding, 0, 0);
+                for (int i = 0; i < options.Length; i++) {
+                    int index = i;
+                    var selected = ToggleButton(options[i], value == index, P.RowElement(options.Length, gap, 2 * padding), extraIteration || (i > 0));
+                    if (selected) {
+                        value = index;
+                    }
+                }
+                return value;
+            }            
+        }
+
+        public static T ToggleButtonGroup<T>(T value, Positioner? positioner = null, float gap = 0, float externalPaddingCompensation = 0, bool extraIteration = false) where T : struct, Enum {
+            var helper = new EnumHelper<T>();
+            var optionIndex = helper.ValueToIndex(value);
+            int selectedOptionIndex = ToggleButtonGroup(optionIndex, helper.Names, positioner, gap, externalPaddingCompensation, extraIteration);
+            return helper.IndexToValue(selectedOptionIndex);
+        }
+
+
+        public static bool ToggleButton(string text, bool value, Positioner? positioner = null, bool extraIteration = false) {
+            var form = Form.Current;
+
+            RectTransform background = form.Element(null
+                , M.AddComponent<RoundedRectangle>()
+                , M.AddComponent<ConfigurablePressedHoveredHighlighter>()
+
+                , M.AddComponent<BoolUserInputState>()
+                , M.SetFormToNotify(extraIteration)
+                , M.AddComponent<PointerClickHandler>()
+                , M.SetRectangleCorners(4)
+                , M.AddClickHandlerEx((go, e) => {
+                    var input = go.GetComponent<BoolUserInputState>();
+                    input.UserInput(!input.Value);
+                })
+            );
+
+            var userInputState = background.GetComponent<BoolUserInputState>();
+
+            bool result;
+            if (!userInputState.NewUserInput) {
+                userInputState.Value = value;
+                result = value;
+            }
+            else {
+                result = userInputState.Value;
+            }
+
+            Color backgroundColor = result ? Theme.Instance.PrimaryColor : Theme.Instance.newButtonColor;
+            Color labelColor = backgroundColor.ContrastColor();
+
+            var highlighter = background.GetComponent<ConfigurablePressedHoveredHighlighter>();
+            highlighter.initialColor = backgroundColor;
+            highlighter.pressedColor = backgroundColor.MultiplySaturationBrightness(1.3f, 1.3f);
+            highlighter.hoveredColor = backgroundColor.MultiplySaturationBrightness(1.1f, 1.1f);
+
+            form.BeginControls(background);
+
+            form.Padding(10, 10, 0, 0);
+            form.LabelModifiable(P.RigidFill
+                , M.SetText(text)
+                , M.SetColor(labelColor)
+                , M.SetTextAlignment(TMPro.HorizontalAlignmentOptions.Center)
+                );
+
+            form.EndControls();
+
+            (positioner ?? Form.DefaultControlPositioner)(background, form.CurrentBorders, () => new Vector2(Theme.Instance.LineHeight, Theme.Instance.LineHeight));
+
+            return result;
+        }
+
+
+        public static bool Checkbox(bool value, Positioner? positioner = null, bool extraIteration = false) {
             var form = Form.Current;
 
             RectTransform background = form.Element(null
                 , M.AddComponent<RoundedRectangle>()
                 , M.AddComponent<ButtonHighlighter>()
                 , M.AddComponent<BoolUserInputState>()
-                , M.SetFormToNotify(numExtraIterations)
+                , M.SetFormToNotify(extraIteration)
                 , M.AddComponent<PointerClickHandler>()
                 , M.SetRectangleCorners(4)
                 , M.AddClickHandlerEx((go, e) => {
@@ -86,55 +170,55 @@ namespace FUI {
         }
 
 
-        public static int LabeledInputFieldSpinbox(string label, int value, int dragStepSize = 1, Positioner? positioner = null, string toStringFormat = "", Func<string, int>? fromString = null, int numExtraIterations = 0) {
+        public static int LabeledInputFieldSpinbox(string label, int value, int dragStepSize = 1, Positioner? positioner = null, string toStringFormat = "", Func<string, int>? fromString = null, bool extraIteration = false) {
             var form = Form.Current;
             using (Labeled(label, positioner)) {
                 value = Spinbox(value, dragStepSize, P.Right(Theme.Instance.LineHeight));
                 form.GapRight(2);
-                return form.InputField(value, P.Fill, toStringFormat, fromString, numExtraIterations);
+                return form.InputField(value, P.Fill, toStringFormat, fromString, extraIteration);
             }
         }
 
-        public static float LabeledInputFieldSpinbox(string label, float value, float dragStepSize, Positioner? positioner = null, string toStringFormat = "", Func<string, float>? fromString = null, int numExtraIterations = 0) {
+        public static float LabeledInputFieldSpinbox(string label, float value, float dragStepSize, Positioner? positioner = null, string toStringFormat = "", Func<string, float>? fromString = null, bool extraIteration = false) {
             var form = Form.Current;
             using (Labeled(label, positioner)) {
                 value = Spinbox(value, dragStepSize, P.Right(Theme.Instance.LineHeight));
                 form.GapRight(2);
-                return form.InputField(value, P.Fill, toStringFormat, fromString, numExtraIterations);
+                return form.InputField(value, P.Fill, toStringFormat, fromString, extraIteration);
             }
         }
 
-        public static double LabeledInputFieldSpinbox(string label, double value, double dragStepSize, Positioner? positioner = null, string toStringFormat = "", Func<string, double>? fromString = null, int numExtraIterations = 0) {
+        public static double LabeledInputFieldSpinbox(string label, double value, double dragStepSize, Positioner? positioner = null, string toStringFormat = "", Func<string, double>? fromString = null, bool extraIteration = false) {
             var form = Form.Current;
             using (Labeled(label, positioner)) {
                 value = Spinbox(value, dragStepSize, P.Right(Theme.Instance.LineHeight));
                 form.GapRight(2);
-                return form.InputField(value, P.Fill, toStringFormat, fromString, numExtraIterations);
+                return form.InputField(value, P.Fill, toStringFormat, fromString, extraIteration);
             }
         }
 
-        public static int Spinbox(int value, int dragStepSize = 1, Positioner? positioner = null, int numExtraIterations = 0) {
-            return Spinbox<int, IntUserInputState>(value, positioner, numExtraIterations, (v, d) => v / dragStepSize * dragStepSize + dragStepSize * d);
+        public static int Spinbox(int value, int dragStepSize = 1, Positioner? positioner = null, bool extraIteration = false) {
+            return Spinbox<int, IntUserInputState>(value, positioner, extraIteration, (v, d) => v / dragStepSize * dragStepSize + dragStepSize * d);
         }
-        public static float Spinbox(float value, float dragStepSize, Positioner? positioner = null, int numExtraIterations = 0) {
-            return Spinbox<float, FloatUserInputState>(value, positioner, numExtraIterations, (v, d) => {
+        public static float Spinbox(float value, float dragStepSize, Positioner? positioner = null, bool extraIteration = false) {
+            return Spinbox<float, FloatUserInputState>(value, positioner, extraIteration, (v, d) => {
                 var s = Math.Round(v / dragStepSize + d);
                 return (float)(s * dragStepSize);
             });
         }
-        public static double Spinbox(double value, double dragStepSize, Positioner? positioner = null, int numExtraIterations = 0) {
-            return Spinbox<double, DoubleUserInputState>(value, positioner, numExtraIterations, (v, d) => Math.Round(v / dragStepSize) * dragStepSize + dragStepSize * d);
+        public static double Spinbox(double value, double dragStepSize, Positioner? positioner = null, bool extraIteration = false) {
+            return Spinbox<double, DoubleUserInputState>(value, positioner, extraIteration, (v, d) => Math.Round(v / dragStepSize) * dragStepSize + dragStepSize * d);
         }
 
 
-        public static T Spinbox<T, S>(T value, Positioner? positioner, int numExtraIterations, Func<T, int, T> deltaToValue) where S : UserInputState<T> {
+        public static T Spinbox<T, S>(T value, Positioner? positioner, bool extraIteration, Func<T, int, T> deltaToValue) where S : UserInputState<T> {
             var form = Form.Current;
 
             RectTransform background = form.Element(null
                 , M.AddComponent<RoundedRectangle>()
                 , M.AddComponent<ButtonHighlighter>()
                 , M.AddComponent<S>()
-                , M.SetFormToNotify(numExtraIterations)
+                , M.SetFormToNotify(extraIteration)
                 , M.AddComponent<PointerClickHandler>()
                 , M.SetRectangleCorners(4)
 
@@ -177,7 +261,7 @@ namespace FUI {
                     var input = go.GetComponent<BoolUserInputState>();
                     input.UserInput(!input.Value);
                 })
-                , M.SetFormToNotify(0)
+                , M.SetFormToNotify()
             );
 
             var userInputState = background.GetComponent<BoolUserInputState>();
@@ -305,13 +389,13 @@ namespace FUI {
         }
 
 
-        public static float Slider(float value, Positioner? positioner = null, Color? backgroundColor = null, Color? handleColor = null, int numExtraIterations = 0) {
+        public static float Slider(float value, Positioner? positioner = null, Color? backgroundColor = null, Color? handleColor = null, bool extraIteration = false) {
             var form = Form.Current;
 
             var background = form.Element(null
                 , M.AddComponent<RoundedRectangle>()
                 , M.AddComponent<Slider>()
-                , M.SetFormToNotify(numExtraIterations)
+                , M.SetFormToNotify(extraIteration)
                 , M.SetColor(backgroundColor ?? new Color(0, 0, 0, 0))
             );
 

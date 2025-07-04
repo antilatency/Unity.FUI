@@ -223,14 +223,14 @@ namespace FUI {
                 }
             );
 
-        public static Modifier SetFormToNotify(int NumExtraIterations) =>
+        public static Modifier SetFormToNotify(bool extraIteration = false) =>
             new (
                 "SetFormToNotify",
                 null,
                 x => {
                     var notifier = x.GetComponent<AbstractUserInputNotifier>();
                     notifier.SetFormToNotify(Form.Current);
-                    notifier.ExtraIterations = NumExtraIterations;
+                    notifier.ExtraIteration = extraIteration;
                 }
                 );
 

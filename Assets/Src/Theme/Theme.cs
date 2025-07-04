@@ -14,11 +14,16 @@ namespace FUI {
             }
         }
 
-
+        public static Color Gray(float value) {
+            return new Color(value, value, value, 1f);
+        }
 
         public Color WindowBackgroundColor = new Color32(0x30, 0x30, 0x30, 255);
         public Color LabelColor = Color.white;
         public Color PrimaryColor = new Color32(0xAC, 0xC4, 0x35, 255);
+
+        public Color newButtonColor = Gray(0.2f);
+
 
         public Color InputColor = Color.black.Alpha(0.25f);
         public Color InputColorHovered = Color.black.Alpha(0.5f);

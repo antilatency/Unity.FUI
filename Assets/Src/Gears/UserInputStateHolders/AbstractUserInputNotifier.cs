@@ -9,10 +9,10 @@ namespace FUI.Gears {
         }
 
         public void NotifyForm() {
-            FormToNotify?.MakeDirty(ExtraIterations);
+            FormToNotify?.MakeDirty(ExtraIteration);
         }
 
-        public int ExtraIterations = 0;
+        public bool ExtraIteration = false;
 
 
     }

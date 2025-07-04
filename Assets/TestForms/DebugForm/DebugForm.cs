@@ -50,12 +50,24 @@ internal class DebugForm : Form {
     }
 
 
-
+    void PopulateTabs(Color[] colors, int height = 150, float gap = 10) {
+        int index = 0;
+        float fraction = 1f / colors.Length;
+        float gapCompensation = gap * (colors.Length - 1) / colors.Length;
+        using (Group(P.Up(height))) {
+            Rectangle(P.Fill, Color.white);
+            for (int i = 0; i < colors.Length; i++) {
+                var color = colors[i];
+                Rectangle(P.Left(-gapCompensation, fraction), color);
+                GapLeft(gap);
+            }
+        }
+    }
 
 
     protected override void Build() {
 
-        Item[] palette = new Item[] { 
+        Item[] palette = new Item[] {
             new Item("Lemon","\ue079", new Color(1f,1f,0.3f)),
             new Item("Carrot","\uf787", new Color(1f,0.6f,0.2f)),
             new Item("Pepper","\uf816", new Color(1f,0.0f,0.1f)),
@@ -64,8 +76,19 @@ internal class DebugForm : Form {
 
 
 
-        using (WindowBackground()){
+        using (WindowBackground()) {
+            
 
+
+            using (Group(P.Right(50))) {
+                Rectangle(P.Fill, Color.white);
+                Padding(10);
+                Rectangle(P.ColumnElement(3, 5, 2 * 10), Color.red);
+                Rectangle(P.ColumnElement(3, 5, 2 * 10), Color.green);
+                Rectangle(P.ColumnElement(3, 5, 2 * 10), Color.blue);
+            }
+
+            
 
             using (Panel(P.Left(50))) {
 
@@ -79,7 +102,7 @@ internal class DebugForm : Form {
                 Image_ToSRGB_IgnoreAlpha(P.Up(50), TestTexture2, -Vector3.one);
 
                 using (Group(P.Up(50))) {
-                    Circle(P.Fill, Color.black,numSegments:32);
+                    Circle(P.Fill, Color.black, numSegments: 32);
                     Padding(4);
                     Circle(P.Fill, Color.white, TestFloat, numSegments: 32);
                 }
@@ -91,42 +114,65 @@ internal class DebugForm : Form {
 
             }
 
-            
+
 
             GapTop(4);
             using (TempPaddingHorizontal(4, 4)) {
-                if (ExpandableGroupHeader("ExpandableGroupHeader")){
+
+
+
+
+                using (TempPaddingHorizontal(10, 10)) {
+                    PopulateTabs(new Color[] { Color.red, Color.green, Color.blue }, 50, 10);
+                }
+
+                using (Group(P.Up(50))) {
+                    Padding(10);
+                    Rectangle(P.RowElement(3, 10, 2 * 10), Color.red);
+                    Rectangle(P.RowElement(3, 10, 2 * 10), Color.green);
+                    Rectangle(P.RowElement(3, 10, 2 * 10), Color.blue);
+                }
+
+
+                if (ExpandableGroupHeader("ExpandableGroupHeader")) {
                     Label("Expanded");
                 }
                 GapTop(2);
-                
+
                 Button("Button", () => { }, P.Up(20));
                 GapTop(2);
 
-                ColoredButton("ColoredButton", () => { },null, P.Up(20));
+                ColoredButton("ColoredButton", () => { }, null, P.Up(20));
                 GapTop(2);
 
                 TestBool = LabeledCheckbox("Bool", TestBool);
+                GapTop(2);
+                TestBool = ToggleButton("Toggle", TestBool, extraIteration: true);
                 GapTop(2);
 
                 Label(TestInt.ToString());
                 GapTop(2);
 
-                TestInt = LabeledInputField("Int", TestInt, numExtraIterations: 1);   
+                TestInt = LabeledInputField("Int", TestInt, extraIteration: true);
                 GapTop(2);
 
 
                 TestFloat = ClampMakeDirty(
-                    LabeledInputFieldSpinbox("Float",TestFloat,0.001f, null, "0.###")
-                    ,0
-                    ,1);
+                    LabeledInputFieldSpinbox("Float", TestFloat, 0.001f, null, "0.###")
+                    , 0
+                    , 1);
 
                 GapTop(2);
                 TestDouble = LabeledInputFieldSpinbox("Double", TestDouble, 0.1f, null, "0.###");
-                GapTop(2);                
+                GapTop(2);
 
                 testEnum = LabeledDropdown("Enum", testEnum);
+
+                testEnum = ToggleButtonGroup(testEnum,null,4,0);
+
                 Label($"Enum Value: {(int)testEnum}");
+
+
 
                 GapTop(2);
                 LabelModifiable(P.Up(Theme.Instance.LineHeight), M.SetText("The quick brown fox jumps over the lazy dog"), M.SetTextOverflow(TMPro.TextOverflowModes.Linked));
@@ -141,7 +187,7 @@ internal class DebugForm : Form {
 
             void Swap(int i) {
                 var temp = Items[i];
-                Items[i] = Items[i+1];
+                Items[i] = Items[i + 1];
                 Items[i + 1] = temp;
             }
 
@@ -157,7 +203,7 @@ internal class DebugForm : Form {
                         IconFontAwesome(item.Icon, 16, item.Color, P.Left(20));
                         GapLeft(10);
 
-                        IconButtonFontAwesome("\uf2ed", 12, () => { Items.RemoveAt(index); MakeDirty(); }, P.Right(buttonSize));                        
+                        IconButtonFontAwesome("\uf2ed", 12, () => { Items.RemoveAt(index); MakeDirty(); }, P.Right(buttonSize));
                         GapRight(10);
 
                         if (i == (Items.Count - 1))
@@ -168,8 +214,8 @@ internal class DebugForm : Form {
                         if (i == 0)
                             GapRight(buttonSize);
                         else
-                            IconButtonFontAwesome("\uf062", 12, () => { Swap(index-1); MakeDirty(); }, P.Right(buttonSize));//Up
-                        
+                            IconButtonFontAwesome("\uf062", 12, () => { Swap(index - 1); MakeDirty(); }, P.Right(buttonSize));//Up
+
 
                         Label(item.Name, P.Fill);
                         /*Button("ClickMe", () => Debug.Log("clicked"), PushRight());
@@ -180,7 +226,7 @@ internal class DebugForm : Form {
                     }
                     GapTop(4);
                 }
-            }              
+            }
 
         }
 
