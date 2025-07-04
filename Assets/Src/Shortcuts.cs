@@ -3,49 +3,62 @@ using System;
 using TMPro;
 using UnityEngine;
 
-namespace FUI {
+namespace FUI
+{
 #nullable enable
 
-    public static partial class Shortcuts {
-        public static void Label(string value, Positioner? positioner = null) {
-            Form.Current.LabelModifiable(positioner??Form.DefaultControlPositioner, M.SetText(value));
+    public static partial class Shortcuts
+    {
+        public static void Label(string value, Positioner? positioner = null)
+        {
+            Form.Current.LabelModifiable(positioner ?? Form.DefaultControlPositioner, M.SetText(value));
         }
 
-        public static Disposable Labeled(string label, Positioner? positioner = null) {
+        public static Disposable Labeled(string label, Positioner? positioner = null)
+        {
             var form = Form.Current;
             Disposable result = form.Group(positioner ?? Form.DefaultControlPositioner);
             Label(label, P.Left(0, 0.5f));
             return result;
         }
 
-        public static T LabeledInputField<T>(string label, T value, Positioner? positioner = null, string toStringFormat = "", Func<string, T>? fromString = null, int numExtraIterations = 0) where T : notnull {
+        public static T LabeledInputField<T>(string label, T value, Positioner? positioner = null, string toStringFormat = "", Func<string, T>? fromString = null, int numExtraIterations = 0) where T : notnull
+        {
             var form = Form.Current;
-            using (Labeled(label, positioner)) {
+            using (Labeled(label, positioner))
+            {
                 return form.InputField(value, P.Fill, toStringFormat, fromString, numExtraIterations);
             }
         }
 
-        public static T LabeledDropdown<T>(string label, T value, Positioner? positioner = null, int numExtraIterations = 0) where T : struct {
+        public static T LabeledDropdown<T>(string label, T value, Positioner? positioner = null, int numExtraIterations = 0) where T : struct
+        {
             var form = Form.Current;
-            using (Labeled(label, positioner)) {
+            using (Labeled(label, positioner))
+            {
                 return form.Dropdown(value, P.Fill, numExtraIterations);
             }
         }
-        public static int LabeledDropdown(string label, int value, string[] options, Positioner? positioner = null, int numExtraIterations = 0) {
+        public static int LabeledDropdown(string label, int value, string[] options, Positioner? positioner = null, int numExtraIterations = 0)
+        {
             var form = Form.Current;
-            using (Labeled(label, positioner)) {
+            using (Labeled(label, positioner))
+            {
                 return form.Dropdown(value, options, P.Fill, numExtraIterations);
             }
         }
 
 
-        public static bool LabeledCheckbox(string label, bool value, Positioner? positioner = null, int numExtraIterations = 0) {
-            using (Labeled(label, positioner)) {
+        public static bool LabeledCheckbox(string label, bool value, Positioner? positioner = null, int numExtraIterations = 0)
+        {
+            using (Labeled(label, positioner))
+            {
                 return Checkbox(value, P.Left(), numExtraIterations);
             }
         }
 
-        public static bool Checkbox(bool value, Positioner? positioner = null, int numExtraIterations = 0) {
+        public static bool Checkbox(bool value, Positioner? positioner = null, int numExtraIterations = 0)
+        {
             var form = Form.Current;
 
             RectTransform background = form.Element(null
@@ -55,7 +68,8 @@ namespace FUI {
                 , M.SetFormToNotify(numExtraIterations)
                 , M.AddComponent<PointerClickHandler>()
                 , M.SetRectangleCorners(4)
-                , M.AddClickHandlerEx((go,e) => {
+                , M.AddClickHandlerEx((go, e) =>
+                {
                     var input = go.GetComponent<BoolUserInputState>();
                     input.UserInput(!input.Value);
                 })
@@ -64,69 +78,84 @@ namespace FUI {
 
             var userInputState = background.GetComponent<BoolUserInputState>();
             bool result;
-            if (!userInputState.NewUserInput) {
+            if (!userInputState.NewUserInput)
+            {
                 userInputState.Value = value;
                 result = value;
-            } else {
+            }
+            else
+            {
                 result = userInputState.Value;
             }
 
             form.BeginControls(background);
 
-            if (result) {
+            if (result)
+            {
                 IconFontAwesome("\uf00c", Theme.Instance.LineHeight * 0.8f, P.Fill);
             }
 
             form.EndControls();
 
-            (positioner??Form.DefaultControlPositioner)(background, form.CurrentBorders, () => new Vector2(Theme.Instance.LineHeight, Theme.Instance.LineHeight));
+            (positioner ?? Form.DefaultControlPositioner)(background, form.CurrentBorders, () => new Vector2(Theme.Instance.LineHeight, Theme.Instance.LineHeight));
 
             return result;
         }
 
 
-        public static int LabeledInputFieldSpinbox(string label, int value, int dragStepSize = 1, Positioner? positioner = null, string toStringFormat = "", Func<string, int>? fromString = null, int numExtraIterations = 0) {
+        public static int LabeledInputFieldSpinbox(string label, int value, int dragStepSize = 1, Positioner? positioner = null, string toStringFormat = "", Func<string, int>? fromString = null, int numExtraIterations = 0)
+        {
             var form = Form.Current;
-            using (Labeled(label, positioner)) {
+            using (Labeled(label, positioner))
+            {
                 value = Spinbox(value, dragStepSize, P.Right(Theme.Instance.LineHeight));
                 form.GapRight(2);
                 return form.InputField(value, P.Fill, toStringFormat, fromString, numExtraIterations);
             }
         }
 
-        public static float LabeledInputFieldSpinbox(string label, float value, float dragStepSize, Positioner? positioner = null, string toStringFormat = "", Func<string, float>? fromString = null, int numExtraIterations = 0) {
+        public static float LabeledInputFieldSpinbox(string label, float value, float dragStepSize, Positioner? positioner = null, string toStringFormat = "", Func<string, float>? fromString = null, int numExtraIterations = 0)
+        {
             var form = Form.Current;
-            using (Labeled(label, positioner)) {
+            using (Labeled(label, positioner))
+            {
                 value = Spinbox(value, dragStepSize, P.Right(Theme.Instance.LineHeight));
                 form.GapRight(2);
                 return form.InputField(value, P.Fill, toStringFormat, fromString, numExtraIterations);
             }
         }
 
-        public static double LabeledInputFieldSpinbox(string label, double value, double dragStepSize, Positioner? positioner = null, string toStringFormat = "", Func<string, double>? fromString = null, int numExtraIterations = 0) {
+        public static double LabeledInputFieldSpinbox(string label, double value, double dragStepSize, Positioner? positioner = null, string toStringFormat = "", Func<string, double>? fromString = null, int numExtraIterations = 0)
+        {
             var form = Form.Current;
-            using (Labeled(label, positioner)) {
+            using (Labeled(label, positioner))
+            {
                 value = Spinbox(value, dragStepSize, P.Right(Theme.Instance.LineHeight));
                 form.GapRight(2);
                 return form.InputField(value, P.Fill, toStringFormat, fromString, numExtraIterations);
             }
         }
 
-        public static int Spinbox(int value, int dragStepSize = 1, Positioner? positioner = null, int numExtraIterations = 0) {
+        public static int Spinbox(int value, int dragStepSize = 1, Positioner? positioner = null, int numExtraIterations = 0)
+        {
             return Spinbox<int, IntUserInputState>(value, positioner, numExtraIterations, (v, d) => v / dragStepSize * dragStepSize + dragStepSize * d);
         }
-        public static float Spinbox(float value, float dragStepSize, Positioner? positioner = null, int numExtraIterations = 0) {            
-            return Spinbox<float, FloatUserInputState>(value, positioner, numExtraIterations, (v, d) => {
+        public static float Spinbox(float value, float dragStepSize, Positioner? positioner = null, int numExtraIterations = 0)
+        {
+            return Spinbox<float, FloatUserInputState>(value, positioner, numExtraIterations, (v, d) =>
+            {
                 var s = Math.Round(v / dragStepSize + d);
                 return (float)(s * dragStepSize);
-            } );
+            });
         }
-        public static double Spinbox(double value, double dragStepSize, Positioner? positioner = null, int numExtraIterations = 0) {
+        public static double Spinbox(double value, double dragStepSize, Positioner? positioner = null, int numExtraIterations = 0)
+        {
             return Spinbox<double, DoubleUserInputState>(value, positioner, numExtraIterations, (v, d) => Math.Round(v / dragStepSize) * dragStepSize + dragStepSize * d);
         }
 
 
-        public static T Spinbox<T,S>(T value, Positioner? positioner, int numExtraIterations, Func<T,int,T> deltaToValue) where S: UserInputState<T> {
+        public static T Spinbox<T, S>(T value, Positioner? positioner, int numExtraIterations, Func<T, int, T> deltaToValue) where S : UserInputState<T>
+        {
             var form = Form.Current;
 
             RectTransform background = form.Element(null
@@ -137,7 +166,8 @@ namespace FUI {
                 , M.AddComponent<PointerClickHandler>()
                 , M.SetRectangleCorners(4)
 
-                , M.AddDraggable((go,e) => {
+                , M.AddDraggable((go, e) =>
+                {
                     var input = go.GetComponent<S>();
 
                     var m = Input.GetKey(KeyCode.LeftShift) ? 10 : 1;
@@ -148,10 +178,13 @@ namespace FUI {
 
             var userInputState = background.GetComponent<S>();
             T result;
-            if (!userInputState.NewUserInput) {
+            if (!userInputState.NewUserInput)
+            {
                 userInputState.Value = value;
                 result = value;
-            } else {
+            }
+            else
+            {
                 result = userInputState.Value;
             }
             form.BeginControls(background);
@@ -163,7 +196,8 @@ namespace FUI {
 
 
 
-        public static bool ExpandableGroupHeader(string label, Positioner? positioner = null, bool? opened = null) {
+        public static bool ExpandableGroupHeader(string label, Positioner? positioner = null, bool? opened = null)
+        {
             var form = Form.Current;
 
             var background = form.Element(null
@@ -171,19 +205,23 @@ namespace FUI {
                 , M.SetRectangleCorners(4)
                 , M.AddComponent<ButtonHighlighter>()
                 , M.AddComponent<BoolUserInputState>()
-                , M.AddClickHandlerEx((go,e) => {
+                , M.AddClickHandlerEx((go, e) =>
+                {
                     var input = go.GetComponent<BoolUserInputState>();
                     input.UserInput(!input.Value);
                 })
-                ,M.SetFormToNotify(0)
+                , M.SetFormToNotify(0)
             );
 
             var userInputState = background.GetComponent<BoolUserInputState>();
 
             bool result;
-            if (!userInputState.NewUserInput && opened.HasValue) {
+            if (!userInputState.NewUserInput && opened.HasValue)
+            {
                 result = opened.Value;
-            } else {
+            }
+            else
+            {
                 result = userInputState.Value;
             }
 
@@ -194,8 +232,8 @@ namespace FUI {
 
             IconFontAwesome(result ? caretDown : caretRight, Theme.Instance.LineHeight * 0.8f, P.Left(Theme.Instance.LineHeight));
 
-            Label(label,P.RigidFill);
-            
+            Label(label, P.RigidFill);
+
             /*var labelElement = form.Element(P.Fill, form.Library.Label
                 , M.SetText(label)
                 , M.SetColor(Theme.Instance.LabelColor)
@@ -204,7 +242,8 @@ namespace FUI {
 
             var innerSize = form.EndControls();
 
-            (positioner?? Form.DefaultControlPositioner) (background, form.CurrentBorders, () => {
+            (positioner ?? Form.DefaultControlPositioner)(background, form.CurrentBorders, () =>
+            {
                 return new Vector2(innerSize.x, Theme.Instance.LineHeight);
             });
 
@@ -212,7 +251,8 @@ namespace FUI {
         }
 
 
-        public static void Rectangle(Positioner positioner, Color color, float radius = 0) {
+        public static void Rectangle(Positioner positioner, Color color, float radius = 0)
+        {
             var form = Form.Current;
             var element = form.Element(null
                 , M.AddComponent<RoundedRectangle>()
@@ -223,16 +263,18 @@ namespace FUI {
         }
 
 
-        public static void Circle(Positioner positioner, Color color, float angle = 1, float startAngle = 0, int numSegments = 64) {
+        public static void Circle(Positioner positioner, Color color, float angle = 1, float startAngle = 0, int numSegments = 64)
+        {
             var form = Form.Current;
             var element = form.Element(null
-                , M.AddCircle(angle,startAngle,numSegments)
+                , M.AddCircle(angle, startAngle, numSegments)
                 , M.SetColor(color)
                 );
             positioner(element, form.CurrentBorders, () => new Vector2(100, 100));
         }
 
-        public static void CircleOutline(Positioner positioner, Color color, float angle = 1, float startAngle = 0, float innerThickness = 0, float outerThickness = 0, int numSegments = 64) {
+        public static void CircleOutline(Positioner positioner, Color color, float angle = 1, float startAngle = 0, float innerThickness = 0, float outerThickness = 0, int numSegments = 64)
+        {
             var form = Form.Current;
             var element = form.Element(null
                 , M.AddCircleOutline(innerThickness, outerThickness, angle, startAngle, numSegments)
@@ -241,7 +283,8 @@ namespace FUI {
             positioner(element, form.CurrentBorders, () => new Vector2(100, 100));
         }
 
-        public static void CircleOutlineScreenSpaceThickness(Positioner positioner, Color color, float angle = 1, float startAngle = 0, float innerThickness = 0, float outerThickness = 0, float screenSpaceThickness = 1, int numSegments = 64) {
+        public static void CircleOutlineScreenSpaceThickness(Positioner positioner, Color color, float angle = 1, float startAngle = 0, float innerThickness = 0, float outerThickness = 0, float screenSpaceThickness = 1, int numSegments = 64)
+        {
             var form = Form.Current;
             var element = form.Element(null
                 , M.AddCircleOutline(innerThickness, outerThickness, angle, startAngle, numSegments)
@@ -256,12 +299,13 @@ namespace FUI {
             Color color,
             Vector2 pointA, Vector2 tangentA,
             Vector2 pointB, Vector2 tangentB,
-            
-            
+
+
             float innerThickness = 0,
             float outerThickness = 0,
             int numSegments = 64
-        ) {
+        )
+        {
             var form = Form.Current;
             var element = form.Element(
                 null,
@@ -274,24 +318,27 @@ namespace FUI {
 
 
 
-        public static Disposable Panel(Positioner positioner, float radius = 0) {
+        public static Disposable Panel(Positioner positioner, float radius = 0)
+        {
             var form = Form.Current;
             return form.Group(positioner
                     , M.AddComponent<RoundedRectangle>()
                     , M.SetRectangleCorners(radius)
                     , M.SetColor(Theme.Instance.PanelBackgroundColor)
-                    );                    
+                    );
         }
-        public static Disposable WindowBackground(Positioner? positioner = null) {
+        public static Disposable WindowBackground(Positioner? positioner = null)
+        {
             var form = Form.Current;
-            return form.Group(positioner?? P.Fill
+            return form.Group(positioner ?? P.Fill
                     , M.AddComponent<RoundedRectangle>()
                     , M.SetColor(Theme.Instance.WindowBackgroundColor)
                     );
         }
 
 
-        public static T SubForm<T>(Positioner positioner) where T : Form {
+        public static T SubForm<T>(Positioner positioner) where T : Form
+        {
             var form = Form.Current;
             var subform = form.Element(null
                 , M.AddComponent<T>()
@@ -302,7 +349,8 @@ namespace FUI {
         }
 
 
-        public static float Slider(float value, Positioner? positioner = null, Color? backgroundColor = null, Color? handleColor = null, int numExtraIterations = 0) {
+        public static float Slider(float value, Positioner? positioner = null, Color? backgroundColor = null, Color? handleColor = null, int numExtraIterations = 0)
+        {
             var form = Form.Current;
 
             var background = form.Element(null
@@ -313,7 +361,7 @@ namespace FUI {
             );
 
 
-            (positioner?? Form.DefaultControlPositioner)(background, form.CurrentBorders, () => new Vector2(80, Theme.Instance.LineHeight));
+            (positioner ?? Form.DefaultControlPositioner)(background, form.CurrentBorders, () => new Vector2(80, Theme.Instance.LineHeight));
 
 
             form.BeginControls(background);
@@ -325,11 +373,13 @@ namespace FUI {
 
 
             var slider = background.GetComponent<Gears.Slider>();
-            if (slider.NewUserInput) {
+            if (slider.NewUserInput)
+            {
                 value = slider.Value.x;
             }
             value = Mathf.Clamp01(value);
-            if (!slider.Moving) {
+            if (!slider.Moving)
+            {
                 slider.Value = new Vector2(value, 0);
             }
 
@@ -343,11 +393,13 @@ namespace FUI {
             return value;
         }
 
-        public static void IconFontAwesome(string icon, float size, Positioner positioner) {
+        public static void IconFontAwesome(string icon, float size, Positioner positioner)
+        {
             IconFontAwesome(icon, size, Theme.Instance.LabelColor, positioner);
         }
 
-        public static void IconFontAwesome(string icon, float size, Color color, Positioner positioner) {
+        public static void IconFontAwesome(string icon, float size, Color color, Positioner positioner)
+        {
             var form = Form.Current;
             var iconElement = form.Element(form.Library.FontAwesomeIcon
                 , M.SetColor(color)
@@ -359,11 +411,13 @@ namespace FUI {
             positioner(iconElement, form.CurrentBorders, () => new Vector2(size, size));
         }
 
-        public static void IconButtonFontAwesome(string icon, float size, Action action, Positioner positioner) {
+        public static void IconButtonFontAwesome(string icon, float size, Action action, Positioner positioner)
+        {
             IconButtonFontAwesome(icon, size, Theme.Instance.LabelColor, action, positioner);
         }
 
-        public static IDisposable TransparentButton(Action action, Positioner positioner){
+        public static IDisposable TransparentButton(Action action, Positioner positioner)
+        {
             var form = Form.Current;
             var group = form.Element(null
                 , M.AddComponent<RoundedRectangle>()
@@ -382,14 +436,17 @@ namespace FUI {
             });
         }
 
-        public static void IconButtonFontAwesome(string icon, float size, Color color, Action action, Positioner positioner){
-            using (TransparentButton(action, positioner)) {
+        public static void IconButtonFontAwesome(string icon, float size, Color color, Action action, Positioner positioner)
+        {
+            using (TransparentButton(action, positioner))
+            {
                 IconFontAwesome(icon, size, color, P.RigidFill);
             }
 
         }
 
-        public static void ColoredButton(string text, Action action, Color? color = null, Positioner? positioner = null) {
+        public static void ColoredButton(string text, Action action, Color? color = null, Positioner? positioner = null)
+        {
             var form = Form.Current;
 
             var backgroundColor = color ?? Theme.Instance.PrimaryColor;
@@ -405,7 +462,8 @@ namespace FUI {
                         )
                     , M.AddClickHandler(action)
                     )
-                    ) {
+                    )
+            {
                 form.Padding(10, 10, 0, 0);
                 form.LabelModifiable(P.Fill
                     , M.SetText(text)
@@ -415,7 +473,8 @@ namespace FUI {
             }
         }
 
-        public static void Button(string text, Action action, Positioner? positioner = null) {
+        public static void Button(string text, Action action, Positioner? positioner = null)
+        {
             var form = Form.Current;
             using (form.Group(positioner ?? P.Up(Theme.Instance.LineHeight)
                     , M.AddComponent<RoundedRectangle>()
@@ -423,7 +482,8 @@ namespace FUI {
                     , M.AddComponent<ButtonHighlighter>()
                     , M.AddClickHandler(action)
                     )
-                    ) {
+                    )
+            {
                 form.Padding(10, 10, 0, 0);
                 form.LabelModifiable(P.Fill
                     , M.SetText(text)
@@ -432,15 +492,17 @@ namespace FUI {
                     );
             }
         }
-        
-        public static void DisabledButton(string text, Positioner? positioner = null) {
+
+        public static void DisabledButton(string text, Positioner? positioner = null)
+        {
             var form = Form.Current;
             using (form.Group(positioner ?? P.Up(Theme.Instance.LineHeight)
                        , M.AddComponent<RoundedRectangle>()
                        , M.SetRectangleCorners(4)
                        , M.SetColor(Theme.Instance.ButtonColor * 0.75f)
                    )
-                  ) {
+                  )
+            {
                 form.Padding(10, 10, 0, 0);
                 form.LabelModifiable(P.Fill
                     , M.SetText(text)
@@ -450,13 +512,16 @@ namespace FUI {
             }
         }
 
-        public static Disposable ZoomPanViewport(Positioner positioner, Vector2 contentSize) {
+        public static Disposable ZoomPanViewport(Positioner positioner, Vector2 contentSize)
+        {
             var form = Form.Current;
             var background = form.Element(null
                 , M.AddComponent<RoundedRectangle>()
                 , M.AddMask(false)
-                , M.AddClickHandlerEx((go, e) => {
-                    if (e.clickCount == 2) {
+                , M.AddClickHandlerEx((go, e) =>
+                {
+                    if (e.clickCount == 2)
+                    {
                         var component = go.GetComponent<ZoomPanViewport>();
                         component.IntScale = 0;
                         component.ViewportCenterInContent = Vector2.zero;
@@ -470,11 +535,33 @@ namespace FUI {
             var content = background.GetComponent<ZoomPanViewport>().Content;
             form.BeginControls(content);
 
-            return new Disposable(() => {
+            return new Disposable(() =>
+            {
                 form.EndControls();
             });
-
         }
 
+        static Vector2 GetDimension(Positioner? positioner, Dimension.DimensionsMask mask, int NumExtraIterations = 0)
+        {
+            var form = Form.Current;
+
+            var observer = form.Element(null
+                , M.AddComponent<Dimension>()
+            );
+
+            var component = observer.GetComponent<Dimension>();
+            component.SetFormToNotify(Form.Current);
+            component.ExtraIterations = NumExtraIterations;
+            component.Mask = mask;
+
+            float dimension = mask.HasFlag(Dimension.DimensionsMask.Width) ? observer.rect.width : observer.rect.height;
+            (positioner ?? P.Fill)(observer, form.CurrentBorders, () => new Vector2(0, 0));
+
+            return new Vector2(component.Width, component.Height);
+        }
+
+        public static float GetWidth(Positioner? positioner = null, int NumExtraIterations = 0) => GetDimension(positioner, Dimension.DimensionsMask.Width, NumExtraIterations).x;
+        public static float GetHeight(Positioner? positioner = null, int NumExtraIterations = 0) => GetDimension(positioner, Dimension.DimensionsMask.Height, NumExtraIterations).y;
+        public static Vector2 GetSize(Positioner? positioner = null, int NumExtraIterations = 0) => GetDimension(positioner, Dimension.DimensionsMask.Both, NumExtraIterations);
     }
 }
