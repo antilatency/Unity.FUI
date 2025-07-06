@@ -16,7 +16,7 @@ internal class ColorPickerForm : Form {
         var background = form.Element(null
             ,M.AddComponent<RoundedRectangle>()
             ,M.AddComponent<Slider>()
-            ,M.SetFormToNotify(extraIteration)
+            //,M.SetFormToNotify(extraIteration)
             ,M.SetCustomShader("UI/HueSaturationRect")
         );
 
@@ -31,6 +31,7 @@ internal class ColorPickerForm : Form {
         form.EndControls();
 
         var slider = background.GetComponent<Slider>();
+        slider.SetFormToNotify(form, extraIteration);
         if (slider.NewUserInput) {
             value = slider.Value;
         }

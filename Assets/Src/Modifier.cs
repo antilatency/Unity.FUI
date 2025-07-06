@@ -152,15 +152,17 @@ namespace FUI {
                 }
             );
 
-        public static Modifier AddPointerEventReceiver(Func<GameObject, PointerEventData, bool> handler) =>
+        public static Modifier AddPointerEventObserver(Func<GameObject, PointerEventData, bool> handler) =>
             new(
                 "AddPointerEventReceiver",
-                x => x.AddComponent<PointerEventReceiver>(),
+                x => x.AddComponent<PointerEventObserver>(),
                 x => {
-                    var receiver = x.GetComponent<PointerEventReceiver>();
+                    var receiver = x.GetComponent<PointerEventObserver>();
                     receiver.Handler = handler;
                 }
             );
+
+
 
         public static Modifier AddClickHandler(Action click) =>
             new(
@@ -223,16 +225,15 @@ namespace FUI {
                 }
             );
 
-        public static Modifier SetFormToNotify(bool extraIteration = false) =>
+        /*public static Modifier SetFormToNotify(bool extraIteration = false) =>
             new (
                 "SetFormToNotify",
                 null,
                 x => {
-                    var notifier = x.GetComponent<AbstractUserInputNotifier>();
-                    notifier.SetFormToNotify(Form.Current);
-                    notifier.ExtraIteration = extraIteration;
+                    var notifier = x.GetComponent<AbstractFormNotifier>();
+                    notifier.SetFormToNotify(Form.Current,extraIteration);
                 }
-                );
+                );*/
 
         public static Modifier DisableRaycastTarget() =>
             new (

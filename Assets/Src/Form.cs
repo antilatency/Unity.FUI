@@ -339,10 +339,10 @@ namespace FUI {
 
         public T InputField<T>(T value, Positioner positioner, string toStringFormat = "", Func<string, T>? fromString = null, bool extraIteration = false) {
 
-            var transform = Element(Library.InputField.gameObject
-                , M.SetFormToNotify(extraIteration)
-                );
+            var transform = Element(Library.InputField.gameObject);
+            
             var input = transform.GetComponent<InputFieldState>();
+            input.SetFormToNotify(Form.Current, extraIteration);
 
             positioner(transform, CurrentBorders, () => {
                 var textSize = input.GetComponent<FUI_InputField>().textComponent.GetPreferredValues("Hello");
@@ -388,12 +388,11 @@ namespace FUI {
         }
 
         public int Dropdown(int value, string[] options, Positioner? positioner = null, bool extraIteration = false) {
+            var form = Form.Current;
             if (positioner == null)
                 positioner = DefaultControlPositioner;
 
-            var element = Element(Library.Dropdown
-                , M.SetFormToNotify(extraIteration)
-                );
+            var element = Element(Library.Dropdown);
             positioner(element, CurrentBorders, () => new Vector2(40, Theme.Instance.LineHeight));
 
 
@@ -402,9 +401,12 @@ namespace FUI {
             dropdown.options = options.Select(x => new TMP_Dropdown.OptionData(x)).ToList();
 
             var state = dropdown.GetComponent<DropdownState>();
+            state.SetFormToNotify(form, extraIteration);
+
             if (state.NewUserInput) {
                 return state.Value;
-            } else {
+            }
+            else {
                 var editing = dropdown.IsExpanded;
                 if (!editing) {
                     state.Value = value;

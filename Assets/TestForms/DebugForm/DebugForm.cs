@@ -168,7 +168,7 @@ internal class DebugForm : Form {
 
                 testEnum = LabeledDropdown("Enum", testEnum);
 
-                testEnum = ToggleButtonGroup(testEnum,null,4,0);
+                testEnum = ToggleButtonGroup(testEnum, null, 4, 0);
 
                 Label($"Enum Value: {(int)testEnum}");
 
@@ -181,7 +181,9 @@ internal class DebugForm : Form {
                 LabelModifiable(P.Up(Theme.Instance.LineHeight), M.SetText("Red text"), M.SetColor(Color.red));
                 LabelModifiable(P.Up(Theme.Instance.LineHeight), M.SetText("Bold text"), M.SetFontStyle(TMPro.FontStyles.Bold));
 
-
+                //Label($"Width: {GetWidth()}");
+                var size = GetSize();
+                Label($"Size: {size.x}x{size.y}");
 
             }
 

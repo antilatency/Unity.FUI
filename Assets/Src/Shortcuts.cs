@@ -1,8 +1,5 @@
 ﻿using FUI.Gears;
 using System;
-using System.Text.RegularExpressions;
-
-using TMPro;
 using UnityEngine;
 
 namespace FUI {
@@ -65,7 +62,7 @@ namespace FUI {
                     }
                 }
                 return value;
-            }            
+            }
         }
 
         public static T ToggleButtonGroup<T>(T value, Positioner? positioner = null, float gap = 0, float externalPaddingCompensation = 0, bool extraIteration = false) where T : struct, Enum {
@@ -84,7 +81,7 @@ namespace FUI {
                 , M.AddComponent<ConfigurablePressedHoveredHighlighter>()
 
                 , M.AddComponent<BoolUserInputState>()
-                , M.SetFormToNotify(extraIteration)
+                //, M.SetFormToNotify(extraIteration)
                 , M.AddComponent<PointerClickHandler>()
                 , M.SetRectangleCorners(4)
                 , M.AddClickHandlerEx((go, e) => {
@@ -94,6 +91,7 @@ namespace FUI {
             );
 
             var userInputState = background.GetComponent<BoolUserInputState>();
+            userInputState.SetFormToNotify(form, extraIteration);
 
             bool result;
             if (!userInputState.NewUserInput) {
@@ -136,7 +134,7 @@ namespace FUI {
                 , M.AddComponent<RoundedRectangle>()
                 , M.AddComponent<ButtonHighlighter>()
                 , M.AddComponent<BoolUserInputState>()
-                , M.SetFormToNotify(extraIteration)
+                //, M.SetFormToNotify(extraIteration)
                 , M.AddComponent<PointerClickHandler>()
                 , M.SetRectangleCorners(4)
                 , M.AddClickHandlerEx((go, e) => {
@@ -147,6 +145,7 @@ namespace FUI {
 
 
             var userInputState = background.GetComponent<BoolUserInputState>();
+            userInputState.SetFormToNotify(form, extraIteration);
             bool result;
             if (!userInputState.NewUserInput) {
                 userInputState.Value = value;
@@ -211,14 +210,14 @@ namespace FUI {
         }
 
 
-        public static T Spinbox<T, S>(T value, Positioner? positioner, bool extraIteration, Func<T, int, T> deltaToValue) where S : UserInputState<T> {
+        public static T Spinbox<T, S>(T value, Positioner? positioner, bool extraIteration, Func<T, int, T> deltaToValue) where S : UserInputState<T> where T : struct, System.IEquatable<T> {
             var form = Form.Current;
 
             RectTransform background = form.Element(null
                 , M.AddComponent<RoundedRectangle>()
                 , M.AddComponent<ButtonHighlighter>()
                 , M.AddComponent<S>()
-                , M.SetFormToNotify(extraIteration)
+                //, M.SetFormToNotify(extraIteration)
                 , M.AddComponent<PointerClickHandler>()
                 , M.SetRectangleCorners(4)
 
@@ -232,6 +231,7 @@ namespace FUI {
             );
 
             var userInputState = background.GetComponent<S>();
+            userInputState.SetFormToNotify(form, extraIteration);
             T result;
             if (!userInputState.NewUserInput) {
                 userInputState.Value = value;
@@ -261,11 +261,11 @@ namespace FUI {
                     var input = go.GetComponent<BoolUserInputState>();
                     input.UserInput(!input.Value);
                 })
-                , M.SetFormToNotify()
+                //, M.SetFormToNotify()
             );
 
             var userInputState = background.GetComponent<BoolUserInputState>();
-
+            userInputState.SetFormToNotify(form, false);
             bool result;
             if (!userInputState.NewUserInput && opened.HasValue) {
                 result = opened.Value;
@@ -395,7 +395,7 @@ namespace FUI {
             var background = form.Element(null
                 , M.AddComponent<RoundedRectangle>()
                 , M.AddComponent<Slider>()
-                , M.SetFormToNotify(extraIteration)
+                //, M.SetFormToNotify(extraIteration)
                 , M.SetColor(backgroundColor ?? new Color(0, 0, 0, 0))
             );
 
@@ -412,6 +412,8 @@ namespace FUI {
 
 
             var slider = background.GetComponent<Gears.Slider>();
+            slider.SetFormToNotify(form, extraIteration);
+
             if (slider.NewUserInput) {
                 value = slider.Value.x;
             }
@@ -562,6 +564,27 @@ namespace FUI {
 
         }
 
+        private static Vector2 GetDimension(Positioner? positioner, Dimension.DimensionsMask mask, bool extraIteration = false) {
+            var form = Form.Current;
 
+            var observer = form.Element(null
+                , M.AddComponent<Dimension>()
+                //, M.SetFormToNotify(extraIteration)
+            );
+            //var notifier = observer.GetComponent<IFormNotifier>();
+            var component = observer.GetComponent<Dimension>();
+            component.SetFormToNotify(Form.Current,extraIteration);
+
+            component.Mask = mask;
+
+            float dimension = mask.HasFlag(Dimension.DimensionsMask.Width) ? observer.rect.width : observer.rect.height;
+            (positioner ?? P.Fill)(observer, form.CurrentBorders, () => new Vector2(0, 0));
+
+            return new Vector2(component.Width, component.Height);
+        }
+
+        public static float GetWidth(Positioner? positioner = null, bool extraIteration = false) => GetDimension(positioner, Dimension.DimensionsMask.Width, extraIteration).x;
+        public static float GetHeight(Positioner? positioner = null, bool extraIteration = false) => GetDimension(positioner, Dimension.DimensionsMask.Height, extraIteration).y;
+        public static Vector2 GetSize(Positioner? positioner = null, bool extraIteration = false) => GetDimension(positioner, Dimension.DimensionsMask.Both, extraIteration);
     }
 }

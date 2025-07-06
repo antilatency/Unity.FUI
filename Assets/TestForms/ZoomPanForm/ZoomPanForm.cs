@@ -36,14 +36,14 @@ public class ZoomPanForm : Form {
                     Element(P.Fill, null
                     , M.AddComponent<RoundedRectangle>()
                     , M.SetColor(Color.yellow)
-                    , M.AddPointerEventReceiver((g, e) => {
+                    , M.AddPointerEventObserver((g, e) => {
                         //check Ctrl key
                         if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) {
                             Debug.Log($"Ctrl + Left Click on {g.name}");
                             return false; // Propagate the event
                         }
                         
-                        Debug.Log($"UV on {g.name} = {PointerEventReceiver.GetPointerUV(g, e)}");
+                        Debug.Log($"UV on {g.name} = {PointerEventObserver.GetPointerUV(g, e)}");
                         if (e.dragging) {
                             Debug.Log($"Dragging on {g.name}");
                             return false;

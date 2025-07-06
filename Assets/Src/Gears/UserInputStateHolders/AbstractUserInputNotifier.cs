@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
-namespace FUI.Gears {
+#nullable enable
+
+/*namespace FUI.Gears {
     public abstract class AbstractUserInputNotifier : MonoBehaviour {
         
         [SerializeField]
@@ -13,7 +15,5 @@ namespace FUI.Gears {
         }
 
         public bool ExtraIteration = false;
-
-
     }
-}
+}*/

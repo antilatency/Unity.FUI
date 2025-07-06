@@ -5,7 +5,8 @@ using UnityEngine.EventSystems;
 
 
 namespace FUI.Gears {
-    public class PointerEventReceiver : MonoBehaviour,
+
+    public class PointerEventObserver : MonoBehaviour,
         IPointerClickHandler,
         IPointerDownHandler,
         IPointerUpHandler,
