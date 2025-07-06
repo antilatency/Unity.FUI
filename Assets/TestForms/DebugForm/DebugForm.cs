@@ -158,7 +158,7 @@ internal class DebugForm : Form {
 
 
                 TestFloat = ClampMakeDirty(
-                    LabeledInputFieldSpinbox("Float", TestFloat, 0.001f, null, "0.###")
+                    LabeledInputFieldSpinbox("Float", TestFloat, 0.001f, null, "0.###", extraIteration: true)
                     , 0
                     , 1);
 
@@ -168,7 +168,7 @@ internal class DebugForm : Form {
 
                 testEnum = LabeledDropdown("Enum", testEnum);
 
-                testEnum = ToggleButtonGroup(testEnum, null, 4, 0);
+                testEnum = ToggleButtonGroup(testEnum, null, 4, 0, true);
 
                 Label($"Enum Value: {(int)testEnum}");
 

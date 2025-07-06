@@ -52,17 +52,34 @@ namespace FUI {
             if (positioner == null)
                 positioner = Form.DefaultControlPositioner;
 
-            using (form.Group(positioner)) {
-                form.Padding(padding, padding, 0, 0);
-                for (int i = 0; i < options.Length; i++) {
-                    int index = i;
-                    var selected = ToggleButton(options[i], value == index, P.RowElement(options.Length, gap, 2 * padding), extraIteration || (i > 0));
-                    if (selected) {
-                        value = index;
-                    }
-                }
-                return value;
+            var element = form.Element(null, M.AddComponent<IntUserInputState>());
+            var state = element.GetComponent<IntUserInputState>();
+            state.SetFormToNotify(form, extraIteration);
+
+            if (!state.NewUserInput) {
+                state.Value = value;
             }
+            else {
+                value = state.Value;
+            }
+
+            form.BeginControls(element);
+            form.Padding(padding, padding, 0, 0);
+            for (int i = 0; i < options.Length; i++) {
+                int index = i;
+                var color = value == index ? Theme.Instance.PrimaryColor : Theme.Instance.newButtonColor;
+                ColoredButton(options[i], () => {
+                    if (value == index) {
+                        return; // already selected
+                    }
+                    state.UserInput(index);
+                }, color, P.RowElement(options.Length, gap, 2 * padding));
+            }
+            form.EndControls();
+
+            (positioner ?? Form.DefaultControlPositioner)
+                (element, form.CurrentBorders, () => new Vector2(Theme.Instance.LineHeight, Theme.Instance.LineHeight));
+            return state.Value; 
         }
 
         public static T ToggleButtonGroup<T>(T value, Positioner? positioner = null, float gap = 0, float externalPaddingCompensation = 0, bool extraIteration = false) where T : struct, Enum {
