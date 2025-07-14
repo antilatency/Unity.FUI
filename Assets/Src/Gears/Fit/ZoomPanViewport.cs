@@ -9,14 +9,15 @@ using static UnityEngine.EventSystems.PointerEventData;
 
 namespace FUI {
     public static partial class M {
-        public static Modifier AddZoomPanViewport(Vector2 contentSize, InputButtonMask allowedButtons = InputButtonMask.All) =>
+        public static Modifier AddZoomPanViewport(Vector2 contentSize, PointerEventUtils.PointerEventFilter? scrollFilter = null, PointerEventUtils.PointerEventFilter? dragFilter = null ) =>
             new Modifier(
                 "AddZoomPanViewport",
                 x => x.AddComponent<Gears.ZoomPanViewport>(),
                 x => {
                     var component = x.GetComponent<Gears.ZoomPanViewport>();
                     component.ContentSize = contentSize;
-                    component.AllowedButtons = allowedButtons;
+                    component.ScrollFilter = scrollFilter;
+                    component.DragFilter = dragFilter;
                 }
                 );
     }
@@ -26,7 +27,11 @@ namespace FUI.Gears {
 
     public class ZoomPanViewport : FitInside, IDragHandler, IScrollHandler {
 
-        public InputButtonMask AllowedButtons = InputButtonMask.All;
+        
+
+        public PointerEventUtils.PointerEventFilter? ScrollFilter = null;
+        public PointerEventUtils.PointerEventFilter? DragFilter = null;
+        //public InputButtonMask AllowedButtons = InputButtonMask.All;
 
         private int intScale;
         public int IntScale {
@@ -55,17 +60,38 @@ namespace FUI.Gears {
 
 
         void IDragHandler.OnDrag(PointerEventData eventData) {
-            Draggable.HandleDragWithAllowedButtons(
+            if (DragFilter != null && !DragFilter(gameObject, eventData)) {
+                var parent = gameObject.transform.parent;
+                ExecuteEvents.ExecuteHierarchy(
+                    parent.gameObject,
+                    eventData,
+                    ExecuteEvents.dragHandler
+                );
+                return;
+            }
+            Move(eventData.delta);
+            /*Draggable.HandleDragWithAllowedButtons(
                 gameObject,
                 eventData,
                 AllowedButtons,
                 (g,e) => {
                     Move(e.delta);
                 }
-            );            
+            );  */          
         }
 
         void IScrollHandler.OnScroll(PointerEventData eventData) {
+            if (ScrollFilter != null && !ScrollFilter(gameObject, eventData)) {
+                var parent = gameObject.transform.parent;
+                ExecuteEvents.ExecuteHierarchy(
+                    parent.gameObject,
+                    eventData,
+                    ExecuteEvents.scrollHandler
+                );
+                return;
+            }
+
+
             var cursorInContent = GetMousePositionInContent(eventData);
             var scale = Scale;
             IntScale += Mathf.RoundToInt(eventData.scrollDelta.y);

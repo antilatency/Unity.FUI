@@ -5,11 +5,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using static FUI.Shortcuts;
+using static UnityEngine.EventSystems.PointerEventData;
 
 
 public class ZoomPanForm : Form {
 
-    
+    public enum InputButtonMask {
+        Left = 1 << InputButton.Left,
+        Right = 1 << InputButton.Right,
+        Middle = 1 << InputButton.Middle,
+        All = Left | Right | Middle
+    }
 
     public float TestFloat;
     
@@ -26,7 +32,16 @@ public class ZoomPanForm : Form {
                 AllowedButtons = Dropdown(AllowedButtons);
             }
 
-            using (ZoomPanViewport(P.Fill, new Vector2(640, 480), AllowedButtons)) {
+            using (ZoomPanViewport(P.Fill, new Vector2(640, 480), 
+                scrollFilter: (g, e) => {
+                    var anyControl = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
+                    return !anyControl;
+                },
+                dragFilter: (g, e) => {
+                    var allowed = ((int)AllowedButtons & (1 << (int)e.button)) != 0;
+                    return allowed;
+                }
+            )) {
                 Rectangle(P.Absolute(Vector2.zero, 50, null, Vector2.zero, Vector2.one - Vector2.zero), Color.red);
                 Rectangle(P.Absolute(Vector2.zero, 50, null, Vector2.up, Vector2.one - Vector2.up), Color.green);
                 Rectangle(P.Absolute(Vector2.zero, 50, null, Vector2.one, Vector2.one - Vector2.one), Color.blue);

@@ -9,7 +9,7 @@ namespace FUI.Gears {
     public class Draggable : MonoBehaviour, IDragHandler, IInitializePotentialDragHandler {
 
 
-        public InputButtonMask AllowedButtons = InputButtonMask.All;
+        public PointerEventUtils.PointerEventFilter EventFilter = null;
 
         public Action<GameObject, PointerEventData> DragAction;
 
@@ -18,15 +18,19 @@ namespace FUI.Gears {
         }
 
         void IDragHandler.OnDrag(PointerEventData eventData) {
-            HandleDragWithAllowedButtons(
-                gameObject,
-                eventData,
-                AllowedButtons,
-                DragAction
-            );
+            if (EventFilter != null && !EventFilter(gameObject, eventData)) {
+                var parent = gameObject.transform.parent;
+                ExecuteEvents.ExecuteHierarchy(
+                    parent.gameObject,
+                    eventData,
+                    ExecuteEvents.dragHandler
+                );
+                return;
+            }
+            DragAction(gameObject, eventData);
         }
 
-        public static void HandleDragWithAllowedButtons(
+        /*public static void HandleDragWithAllowedButtons(
             GameObject gameObject,
             PointerEventData eventData,
             InputButtonMask allowedButtons,
@@ -43,7 +47,7 @@ namespace FUI.Gears {
                     ExecuteEvents.dragHandler
                 );
             }
-        }
+        }*/
 
     }
 
