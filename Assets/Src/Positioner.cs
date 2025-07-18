@@ -5,7 +5,7 @@ namespace FUI {
     public delegate void Positioner(UnityEngine.RectTransform rectTransform, Borders borders, System.Func<UnityEngine.Vector2> sizeGetter);
 
     public static class P {
-        public static Positioner Left(float? size = null, float fraction = 0) {
+        public static Positioner Left(float? size = null, float fraction = 0, bool keepBorders = false) {
             return (rectTransform, borders, sizeGetter) => {
                 var offset = size ?? sizeGetter?.Invoke().x ?? 0;
 
@@ -14,13 +14,12 @@ namespace FUI {
 
                 rectTransform.offsetMin = new Vector2(borders.Left.Pixels, borders.Bottom.Pixels);
                 rectTransform.offsetMax = new Vector2(borders.Left.Pixels + offset, -borders.Top.Pixels);
-
-                borders.Left.Increment(offset, fraction);
+                if (!keepBorders) borders.Left.Increment(offset, fraction);
             };
         }
 
 
-        public static Positioner Right(float? size = null, float fraction = 0) {
+        public static Positioner Right(float? size = null, float fraction = 0, bool keepBorders = false) {
             return (rectTransform, borders, sizeGetter) => {
                 var offset = size ?? sizeGetter?.Invoke().x ?? 0;
 
@@ -30,11 +29,11 @@ namespace FUI {
                 rectTransform.offsetMin = new Vector2(-borders.Right.Pixels - offset, borders.Bottom.Pixels);
                 rectTransform.offsetMax = new Vector2(-borders.Right.Pixels, -borders.Top.Pixels);
 
-                borders.Right.Increment(offset, fraction);
+                if (!keepBorders) borders.Right.Increment(offset, fraction);
             };
         }
 
-        public static Positioner Down(float? size = null, float fraction = 0) {
+        public static Positioner Down(float? size = null, float fraction = 0, bool keepBorders = false) {
             return (rectTransform, borders, sizeGetter) => {
                 var offset = size ?? sizeGetter?.Invoke().y ?? 0;
 
@@ -44,12 +43,12 @@ namespace FUI {
                 rectTransform.offsetMin = new Vector2(borders.Left.Pixels, borders.Bottom.Pixels);
                 rectTransform.offsetMax = new Vector2(-borders.Right.Pixels, borders.Bottom.Pixels + offset);
 
-                borders.Bottom.Increment(offset, fraction);
+                if (!keepBorders) borders.Bottom.Increment(offset, fraction);
             };
         }
 
 
-        public static Positioner Up(float? size = null, float fraction = 0) {
+        public static Positioner Up(float? size = null, float fraction = 0, bool keepBorders = false) {
             return (rectTransform, borders, sizeGetter) => {
                 var offset = size ?? sizeGetter?.Invoke().y ?? 0;
 
@@ -59,7 +58,7 @@ namespace FUI {
                 rectTransform.offsetMin = new Vector2(borders.Left.Pixels, -borders.Top.Pixels - offset);
                 rectTransform.offsetMax = new Vector2(-borders.Right.Pixels, -borders.Top.Pixels);
 
-                borders.Top.Increment(offset, fraction);
+                if (!keepBorders) borders.Top.Increment(offset, fraction);
             };
         }
 
