@@ -148,7 +148,7 @@ namespace FUI {
         }
 
         public RectTransform Element(Positioner positioner, GameObject original = null, params Modifier[] modifiers) {
-            var result = Element(null, modifiers);
+            var result = Element(original, modifiers);
             positioner?.Invoke(result, Form.Current.CurrentBorders, null);
             return result;
         }
