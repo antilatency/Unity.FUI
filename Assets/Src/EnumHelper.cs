@@ -8,6 +8,7 @@ namespace FUI {
             string[] _names;
             T[] _values;
             public string[] Names => _names;
+            public string[] NamesTrimmed => Array.ConvertAll(_names, n => n.Trim('_'));
             public EnumHelper() {
                 _names = Enum.GetNames(typeof(T));
                 _values = (T[])Enum.GetValues(typeof(T));

@@ -85,7 +85,7 @@ namespace FUI {
         public static T ToggleButtonGroup<T>(T value, Positioner? positioner = null, float gap = 0, float externalPaddingCompensation = 0, bool extraIteration = false) where T : struct, Enum {
             var helper = new EnumHelper<T>();
             var optionIndex = helper.ValueToIndex(value);
-            int selectedOptionIndex = ToggleButtonGroup(optionIndex, helper.Names, positioner, gap, externalPaddingCompensation, extraIteration);
+            int selectedOptionIndex = ToggleButtonGroup(optionIndex, helper.NamesTrimmed, positioner, gap, externalPaddingCompensation, extraIteration);
             return helper.IndexToValue(selectedOptionIndex);
         }
 
