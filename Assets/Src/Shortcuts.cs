@@ -424,7 +424,7 @@ namespace FUI {
             var handle = form.Element(null
                 , M.AddComponent<RoundedRectangle>()
                 , M.SetColor(handleColor ?? Color.white)
-                , M.DisableRaycastTarget()
+                , M.SetRaycastTarget(false)
             );
 
 
@@ -459,7 +459,7 @@ namespace FUI {
                 , M.SetColor(color)
                 , M.SetText(icon)
                 , M.SetFontSize(size)
-                , M.DisableRaycastTarget()
+                , M.SetRaycastTarget(false)
                 );
 
             positioner(iconElement, form.CurrentBorders, () => new Vector2(size, size));

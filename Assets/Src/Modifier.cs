@@ -235,10 +235,10 @@ namespace FUI {
                 }
                 );*/
 
-        public static Modifier DisableRaycastTarget() =>
+        public static Modifier SetRaycastTarget(bool value) =>
             new (
-                "DisableRaycastTarget",
-                x => x.GetComponent<Graphic>().raycastTarget = false,
+                "SetRaycastTarget",
+                x => x.GetComponent<Graphic>().raycastTarget = value,
                 null
                 );
 

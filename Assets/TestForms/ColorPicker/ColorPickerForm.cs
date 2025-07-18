@@ -26,7 +26,7 @@ internal class ColorPickerForm : Form {
         var handle = form.Element(null
             , M.AddComponent<RoundedRectangle>()
             , M.SetColor(Color.black)
-            , M.DisableRaycastTarget()
+            , M.SetRaycastTarget(false)
         );
         form.EndControls();
 
