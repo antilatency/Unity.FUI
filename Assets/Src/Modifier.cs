@@ -77,6 +77,18 @@ namespace FUI {
         public static Modifier SetTextOverflow(TextOverflowModes overflowMode, bool mutable = true)
             => MakeSetter(mutable, x => { x.GetComponent<TMP_Text>().overflowMode = overflowMode; });
 
+        public static Modifier SetTextMargin(float left = 0, float right = 0, float top = 0, float bottom = 0, bool mutable = true)
+            => MakeSetter(mutable, x => {
+                var text = x.GetComponent<TMP_Text>();
+                text.margin = new Vector4(left, top, right, bottom);
+            });
+
+        public static Modifier SetTextMargin(float horizontal, float vertical = 0, bool mutable = true)
+            => MakeSetter(mutable, x => {
+                var text = x.GetComponent<TMP_Text>();
+                text.margin = new Vector4(horizontal, vertical, horizontal, vertical);
+            });
+
         public static Modifier AddComponent<T>() where T : Component =>
             new(
                 $"AddComponent<{typeof(T).FullName}>",
