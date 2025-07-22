@@ -51,7 +51,6 @@ internal class DebugForm : Form {
 
 
     void PopulateTabs(Color[] colors, int height = 150, float gap = 10) {
-        int index = 0;
         float fraction = 1f / colors.Length;
         float gapCompensation = gap * (colors.Length - 1) / colors.Length;
         using (Group(P.Up(height))) {
