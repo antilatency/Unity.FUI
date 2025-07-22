@@ -83,12 +83,6 @@ namespace FUI {
                 text.margin = new Vector4(left, top, right, bottom);
             });
 
-        public static Modifier SetTextMargin(float horizontal, float vertical = 0, bool mutable = true)
-            => MakeSetter(mutable, x => {
-                var text = x.GetComponent<TMP_Text>();
-                text.margin = new Vector4(horizontal, vertical, horizontal, vertical);
-            });
-
         public static Modifier AddComponent<T>() where T : Component =>
             new(
                 $"AddComponent<{typeof(T).FullName}>",
