@@ -10,6 +10,6 @@
     "FUI"
   ],
   "dependencies": {
-    "com.unity.textmeshpro": "3.x.x"
+    "com.unity.textmeshpro": "3.0.6"
   }
 }
