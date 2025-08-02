@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 namespace FUI {
 
+
     [RequireComponent(typeof(CanvasRenderer))]
     public class Circle : MaskableGraphic {
         private float startAngle = 0;
