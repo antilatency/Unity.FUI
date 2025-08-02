@@ -25,7 +25,11 @@ namespace FUI {
             new(
                 $"AddVectorCanvas",
                 x => x.AddComponent<VectorCanvas>(),
-                x => x.GetComponent<VectorCanvas>().OnDrawing = drawingDelegate
+                x => {
+                    var canvas = x.GetComponent<VectorCanvas>();
+                    canvas.OnDrawing = drawingDelegate;
+                    canvas.SetVerticesDirty();
+                }
             );
     }
 
