@@ -137,7 +137,7 @@ namespace FUI {
                 });
             }
 
-            for (int i = 0; i < positions.Length - 2; i++) {
+            for (int i = 0; i < segments; i++) {
                 _vertexHelper.AddTriangle(startIndex, startIndex + i + 2, startIndex + i + 1);
             }
         }
