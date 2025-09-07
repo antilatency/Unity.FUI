@@ -581,6 +581,24 @@ namespace FUI {
 
         }
 
+        public static Disposable FitInside(Positioner positioner, Vector2 contentSize) { 
+            var form = Form.Current;
+            var background = form.Element(null
+                , M.AddComponent<RoundedRectangle>()
+                , M.AddMask(false)
+                , M.AddComponent<FitInside>()
+            );
+
+            positioner(background, form.CurrentBorders, () => contentSize);
+
+            var content = background.GetComponent<FitInside>().Content;
+            form.BeginControls(content);
+
+            return new Disposable(() => {
+                form.EndControls();
+            });
+        }
+
         private static Vector2 GetDimension(Positioner? positioner, Dimension.DimensionsMask mask, bool extraIteration = false) {
             var form = Form.Current;
 
