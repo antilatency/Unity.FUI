@@ -590,8 +590,10 @@ namespace FUI {
             );
 
             positioner(background, form.CurrentBorders, () => contentSize);
-
-            var content = background.GetComponent<FitInside>().Content;
+            
+            var component = background.GetComponent<FitInside>();
+            component.ContentSize = contentSize;
+            var content = component.Content;
             form.BeginControls(content);
 
             return new Disposable(() => {
