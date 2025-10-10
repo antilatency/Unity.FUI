@@ -1,3 +1,5 @@
+using FUI.Modifiers;
+
 using UnityEngine;
 
 
@@ -15,8 +17,8 @@ namespace FUI {
         public static void Image(Positioner positioner, Texture texture, Vector4 multiplier, Vector4 increment, bool toSrgb) {
             var form = Form.Current;
             var element = form.Element(null
-                , M.AddComponent<RoundedRectangle>()
-                , M.SetCustomShader("FUI/Image"
+                , new AddComponent<RoundedRectangle>()
+                , new SetCustomShader("FUI/Image"
                     , ("Texture", texture)
                     , ("TO_SRGB", toSrgb)
                     , ("Multiplier", multiplier)

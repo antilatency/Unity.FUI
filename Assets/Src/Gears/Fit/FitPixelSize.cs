@@ -2,7 +2,7 @@
 
 
 namespace FUI {
-    public static partial class M {
+    /*public static partial class M {
         public static Modifier AddFitPixelSize(Vector2 contentSize, float scale, Vector2 viewportCenterInContent) =>
             new Modifier(
                 "AddFitPixelSize",
@@ -14,12 +14,35 @@ namespace FUI {
                     component.ViewportCenterInContent = viewportCenterInContent;
                 }
                 );
+    }*/
+
+    namespace Gears {
+        public class FitPixelSize : BaseAspectFit {
+            protected override float FitScale => 1f;
+        }
     }
+    namespace Modifiers {
+        public class AddFitPixelSize : Modifier {
+            public Vector2 ContentSize;
+            public float Scale;
+            public Vector2 ViewportCenterInContent;
+            public AddFitPixelSize(Vector2 contentSize, float scale, Vector2 viewportCenterInContent) {
+                ContentSize = contentSize;
+                Scale = scale;
+                ViewportCenterInContent = viewportCenterInContent;
+            }
+            public override void Create(GameObject gameObject) {
+                gameObject.AddComponent<Gears.FitPixelSize>();
+            }
+            public override void Update(GameObject gameObject) {
+                var component = gameObject.GetComponent<Gears.FitPixelSize>();
+                component.ContentSize = ContentSize;
+                component.Scale = Scale;
+                component.ViewportCenterInContent = ViewportCenterInContent;
+            }
+        }
+    }
+
 }
 
 
-namespace FUI.Gears {
-    public class FitPixelSize : BaseAspectFit {
-        protected override float FitScale => 1f;
-    }
-}

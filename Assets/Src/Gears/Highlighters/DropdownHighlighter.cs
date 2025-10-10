@@ -1,10 +1,8 @@
 ﻿using UnityEngine;
 namespace FUI.Gears {
-    public class DropdownHighlighter : AbstractHighlighter {
+    public class DropdownHighlighter : ButtonHighlighter {
 
-        protected Color InitialColor => Theme.Instance.ButtonColor;
-        protected Color HoveredColor => Theme.Instance.ButtonColorHovered;
-        protected Color EditingColor => Theme.Instance.ButtonColorPressed;
+
 
         HoveredState hoveredState;
 
@@ -20,7 +18,7 @@ namespace FUI.Gears {
             var input = GetComponent<TMPro.TMP_Dropdown>();
             var editing = input.IsExpanded;
             color = editing
-                ? EditingColor
+                ? PressedColor
                 : hoveredState.Hovered
                     ? HoveredColor
                     : InitialColor;

@@ -13,7 +13,7 @@ public class CanvasTest : Form {
         
 
         using (WindowBackground()) {
-            TestFloat  = LabeledInputFieldSpinbox("Test Float",TestFloat, 0.1f);
+            LabeledInputFieldSpinbox("Test Float",TestFloat, x => { TestFloat = x; MakeDirty(); }, 0.1f);
 
             Label("Hello, World!");
             VectorCanvas((context) => {

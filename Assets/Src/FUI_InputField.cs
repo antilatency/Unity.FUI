@@ -2,16 +2,14 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Threading;
-using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
-using UnityEngine.Serialization;
 using TMPro;
+#nullable enable
 
 namespace FUI{
 
@@ -75,14 +73,20 @@ namespace FUI{
 
         public delegate char OnValidateInput(string text, int charIndex, char addedChar);
 
-        [Serializable]
-        public class SubmitEvent : UnityEvent<string> { }
+        public delegate void TextDelegate(string text); 
 
-        [Serializable]
+        public delegate void FocusDelegate(FUI_InputField inputField, bool focused);
+
+        //[Serializable]
+        //public class FocusChangedEvent : UnityEvent<FUI_InputField, bool> { }
+        /*[Serializable]
+        public class SubmitEvent : UnityEvent<string> { }*/
+
+        /*[Serializable]
         public class OnChangeEvent : UnityEvent<string> { }
 
         [Serializable]
-        public class SelectionEvent : UnityEvent<string> { }
+        public class SelectionEvent : UnityEvent<string> { }*/
 
         [Serializable]
         public class TextSelectionEvent : UnityEvent<string, int, int> { }
@@ -205,26 +209,17 @@ namespace FUI{
         /// <summary>
         /// Event delegates triggered when the input field submits its data.
         /// </summary>
-        [SerializeField]
-        private SubmitEvent m_OnEndEdit = new SubmitEvent();
+        public TextDelegate? onEndEdit = null;
 
         /// <summary>
         /// Event delegates triggered when the input field submits its data.
         /// </summary>
-        [SerializeField]
-        private SubmitEvent m_OnSubmit = new SubmitEvent();
+        public TextDelegate? onSubmit = null;
 
-        /// <summary>
-        /// Event delegates triggered when the input field is focused.
-        /// </summary>
-        [SerializeField]
-        private SelectionEvent m_OnSelect = new SelectionEvent();
 
-        /// <summary>
-        /// Event delegates triggered when the input field focus is lost.
-        /// </summary>
-        [SerializeField]
-        private SelectionEvent m_OnDeselect = new SelectionEvent();
+
+        public FocusDelegate? onFocusChanged = null;
+
 
         /// <summary>
         /// Event delegates triggered when the text is selected / highlighted.
@@ -241,8 +236,8 @@ namespace FUI{
         /// <summary>
         /// Event delegates triggered when the input field changes its data.
         /// </summary>
-        [SerializeField]
-        private OnChangeEvent m_OnValueChanged = new OnChangeEvent();
+        //[SerializeField]
+        public TextDelegate? onValueChanged = null;
 
         /// <summary>
         /// Event delegates triggered when the status of the TouchScreenKeyboard changes.
@@ -658,19 +653,19 @@ namespace FUI{
 
         public Color selectionColor { get { return m_SelectionColor; } set { if (SetPropertyUtility.SetColor(ref m_SelectionColor, value)) MarkGeometryAsDirty(); } }
 
-        public SubmitEvent onEndEdit { get { return m_OnEndEdit; } set { SetPropertyUtility.SetClass(ref m_OnEndEdit, value); } }
+        /*public SubmitEvent? onEndEdit { get { return m_OnEndEdit; } set { SetPropertyUtility.SetClass(ref m_OnEndEdit, value); } }
 
-        public SubmitEvent onSubmit { get { return m_OnSubmit; } set { SetPropertyUtility.SetClass(ref m_OnSubmit, value); } }
+        public SubmitEvent? onSubmit { get { return m_OnSubmit; } set { SetPropertyUtility.SetClass(ref m_OnSubmit, value); } }
 
         public SelectionEvent onSelect { get { return m_OnSelect; } set { SetPropertyUtility.SetClass(ref m_OnSelect, value); } }
 
-        public SelectionEvent onDeselect { get { return m_OnDeselect; } set { SetPropertyUtility.SetClass(ref m_OnDeselect, value); } }
+        public SelectionEvent onDeselect { get { return m_OnDeselect; } set { SetPropertyUtility.SetClass(ref m_OnDeselect, value); } }*/
 
         public TextSelectionEvent onTextSelection { get { return m_OnTextSelection; } set { SetPropertyUtility.SetClass(ref m_OnTextSelection, value); } }
 
         public TextSelectionEvent onEndTextSelection { get { return m_OnEndTextSelection; } set { SetPropertyUtility.SetClass(ref m_OnEndTextSelection, value); } }
 
-        public OnChangeEvent onValueChanged { get { return m_OnValueChanged; } set { SetPropertyUtility.SetClass(ref m_OnValueChanged, value); } }
+        //public OnChangeEvent onValueChanged { get { return m_OnValueChanged; } set { SetPropertyUtility.SetClass(ref m_OnValueChanged, value); } }
 
         public TouchScreenKeyboardEvent onTouchScreenKeyboardStatusChanged { get { return m_OnTouchScreenKeyboardStatusChanged; } set { SetPropertyUtility.SetClass(ref m_OnTouchScreenKeyboardStatusChanged, value); } }
 
@@ -1436,7 +1431,7 @@ namespace FUI{
             // Handle double click to reset / deselect Input Field when ResetOnActivation is false.
             if (!isFocused && m_SelectionStillActive)
             {
-                GameObject selectedObject = EventSystem.current != null ? EventSystem.current.currentSelectedGameObject : null;
+                GameObject? selectedObject = EventSystem.current != null ? EventSystem.current.currentSelectedGameObject : null;
 
                 if (selectedObject == null && m_ResetOnDeActivation)
                 {
@@ -1855,8 +1850,7 @@ namespace FUI{
                 {
                     int wordIndex = TMP_TextUtilities.FindIntersectingWord(m_TextComponent, eventData.position, eventData.pressEventCamera);
 
-                    if (wordIndex != -1)
-                    {
+                    if (wordIndex != -1) {
                         // TODO: Should behavior be different if rich text editing is enabled or not?
 
                         // Select current word
@@ -1866,14 +1860,16 @@ namespace FUI{
                         stringPositionInternal = m_TextComponent.textInfo.characterInfo[caretPositionInternal].index;
                         stringSelectPositionInternal = m_TextComponent.textInfo.characterInfo[caretSelectPositionInternal - 1].index + m_TextComponent.textInfo.characterInfo[caretSelectPositionInternal - 1].stringLength;
                     }
-                    else
-                    {
-                        // Select current character
+                    else {
+                        /*// Select current character
                         caretPositionInternal = insertionIndex;
                         caretSelectPositionInternal = caretPositionInternal + 1;
 
                         stringPositionInternal = m_TextComponent.textInfo.characterInfo[insertionIndex].index;
-                        stringSelectPositionInternal = stringPositionInternal + m_TextComponent.textInfo.characterInfo[insertionIndex].stringLength;
+                        stringSelectPositionInternal = stringPositionInternal + m_TextComponent.textInfo.characterInfo[insertionIndex].stringLength;*/
+
+                        //select all
+                        SelectAll();
                     }
                 }
                 else
@@ -3136,38 +3132,26 @@ namespace FUI{
             SendOnValueChanged();
         }
 
-        private void SendOnValueChanged()
-        {
-            if (onValueChanged != null)
-                onValueChanged.Invoke(text);
+        private void SendOnValueChanged() {
+            onValueChanged?.Invoke(text);
         }
 
         /// <summary>
         /// Submit the input field's text.
         /// </summary>
 
-        protected void SendOnEndEdit()
-        {
-            if (onEndEdit != null)
-                onEndEdit.Invoke(m_Text);
+        protected void SendOnEndEdit(){
+            onEndEdit?.Invoke(m_Text);
         }
 
-        protected void SendOnSubmit()
-        {
-            if (onSubmit != null)
-                onSubmit.Invoke(m_Text);
+        protected void SendOnSubmit(){
+            onSubmit?.Invoke(m_Text);
         }
 
-        protected void SendOnFocus()
-        {
-            if (onSelect != null)
-                onSelect.Invoke(m_Text);
-        }
 
-        protected void SendOnFocusLost()
-        {
-            if (onDeselect != null)
-                onDeselect.Invoke(m_Text);
+
+        protected void SendOnFocusChanged(bool focused){
+            onFocusChanged?.Invoke(this, focused);
         }
 
         protected void SendOnTextSelection()
@@ -4113,12 +4097,11 @@ namespace FUI{
             UpdateLabel();
         }
 
-        public override void OnSelect(BaseEventData eventData)
-        {
+        public override void OnSelect(BaseEventData eventData) {
             //Debug.Log("OnSelect()");
 
             base.OnSelect(eventData);
-            SendOnFocus();
+            SendOnFocusChanged(true);
 
             ActivateInputField();
         }
@@ -4194,12 +4177,11 @@ namespace FUI{
             MarkGeometryAsDirty();
         }
 
-        public override void OnDeselect(BaseEventData eventData)
-        {
+        public override void OnDeselect(BaseEventData eventData) {
             DeactivateInputField();
 
             base.OnDeselect(eventData);
-            SendOnFocusLost();
+            SendOnFocusChanged(false);
         }
 
         public virtual void OnSubmit(BaseEventData eventData)

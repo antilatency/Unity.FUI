@@ -1,5 +1,7 @@
 using FUI;
 using FUI.Gears;
+using FUI.Modifiers;
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -29,7 +31,7 @@ public class ZoomPanForm : Form {
                 Padding(4);
                 Label("Allowed Buttons");
                 GapTop(4);
-                AllowedButtons = Dropdown(AllowedButtons);
+                Dropdown(AllowedButtons, x => AssignAndMakeDirty(ref AllowedButtons, x));
             }
 
             using (ZoomPanViewport(P.Fill, new Vector2(640, 480), 
@@ -49,9 +51,9 @@ public class ZoomPanForm : Form {
 
                 using (Group(P.Absolute(Vector2.zero, 100, 100, Vector2.zero))) {
                     Element(P.Fill, null
-                    , M.AddComponent<RoundedRectangle>()
-                    , M.SetColor(Color.yellow)
-                    , M.AddPointerEventObserver((g, e) => {
+                    , new AddComponent<RoundedRectangle>()
+                    , new SetColor(Color.yellow)
+                    , new AddPointerEventObserver((g, e) => {
                         //check Ctrl key
                         if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) {
                             Debug.Log($"Ctrl + Left Click on {g.name}");
@@ -78,7 +80,7 @@ public class ZoomPanForm : Form {
 
 
 
-                TestFloat = LabeledInputField("input", TestFloat);
+                LabeledInputField("input", TestFloat, x => AssignAndMakeDirty(ref TestFloat, x));
                 Button("Button", () => { });
 
                 Label($"subForm Num Items = {subForm.Items?.Count ?? 0}");

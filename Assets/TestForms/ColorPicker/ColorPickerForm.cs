@@ -1,10 +1,9 @@
 using UnityEngine;
-
-using System;
-using System.Collections.Generic;
 using FUI;
 using FUI.Gears;
 using static FUI.Shortcuts;
+using FUI.Modifiers;
+
 internal class ColorPickerForm : Form {
 
     public string Hint;
@@ -14,19 +13,18 @@ internal class ColorPickerForm : Form {
         var form = Form.Current;
 
         var background = form.Element(null
-            ,M.AddComponent<RoundedRectangle>()
-            ,M.AddComponent<Slider>()
-            //,M.SetFormToNotify(extraIteration)
-            ,M.SetCustomShader("UI/HueSaturationRect")
+            ,new AddComponent<RoundedRectangle>()
+            ,new AddComponent<Slider>()
+            ,new SetCustomShader("UI/HueSaturationRect")
         );
 
         positioner(background, form.CurrentBorders, ()=>new Vector2(80, Theme.Instance.LineHeight));
 
         form.BeginControls(background);
         var handle = form.Element(null
-            , M.AddComponent<RoundedRectangle>()
-            , M.SetColor(Color.black)
-            , M.SetRaycastTarget(false)
+            , new AddComponent<RoundedRectangle>()
+            , new SetColor(Color.black)
+            , new SetRaycastTarget(false)
         );
         form.EndControls();
 
@@ -70,7 +68,7 @@ internal class ColorPickerForm : Form {
 
         using (WindowBackground()) {
             Padding(4);
-            Hint = LabeledInputField("Hint", Hint);
+            LabeledInputField("Hint", Hint, x => { Hint = x; MakeDirty(); });
             GapTop(4);
             using (Group(P.Up(100))) {
                 Rectangle(P.Left(20, 0.2f), Color.HSVToRGB(HueSaturation.x, HueSaturation.y, 1));
@@ -87,11 +85,12 @@ internal class ColorPickerForm : Form {
                     if (i > 0) GapLeft(gap);
 
                     var shortcut = colorShortcuts[i];
-                    ColoredButton(shortcut.Name, () => {
+                    ColorButton(Color.HSVToRGB(shortcut.hueSaturation.x, shortcut.hueSaturation.y, 1), () => {
                         HueSaturation = shortcut.hueSaturation;
                         Hint = shortcut.Name;
                         MakeDirty();
-                    }, Color.HSVToRGB(shortcut.hueSaturation.x, shortcut.hueSaturation.y, 1), P.Left(gapCompensation, width));
+                    }
+                    ,shortcut.Name, P.Left(gapCompensation, width));
 
                 }
             }

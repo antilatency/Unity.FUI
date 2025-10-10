@@ -1,6 +1,8 @@
 using System;
 using System.Linq.Expressions;
 
+using FUI.Modifiers;
+
 using UnityEngine;
 using UnityEngine.UI;
 #nullable enable
@@ -10,17 +12,37 @@ using UnityEngine.UI;
 
 namespace FUI {
     
+
+    namespace Modifiers {
+        public class AddVectorCanvas : Modifier {
+            public VectorCanvas.DrawingDelegate DrawingDelegate;
+            public AddVectorCanvas(VectorCanvas.DrawingDelegate drawingDelegate) {
+                DrawingDelegate = drawingDelegate;
+            }
+            public override void Create(GameObject gameObject) {
+                gameObject.AddComponent<VectorCanvas>();
+            }
+            public override void Update(GameObject gameObject) {
+                var canvas = gameObject.GetComponent<VectorCanvas>();
+                canvas.OnDrawing = DrawingDelegate;
+                canvas.SetVerticesDirty();
+            }
+        }
+    }
+
     public static partial class Shortcuts {
 
         public static void VectorCanvas(VectorCanvas.DrawingDelegate drawingDelegate, Positioner? positioner = null) {
             var form = Form.Current;
-            var element = form.Element(null, M.AddVectorCanvas(drawingDelegate), M.SetRaycastTarget(false));
+            var element = form.Element(null, new AddVectorCanvas(drawingDelegate), new SetRaycastTarget(false));
             (positioner ?? P.Fill)
                 (element, form.CurrentBorders, () => new Vector2(100, 100));
         }
     }
 
-    public static partial class M {
+
+
+    /*public static partial class M {
 
         public static Modifier AddVectorCanvas(VectorCanvas.DrawingDelegate drawingDelegate) =>
             new(
@@ -32,7 +54,7 @@ namespace FUI {
                     canvas.SetVerticesDirty();
                 }
             );
-    }
+    }*/
 
 
     [RequireComponent(typeof(CanvasRenderer))]

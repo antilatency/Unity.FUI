@@ -1,14 +1,14 @@
 using UnityEngine;
 using FUI;
-using FUI.Gears;
 using static FUI.Shortcuts;
+using FUI.Modifiers;
 
 #nullable enable
 
 public class FontLinearOrGammaTest : Form {
 	
     void ColoredLabel(string text, Color color) {
-        LabelModifiable(P.Up(), M.SetText(text), M.SetColor(color));
+        Label(text, P.Up(), new SetColor(color));
     }
 
     public void PopulateLabels(Color backgroundColor) {

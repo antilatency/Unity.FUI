@@ -6,7 +6,7 @@ namespace FUI.Gears{
     public class PointerPressReleaseHandlerEx : MonoBehaviour, IPointerDownHandler, IPointerUpHandler{
         
         public Action<GameObject, PointerEventData>? OnPress;
-        public Action<GameObject,PointerEventData?>? OnRelease;
+        public Action<GameObject, PointerEventData>? OnRelease;
         private bool _pressed;
         
         void IPointerDownHandler.OnPointerDown(PointerEventData eventData){

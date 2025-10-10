@@ -1,4 +1,6 @@
 ﻿using FUI.Gears;
+using FUI.Modifiers;
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -7,11 +9,11 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-
+#nullable enable
 
 namespace FUI {
 
-
+    public delegate void ButtonAction(GameObject gameObject, PointerEventData eventData);
 
     [Serializable]
     public struct Border {
@@ -42,8 +44,31 @@ namespace FUI {
 
     
 
-
+    [RequireComponent(typeof(RectTransform))]
     public abstract class Form : MonoBehaviour {
+        [SerializeField]
+        private Theme _theme;
+        public Theme Theme {
+            get {
+                if (_theme == null) {
+                    _theme = Resources.Load<Theme>("FUI.DefaultTheme");
+                    if (_theme == null)
+                        throw new Exception("Default theme (FUI.DefaultTheme) not found in resources.");
+                }
+
+                return _theme;
+            }
+            set {
+                _theme = value;
+                MakeDirty();
+            }
+        }
+
+        public void ThemeChanged(Theme theme) {
+            if (theme == _theme)
+                MakeDirty();
+        }
+
         public bool Lazy = true;
         public int MaxIterationsPerUpdate = 8;
         public static Form Current = null!;
@@ -55,6 +80,30 @@ namespace FUI {
         public int UpdateIterationsRequired = 1;
         public void MakeDirty(bool extraIteration = false) {
             UpdateIterationsRequired = Math.Max(UpdateIterationsRequired, extraIteration ? 2 : 1);
+        }
+
+        /*public void AssignAndMakeDirty<T>(ref T field, T value) where T : IEquatable<T> {
+            if (!field.Equals(value)) {
+                field = value;
+                MakeDirty();
+            }            
+        } */
+        public void AssignAndMakeDirty<T>(ref T field, T value) {
+            if (!EqualityComparer<T>.Default.Equals(field, value)) {
+                field = value;
+                MakeDirty();
+            }
+        }
+        public void AssignClampedAndMakeDirty<T>(ref T field, T value, T min, T max) where T : IComparable<T> {
+            var clampedValue = value;
+            if (clampedValue.CompareTo(min) < 0)
+                clampedValue = min;
+            else if (clampedValue.CompareTo(max) > 0)
+                clampedValue = max;
+            if (!EqualityComparer<T>.Default.Equals(field, clampedValue)) {
+                field = clampedValue;
+                MakeDirty();
+            }
         }
 
         public PrefabLibrary library = null!;
@@ -76,39 +125,150 @@ namespace FUI {
             }
         }
 
-        public RectTransform Element(GameObject? original = null, params Modifier[] modifiers) {
-            var stackItem = Stack.Peek();
-            var parent = stackItem.Root;
-            var index = stackItem.FirstNotValidatedControlIndex;
+        public class ElementSeed {
+            public GameObject? Original;
+            public ModifiersList? Modifiers { get; }
+            public string Identifier;
 
-            var mark = string.Join('~', modifiers.Select(x => x.Id));
-            if (original != null) {
-                mark = original.GetInstanceID().ToString() + mark;
+            public GameObject? Found = null;
+            public GameObject? Created = null;
+
+            public ElementSeed(GameObject? original, ModifiersList? modifiers = null) {
+                Original = original;
+                Modifiers = modifiers ?? new ModifiersList();
+                Identifier = string.Join('~', Modifiers.Select(x => x.Id));
+                if (original != null) {
+                    Identifier = original.GetInstanceID().ToString() + Identifier;
+                }
             }
 
-
-            int FindIndex() {
-                for (int i = stackItem.FirstNotValidatedControlIndex; i < parent.childCount; i++) {
-                    var child = parent.GetChild(i);
-                    if (child.GetComponent<Mark>()?.Value == mark) {
-                        return i;
+            public void ApplyModifiers() {
+                if (Modifiers == null) return;
+                if (Created != null) {
+                    foreach (var m in Modifiers) {
+                        m.Create(Created);
+                    }
+                } else if (Found != null) {
+                    foreach (var m in Modifiers) {
+                        m.Update(Found);
                     }
                 }
-                return -1;
+            }
+            
+        }
+
+        public ElementSeed BeginCreateElement(GameObject? original = null, ModifiersList? modifiers = null) { 
+            var stackItem = Stack.Peek();
+            var parent = stackItem.Root;
+            ElementSeed seed = new ElementSeed(original, modifiers);
+
+            int indexFound = -1;
+            Transform? transformFound = null;
+            for (int i = stackItem.FirstNotValidatedControlIndex; i < parent.childCount; i++) {
+                var child = parent.GetChild(i);
+                if (child.name == seed.Identifier) {
+                    indexFound = i;
+                    transformFound = child;
+                    break;
+                }
             }
 
-            var indexFound = FindIndex();
-            GameObject gameObject;
-            RectTransform result;
+            //var index = stackItem.FirstNotValidatedControlIndex;
 
-            if (indexFound > -1) {
+            if (indexFound != -1) {
                 var numElementsToDelete = indexFound - stackItem.FirstNotValidatedControlIndex;
                 for (int i = 0; i < numElementsToDelete; i++) {
                     var child = parent.GetChild(stackItem.FirstNotValidatedControlIndex);
                     DestroyImmediate(child.gameObject);
                 }
-                result = (RectTransform)parent.GetChild(stackItem.FirstNotValidatedControlIndex);
+                seed.Found = transformFound!.gameObject;
 
+                if (transformFound is not RectTransform)
+                    seed.Found.AddComponent<RectTransform>();
+
+                stackItem.FirstNotValidatedControlIndex++;
+            }
+            else {
+                if (original != null) {
+                    seed.Created = InstantiatePrefab(original, stackItem.Root);
+                    seed.Created.name = seed.Identifier;
+                }
+                else {
+                    seed.Created = new GameObject(seed.Identifier, typeof(RectTransform));
+                    seed.Created.transform.SetParent(parent, false);
+
+                }
+
+
+                /*foreach (var m in modifiers) {
+                    m.Creator?.Invoke(gameObject);
+                }*/
+
+                //gameObject.AddComponent<Mark>().Identifier = markIdentifier;
+                seed.Created.transform.SetSiblingIndex(stackItem.FirstNotValidatedControlIndex);
+
+
+                stackItem.FirstNotValidatedControlIndex++;
+
+            }
+
+            return seed;
+        }
+
+        public RectTransform Element(GameObject? original = null, params Modifier[] modifiers) {
+            return Element(original, new ModifiersList(modifiers));
+        }
+
+        public RectTransform Element(GameObject? original = null, ModifiersList? modifiers = null) {
+            var seed = BeginCreateElement(original, modifiers ?? new ModifiersList());
+            seed.ApplyModifiers();
+            return (RectTransform)(seed.Created ?? seed.Found)!.transform;
+        }
+        
+        public RectTransform Element(Positioner positioner, GameObject? original = null, params Modifier[] modifiers) {
+            var result = Element(original, modifiers);
+            positioner?.Invoke(result, Form.Current.CurrentBorders, null);
+            return result;
+        }
+
+
+        /*public RectTransform Element(GameObject? original = null, params Modifier[] modifiers) {
+            return Element(original, (IEnumerable<Modifier>)modifiers);
+        }
+
+        public RectTransform Element(GameObject? original, IEnumerable<Modifier> modifiers) {
+            var stackItem = Stack.Peek();
+            var parent = stackItem.Root;
+            var index = stackItem.FirstNotValidatedControlIndex;
+
+            var markIdentifier = string.Join('~', modifiers.Select(x => x.Id));
+            if (original != null) {
+                markIdentifier = original.GetInstanceID().ToString() + markIdentifier;
+            }
+
+
+            (int index, Mark? mark) FindIndex() {
+                for (int i = stackItem.FirstNotValidatedControlIndex; i < parent.childCount; i++) {
+                    var child = parent.GetChild(i);
+                    var mark = child.GetComponent<Mark>();
+                    if (mark?.Identifier == markIdentifier) {
+                        return (i, mark);
+                    }
+                }
+                return (-1, null);
+            }
+
+            var (indexFound, mark) = FindIndex();
+            GameObject gameObject;
+            RectTransform result;
+
+            if (mark != null) {
+                var numElementsToDelete = indexFound - stackItem.FirstNotValidatedControlIndex;
+                for (int i = 0; i < numElementsToDelete; i++) {
+                    var child = parent.GetChild(stackItem.FirstNotValidatedControlIndex);
+                    DestroyImmediate(child.gameObject);
+                }
+                result = (mark.transform as RectTransform)!;
                 gameObject = result.gameObject;
 
                 stackItem.FirstNotValidatedControlIndex++;
@@ -120,7 +280,7 @@ namespace FUI {
                 } else {
                     gameObject = new GameObject("fuiElement", typeof(RectTransform));
                     gameObject.transform.SetParent(stackItem.Root, false);
-                    
+
                 }
                 result = (RectTransform)gameObject.transform;
 
@@ -128,7 +288,7 @@ namespace FUI {
                     m.Creator?.Invoke(gameObject);
                 }
 
-                gameObject.AddComponent<Mark>().Value = mark;
+                gameObject.AddComponent<Mark>().Identifier = markIdentifier;
                 result.SetSiblingIndex(index);
 
 
@@ -137,7 +297,7 @@ namespace FUI {
             }
 
             foreach (var m in modifiers) {
-                if (m.Updater!=null)
+                if (m.Updater != null)
                     m.Updater(gameObject);
             }
 
@@ -145,35 +305,22 @@ namespace FUI {
 
             return result;
 
-        }
-
-        public RectTransform Element(Positioner positioner, GameObject original = null, params Modifier[] modifiers) {
-            var result = Element(original, modifiers);
-            positioner?.Invoke(result, Form.Current.CurrentBorders, null);
-            return result;
-        }
+        }*/
 
 
-        public Disposable Group(Positioner positioner, params Modifier[] modifiers) {
+
+
+        public Disposable<RectTransform> Group(Positioner positioner, params Modifier[] modifiers) {
             var group = Element(null, modifiers);
             BeginControls(group);
-            return new Disposable(() => {
-                 var innerSize = EndControls();
-                positioner(group, CurrentBorders, ()=> innerSize);
+            return new Disposable<RectTransform>(group, _ => {
+                var innerSize = EndControls();
+                positioner(group, CurrentBorders, () => innerSize);
             });
         }
 
 
-        public void LabelModifiable(Positioner positioner, params Modifier[] modifiers) {
-            var result = Element(Form.Current.Library.Label, modifiers);
-            positioner?.Invoke(result, Form.Current.CurrentBorders, () => {
-                var component = result.GetComponent<TMP_Text>();
-                var size = component.GetPreferredValues();
-                size.x = Mathf.Ceil(size.x);
-                size.y = Mathf.Ceil(size.y);
-                return size;
-            });
-        }
+        
 
         public void RebuildIfNeeded() {
             if (Lazy && UpdateIterationsRequired == 0)
@@ -258,7 +405,7 @@ namespace FUI {
             return created;
         }
 
-        public T ClampMakeDirty<T>(T value, T min, T max) where T : IComparable<T> {
+        /*public T ClampMakeDirty<T>(T value, T min, T max) where T : IComparable<T> {
             if (value.CompareTo(min) < 0)
             {
                 MakeDirty();
@@ -270,7 +417,7 @@ namespace FUI {
                 return max;
             }
             return value;
-        }
+        }*/
 
         /*public float ClampMakeDirty(float value, float min, float max) {
             if (value < min) {
@@ -296,21 +443,25 @@ namespace FUI {
             return value;
         }*/
 
-        public void GapLeft(float pixels = 0, float fraction = 0) {
+        public void GapLeft(float pixels, float fraction = 0) {
             CurrentBorders.Left.Increment(pixels, fraction);
         }
+        public void GapLeft() => GapLeft(Theme.DefaultGap);
 
-        public void GapRight(float pixels = 0, float fraction = 0) {
+        public void GapRight(float pixels, float fraction = 0) {
             CurrentBorders.Right.Increment(pixels, fraction);
         }
+        public void GapRight() => GapRight(Theme.DefaultGap);
 
-        public void GapTop(float pixels = 0, float fraction = 0) {
+        public void GapTop(float pixels, float fraction = 0) {
             CurrentBorders.Top.Increment(pixels, fraction);
         }
+        public void GapTop() => GapTop(Theme.DefaultGap);
 
-        public void GapBottom(float pixels = 0, float fraction = 0) {
+        public void GapBottom(float pixels, float fraction = 0) {
             CurrentBorders.Bottom.Increment(pixels, fraction);
         }
+        public void GapBottom() => GapBottom(Theme.DefaultGap);
        
 
 
@@ -337,7 +488,8 @@ namespace FUI {
             throw new InvalidOperationException($"Unsupported type: {typeof(T)}");
         }
 
-        public T InputField<T>(T value, Positioner positioner, string toStringFormat = "", Func<string, T>? fromString = null, bool extraIteration = false) {
+
+        /*public T InputField<T>(T value, Positioner positioner, string toStringFormat = "", Func<string, T>? fromString = null, bool extraIteration = false) {
 
             var transform = Element(Library.InputField.gameObject);
             
@@ -374,46 +526,78 @@ namespace FUI {
             }
 
             return value;
+        }*/
+
+        public RectTransform InputField<T>(T value, Action<T> returnAction, Positioner positioner, string toStringFormat = "", Func<string, T>? fromString = null) {
+            string valueText;
+            if (value is IFormattable formattable) {
+                valueText = formattable.ToString(toStringFormat, CultureInfo.CurrentCulture);
+            }
+            else {
+                valueText = value?.ToString() ?? "";
+            }
+            var transform = InputField(valueText, (s) => {
+                try {
+                    if (fromString == null) {
+                        returnAction(ConvertFromString<T>(s));
+                    }
+                    else {
+                        returnAction(fromString(s));
+                    }
+                }
+                catch { }
+            }, positioner);
+            return transform;
         }
 
-        public static Positioner DefaultControlPositioner => P.Up(Theme.Instance.LineHeight);
+
+        public RectTransform InputField(string value, FUI_InputField.TextDelegate returnAction, Positioner? positioner = null) {
+
+            var transform = Element(Library.InputField, new AddInputFieldHighlighter());
+
+
+
+            var inputField = transform.GetComponent<FUI_InputField>();
+            inputField.onEndEdit = returnAction;
+            //inputField.onSubmit = returnAction;
+            inputField.onValueChanged = returnAction;
+
+            (positioner ?? DefaultControlPositioner)(transform, CurrentBorders, () => {
+                var textSize = inputField.textComponent.GetPreferredValues("Hello");
+                return textSize + new Vector2(16, 4);
+            });
+
+            /*if (input.NewUserInput) {
+                try {
+                    if (fromString == null) {
+                        return ConvertFromString<T>(input.Value);
+                    } else {
+                        return fromString(input.Value);
+                    }
+                }
+                catch { }
+            }*/
+
+            var selected = EventSystem.current.currentSelectedGameObject == transform.gameObject;
+            var editing = inputField.isFocused && selected;
+
+            if (!editing) {
+                inputField.SetTextWithoutNotify(value);
+                /*if (value is IFormattable formattable) {
+                    input.Value = formattable.ToString(toStringFormat, CultureInfo.CurrentCulture);
+                } else {
+                    input.Value = value?.ToString();
+                } */
+            }
+
+            return transform;
+        }
+
+        public Positioner DefaultControlPositioner => P.Up(Theme.LineHeight);
 
  
 
-        public T Dropdown<T>(T value, Positioner? positioner = null, bool extraIteration = false) where T : struct, Enum {
-            var helper = new EnumHelper<T>();
-            var optionIndex = helper.ValueToIndex(value);
-            int selectedOptionIndex = Dropdown(optionIndex, helper.Names, positioner, extraIteration);
-            return helper.IndexToValue(selectedOptionIndex);
-        }
-
-        public int Dropdown(int value, string[] options, Positioner? positioner = null, bool extraIteration = false) {
-            var form = Form.Current;
-            if (positioner == null)
-                positioner = DefaultControlPositioner;
-
-            var element = Element(Library.Dropdown);
-            positioner(element, CurrentBorders, () => new Vector2(40, Theme.Instance.LineHeight));
-
-
-            var dropdown = element.GetComponent<TMP_Dropdown>();
-
-            dropdown.options = options.Select(x => new TMP_Dropdown.OptionData(x)).ToList();
-
-            var state = dropdown.GetComponent<DropdownState>();
-            state.SetFormToNotify(form, extraIteration);
-
-            if (state.NewUserInput) {
-                return state.Value;
-            }
-            else {
-                var editing = dropdown.IsExpanded;
-                if (!editing) {
-                    state.Value = value;
-                }
-            }
-            return value;
-        }
+        
 
 
 
@@ -486,6 +670,6 @@ namespace FUI {
             });
         }
 
-
+        
     }
 }

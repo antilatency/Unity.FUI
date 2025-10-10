@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-
+/*
 namespace FUI.Gears {
     public class TransparentButtonHighlighter : PressedHoveredHighlighter {
 
@@ -7,4 +7,4 @@ namespace FUI.Gears {
         protected override Color HoveredColor => Theme.Instance.TransparentButtonColorHovered;
         protected override Color PressedColor => Theme.Instance.TransparentButtonColorPressed;
     }
-}
+}*/

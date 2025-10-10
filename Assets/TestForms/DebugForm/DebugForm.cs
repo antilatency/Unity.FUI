@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using FUI;
 using FUI.Gears;
 using static FUI.Shortcuts;
+using FUI.Modifiers;
 
 internal class DebugForm : Form {
 
@@ -93,7 +94,7 @@ internal class DebugForm : Form {
 
                 for (int i = 0; i < palette.Length; i++) {
                     var item = palette[i];
-                    IconButtonFontAwesome(item.Icon, 16, item.Color, () => { Items.Add(item); MakeDirty(); }, P.Up(50));
+                    Button(item.Icon, () => { Items.Add(item); MakeDirty(); }, P.Up(50));
                 }
 
 
@@ -141,44 +142,39 @@ internal class DebugForm : Form {
                 Button("Button", () => { }, P.Up(20));
                 GapTop(2);
 
-                ColoredButton("ColoredButton", () => { }, null, P.Up(20));
-                GapTop(2);
 
-                TestBool = LabeledCheckbox("Bool", TestBool);
+
+                LabeledCheckbox("Bool", TestBool, x => AssignAndMakeDirty(ref TestBool, x));
                 GapTop(2);
-                TestBool = ToggleButton("Toggle", TestBool, extraIteration: true);
+                ToggleButton(TestBool, "Toggle", "Toggle",  x => AssignAndMakeDirty(ref TestBool, x));
                 GapTop(2);
 
                 Label(TestInt.ToString());
                 GapTop(2);
 
-                TestInt = LabeledInputField("Int", TestInt, extraIteration: true);
+                LabeledInputField("Int", TestInt, x => AssignAndMakeDirty(ref TestInt, x));
+                
                 GapTop(2);
-
-
-                TestFloat = ClampMakeDirty(
-                    LabeledInputFieldSpinbox("Float", TestFloat, 0.001f, null, "0.###", extraIteration: true)
-                    , 0
-                    , 1);
+                LabeledInputFieldSpinbox("Float", TestFloat, x => AssignAndMakeDirty(ref TestFloat, x), 0.001f, null, "0.###");
 
                 GapTop(2);
-                TestDouble = LabeledInputFieldSpinbox("Double", TestDouble, 0.1f, null, "0.###");
+                LabeledInputFieldSpinbox("Double", TestDouble, x => AssignAndMakeDirty(ref TestDouble, x), 0.1f, null, "0.###");
                 GapTop(2);
 
-                testEnum = LabeledDropdown("Enum", testEnum);
+                LabeledDropdown("Enum", testEnum, x => AssignAndMakeDirty(ref testEnum, x));
 
-                testEnum = ToggleButtonGroup(testEnum, null, 4, 0, true);
+                ToggleGroupButtons(testEnum, x=> AssignAndMakeDirty(ref testEnum, x), null, 4, 0);
 
                 Label($"Enum Value: {(int)testEnum}");
 
 
 
                 GapTop(2);
-                LabelModifiable(P.Up(Theme.Instance.LineHeight), M.SetText("The quick brown fox jumps over the lazy dog"), M.SetTextOverflow(TMPro.TextOverflowModes.Linked));
+                Label("The quick brown fox jumps over the lazy dog", P.Up(Theme.Instance.LineHeight), new SetTextOverflow(TMPro.TextOverflowModes.Linked));
 
 
-                LabelModifiable(P.Up(Theme.Instance.LineHeight), M.SetText("Red text"), M.SetColor(Color.red));
-                LabelModifiable(P.Up(Theme.Instance.LineHeight), M.SetText("Bold text"), M.SetFontStyle(TMPro.FontStyles.Bold));
+                Label("Red text", P.Up(Theme.Instance.LineHeight), new SetColor(Color.red));
+                Label("Bold text", P.Up(Theme.Instance.LineHeight), new SetFontStyle(TMPro.FontStyles.Bold));
 
                 //Label($"Width: {GetWidth()}");
                 var size = GetSize();
@@ -201,21 +197,21 @@ internal class DebugForm : Form {
                     var item = Items[i];
                     using (Panel(P.Up(24), 4)) {
                         GapLeft(4);
-                        IconFontAwesome(item.Icon, 16, item.Color, P.Left(20));
+                        Label(item.Icon, P.Left(20));
                         GapLeft(10);
 
-                        IconButtonFontAwesome("\uf2ed", 12, () => { Items.RemoveAt(index); MakeDirty(); }, P.Right(buttonSize));
+                        Button("\uf2ed", () => { Items.RemoveAt(index); MakeDirty(); }, P.Right(buttonSize));
                         GapRight(10);
 
                         if (i == (Items.Count - 1))
                             GapRight(buttonSize);
                         else
-                            IconButtonFontAwesome("\uf063", 12, () => { Swap(index); MakeDirty(); }, P.Right(buttonSize));//Down
+                            Button("\uf063", () => { Swap(index); MakeDirty(); }, P.Right(buttonSize));//Down
 
                         if (i == 0)
                             GapRight(buttonSize);
                         else
-                            IconButtonFontAwesome("\uf062", 12, () => { Swap(index - 1); MakeDirty(); }, P.Right(buttonSize));//Up
+                            Button("\uf062", () => { Swap(index - 1); MakeDirty(); }, P.Right(buttonSize));//Up
 
 
                         Label(item.Name, P.Fill);

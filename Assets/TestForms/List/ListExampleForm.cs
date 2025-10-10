@@ -28,6 +28,8 @@ internal class ListExampleForm : Form {
     }
 
     protected override void Build() {
+        throw new NotImplementedException();
+        /*
 
         Item[] palette = new Item[] {
             new Item("Lemon","\uf094", new Color(1f,1f,0.3f)),
@@ -93,7 +95,7 @@ internal class ListExampleForm : Form {
                 }
             }
 
-        }
+        }*/
 
     }
 }

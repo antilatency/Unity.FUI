@@ -2,30 +2,46 @@
 
 
 namespace FUI {
-    public static partial class M {
-        public static Modifier AddFitInside(Vector2 contentSize, float scale, Vector2 viewportCenterInContent) =>
-            new Modifier(
-                "AddFitInside",
-                x => x.AddComponent<Gears.FitInside>(),
-                x => {
-                    var component = x.GetComponent<Gears.FitInside>();
-                    component.ContentSize = contentSize;
-                    component.Scale = scale;
-                    component.ViewportCenterInContent = viewportCenterInContent;
-                }
-                );
+
+    namespace Gears {
+        public class FitInside : BaseAspectFit {
+
+        }
     }
-}
+    namespace Modifiers {
+        public class AddFitInside : Modifier {
+            public Vector2 ContentSize;
+            public float Scale;
+            public Vector2 ViewportCenterInContent;
+            public AddFitInside(Vector2 contentSize, float scale, Vector2 viewportCenterInContent) {
+                ContentSize = contentSize;
+                Scale = scale;
+                ViewportCenterInContent = viewportCenterInContent;
+            }
+            public override void Create(GameObject gameObject) {
+                gameObject.AddComponent<Gears.FitInside>();
+            }
+            public override void Update(GameObject gameObject) {
+                var component = gameObject.GetComponent<Gears.FitInside>();
+                component.ContentSize = ContentSize;
+                component.Scale = Scale;
+                component.ViewportCenterInContent = ViewportCenterInContent;
+            }
+        }
 
-
-namespace FUI.Gears {
-    public class FitInside : BaseAspectFit {
-
-        /*public override float CalcFitScale() {
-            if (ContentSize.x == 0 || ContentSize.y == 0)
-                return 1f;
-            var scale2d = ViewportSize / ContentSize;
-            return Mathf.Min(scale2d.x, scale2d.y);
+        /*public static partial class M {
+            public static Modifier AddFitInside(Vector2 contentSize, float scale, Vector2 viewportCenterInContent) =>
+                new Modifier(
+                    "AddFitInside",
+                    x => x.AddComponent<Gears.FitInside>(),
+                    x => {
+                        var component = x.GetComponent<Gears.FitInside>();
+                        component.ContentSize = contentSize;
+                        component.Scale = scale;
+                        component.ViewportCenterInContent = viewportCenterInContent;
+                    }
+                    );
         }*/
     }
+
 }
