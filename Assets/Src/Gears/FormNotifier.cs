@@ -5,10 +5,10 @@ using UnityEngine.EventSystems;
 namespace FUI.Gears {
     
     public interface IFormNotifier {
-        void SetFormToNotify(Form? form, bool extraIteration);
+        void SetFormToNotify(Form? form);
     }
 
-    public abstract class AbstractFormNotifier : MonoBehaviour, IFormNotifier {
+    /*public abstract class AbstractFormNotifier : MonoBehaviour, IFormNotifier {
         [HideInInspector]
         [SerializeField]
         protected Form? FormToNotify;
@@ -16,14 +16,13 @@ namespace FUI.Gears {
         [SerializeField]
         protected bool ExtraIteration = false;
 
-        public void SetFormToNotify(Form? form, bool extraIteration) {
+        public void SetFormToNotify(Form? form) {
             FormToNotify = form;
-            ExtraIteration = extraIteration;
         }
 
         protected void NotifyForm() {
-            FormToNotify?.MakeDirty(ExtraIteration);
+            FormToNotify?.MakeDirty();
         }
         
-    }
+    }*/
 }

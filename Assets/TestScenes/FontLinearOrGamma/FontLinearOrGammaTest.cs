@@ -1,5 +1,6 @@
 using UnityEngine;
 using FUI;
+using static FUI.Basic;
 using static FUI.Shortcuts;
 using FUI.Modifiers;
 

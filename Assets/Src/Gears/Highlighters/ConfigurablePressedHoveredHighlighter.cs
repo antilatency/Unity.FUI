@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿/*using UnityEngine;
 namespace FUI.Gears {
     public class ConfigurablePressedHoveredHighlighter : PressedHoveredHighlighter {
 
@@ -10,4 +10,4 @@ namespace FUI.Gears {
         protected override Color HoveredColor => hoveredColor;
         protected override Color PressedColor => pressedColor;
     }
-}
+}*/

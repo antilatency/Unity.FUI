@@ -3151,6 +3151,11 @@ namespace FUI{
 
 
         protected void SendOnFocusChanged(bool focused){
+            //find IFocusHandler s in current gameobject and call OnFocusChanged
+            var focusHandlers = GetComponents<IFocusHandler>();
+            foreach (var handler in focusHandlers){
+                handler.OnFocusChanged(focused);
+            }
             onFocusChanged?.Invoke(this, focused);
         }
 

@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
 namespace FUI.Gears {
-    public abstract class PressedHoveredHighlighter : AbstractHighlighter {
+    public class PressedHoveredHighlighter : AbstractHighlighter {
 
-        protected abstract Color InitialColor { get; }
-        protected abstract Color HoveredColor { get; }
-        protected abstract Color PressedColor { get; }
+
+
+        public Color InitialColor { get; set; }
+        public Color HoveredColor { get; set; }
+        public Color PressedColor { get; set; }
 
 
         PressedState pressedState;
@@ -18,7 +20,6 @@ namespace FUI.Gears {
         }
 
         private void Update() {
-
             color = pressedState.Pressed
                 ? PressedColor
                 : hoveredState.Hovered

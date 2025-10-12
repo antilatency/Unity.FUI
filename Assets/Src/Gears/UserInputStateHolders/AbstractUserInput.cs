@@ -1,4 +1,4 @@
-﻿namespace FUI.Gears {
+﻿/*namespace FUI.Gears {
 
     public abstract class AbstractUserInput<T> : AbstractFormNotifier {
         public bool NewUserInput { get; protected set; }
@@ -6,4 +6,4 @@
 
         
     }
-}
+}*/

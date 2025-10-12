@@ -1,4 +1,4 @@
-﻿namespace FUI.Gears {
+﻿/*namespace FUI.Gears {
 
     public class InputFieldState : AbstractUserInput<string> {
 
@@ -24,4 +24,4 @@
             NotifyForm();
         }
     }
-}
+}*/

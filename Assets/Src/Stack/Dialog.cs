@@ -2,6 +2,7 @@ using System;
 
 using FUI.Gears;
 using FUI.Modifiers;
+using static FUI.Basic;
 
 using UnityEngine;
 #nullable enable
@@ -10,10 +11,15 @@ namespace FUI {
 
     public abstract class Dialog : Form {
 
-        protected RectTransform? WindowTransform = null;
+        private RectTransform? _windowTransform = null;
 
         protected virtual bool CloseOnEscape => true;
         protected virtual bool CloseOnClickOutside => true;
+
+        public static T Create<T>() where T : Dialog {
+            var dialog = FormStack.Instance.Push<T>();
+            return dialog;
+        }
 
         protected void Close() {
             FormStack.Instance.Pop();
@@ -31,18 +37,25 @@ namespace FUI {
             return result;
         }
 
-        protected virtual RectTransform WindowElement() {
-            return Element();
-
-             
+        protected virtual Disposable<RectTransform> WindowElement() {
+            var result = Element();
+            BeginControls(result);
+            return new Disposable<RectTransform>(result, x => {
+                EndControls();
+            });
         }
 
-        protected abstract void PositionDialogWindow();
+        protected virtual void UpdatePosition(RectTransform window){}
 
         protected override void Update() {
             try {
+                if (CloseOnEscape && Input.GetKeyDown(KeyCode.Escape)) {
+                    Close();
+                    return;
+                }
                 base.Update();
-                PositionDialogWindow();
+                if (_windowTransform != null)
+                    UpdatePosition(_windowTransform);
             }
             catch (Exception e) {
                 Debug.LogError(e);
@@ -52,14 +65,22 @@ namespace FUI {
 
         protected override sealed void Build() {
             using (Glass()) {
-                WindowTransform = WindowElement();
-                BeginControls(WindowTransform);
-                PopulateDialogWindow();
-                EndControls(); 
+                using (var window = WindowElement()) {
+                    _windowTransform = window.Value;
+                    Populate();
+                }
             }
         }
 
-        protected abstract void PopulateDialogWindow();
+        protected abstract void Populate();
+
+        protected static void PositionWindowCentered(RectTransform window) {
+            var half = new Vector2(0.5f, 0.5f);
+            window.pivot = half;
+            window.anchoredPosition = Vector2.zero;
+            window.anchorMin = half;
+            window.anchorMax = half;
+        }
 
         protected static void PositionWindowUnder(RectTransform window, RectTransform control) {
             var canvas = control.GetComponentInParent<Canvas>();
@@ -139,6 +160,26 @@ namespace FUI {
         public T? Value;
 
         [SerializeField]
+        private SerializableAction<T> _return = null!;
+
+        public void SetReturn(Action<T> action) {
+            _return = action;
+        }
+        public void Return(T value) {
+            _return?.Invoke(value);
+        }
+
+        public void Configure(T value, Action<T> returnAction) {
+            Value = value;
+            SetReturn(returnAction);
+        }
+
+    }
+    
+    public abstract class DialogDinamicReturn<T> : Dialog {
+        public T? Value;
+
+        [SerializeField]
         private SerializableAction _return = null!;
 
         public void SetReturn(Delegate action) {
@@ -146,6 +187,15 @@ namespace FUI {
         }
         public void Return(T value) {
             _return?.Invoke(value);
-        }        
+        }
+
+        public void Configure(T value, Action<T> returnAction) {
+            Value = value;
+            SetReturn(returnAction);
+        }
+
+
     }
+
+
 }

@@ -1,12 +1,8 @@
+#nullable enable
 using FUI;
 using FUI.Gears;
 using static FUI.Shortcuts;
-using System;
-using System.Collections;
-using UnityEngine.Events;
-using UnityEngine;
-using System.Reflection;
-using System.Runtime.CompilerServices;
+using static FUI.Basic;
 
 public class DialogsTest : Form {
 

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿/*using System.Collections.Generic;
 
 namespace FUI.Gears {
     public class UserInputState<T> : AbstractUserInput<T> where T : struct, System.IEquatable<T> {
@@ -28,4 +28,4 @@ namespace FUI.Gears {
             NotifyForm();
         }
     }
-}
+}*/

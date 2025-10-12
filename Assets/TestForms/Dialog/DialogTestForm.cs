@@ -8,7 +8,7 @@ public class DialogTestForm : Form {
     public Vector2 G;
 
     protected override void Build() {
-        Rectangle(P.Fill, Theme.Instance.WindowBackgroundColor);
+        /*Rectangle(P.Fill, Theme.Instance.WindowBackgroundColor);
 
         G = new Vector2(
             Slider(G.x,null, Color.black),
@@ -16,7 +16,7 @@ public class DialogTestForm : Form {
             );
 
 
-        Rectangle(P.Absolute(Vector2.zero, 100, 100, G), Color.red);
+        Rectangle(P.Absolute(Vector2.zero, 100, 100, G), Color.red);*/
 
     }
 }

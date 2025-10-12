@@ -33,8 +33,6 @@ public abstract class SerializableActionBase {
             _target = null;
     }
 
-    public abstract void Invoke(object arg);
-
     bool TypeHasNoFields(Type type, out string? firstFieldName) {
         firstFieldName = null;
         var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
@@ -119,16 +117,49 @@ public class SerializableAction : SerializableActionBase {
         return new SerializableAction(action);
     }
 
-    public SerializableAction(Delegate action): base(
+    public SerializableAction(Delegate action) : base(
+        action.Method.Name,
+        action.Target!.GetType().AssemblyQualifiedName,
+        action.Method.GetParameters()[0].ParameterType.AssemblyQualifiedName, action.Target!) {
+        _action = action;
+    }
+
+    public void Invoke(params object[] args) {
+        if (_action != null) {
+            _action.DynamicInvoke(args);
+            return;
+        }
+
+        if (GetMethod(out var method, out var target)) {
+            method.Invoke(target, args);
+            return;
+        }
+        else {
+            Debug.LogError($"Call to method {_methodName} on target {_targetTypeName} failed");
+            return;
+        }
+    }
+}
+
+[Serializable]
+public class SerializableAction<T> : SerializableActionBase {
+    private Action<T>? _action;
+
+
+    public static implicit operator SerializableAction<T>(Action<T> action) {
+        return new SerializableAction<T>(action);
+    }
+
+    public SerializableAction(Action<T> action): base(
         action.Method.Name,
         action.Target!.GetType().AssemblyQualifiedName,
         action.Method.GetParameters()[0].ParameterType.AssemblyQualifiedName, action.Target!) {
         _action = action;        
     }
 
-    public override void Invoke(object arg) {
+    public void Invoke(T arg) {
         if (_action != null) {
-            _action.DynamicInvoke(arg);
+            _action(arg);
             return;
         }
 
@@ -136,7 +167,7 @@ public class SerializableAction : SerializableActionBase {
             method.Invoke(target, new object[] { arg });
             return;
         } else { 
-            Debug.LogError($"Call to method {_methodName} on target {_targetTypeName} failed");
+            Debug.LogError($"Call to method failed.\n{_methodName}\n{_targetTypeName} ");
             return;
         }
     }

@@ -177,6 +177,10 @@ namespace FUI {
             public override void Set(GameObject gameObject) => gameObject.GetComponent<TMP_Text>().overflowMode = TextOverflowModes.Ellipsis;
         }
 
+        public class SetTextOverflowOverflow : ImmutableSetterModifier {
+            public override void Set(GameObject gameObject) => gameObject.GetComponent<TMP_Text>().overflowMode = TextOverflowModes.Overflow;
+        }
+
         public class SetTextMargin : SetterModifier {
             public float Left;
             public float Right;
@@ -218,6 +222,13 @@ namespace FUI {
                 var mask = gameObject.GetComponent<Mask>();
                 mask.showMaskGraphic = ShowMaskGraphic;
             }
+        }
+
+        public class AddRectMask : Modifier {
+            public override void Create(GameObject gameObject) {
+                gameObject.AddComponent<RectMask2D>();
+            }
+            public override void Update(GameObject gameObject) { }
         }
 
         public class AddCircle : Modifier {
@@ -449,17 +460,18 @@ namespace FUI {
                 HoveredColor = hoveredColor;
                 PressedColor = pressedColor;
             }
+            private void AssignColors(PressedHoveredHighlighter highlighter) {
+                highlighter.InitialColor = InitialColor;
+                highlighter.HoveredColor = HoveredColor;
+                highlighter.PressedColor = PressedColor;
+            }
             public override void Create(GameObject gameObject) {
-                var highlighter = gameObject.AddComponent<ConfigurablePressedHoveredHighlighter>();
-                highlighter.initialColor = InitialColor;
-                highlighter.hoveredColor = HoveredColor;
-                highlighter.pressedColor = PressedColor;
+                var highlighter = gameObject.AddComponent<PressedHoveredHighlighter>();
+                AssignColors(highlighter);
             }
             public override void Update(GameObject gameObject) {
-                var highlighter = gameObject.GetComponent<ConfigurablePressedHoveredHighlighter>();
-                highlighter.initialColor = InitialColor;
-                highlighter.hoveredColor = HoveredColor;
-                highlighter.pressedColor = PressedColor;
+                var highlighter = gameObject.GetComponent<PressedHoveredHighlighter>();
+                AssignColors(highlighter);
             }
         }
 

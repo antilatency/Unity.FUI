@@ -17,9 +17,7 @@ namespace FUI.Gears
         [HideInInspector]
         [SerializeField]
         protected Form? FormToNotify;
-        [HideInInspector]
-        [SerializeField]
-        protected bool ExtraIteration = false;
+
 
         float _width = float.NaN;
         float _height = float.NaN;
@@ -60,13 +58,12 @@ namespace FUI.Gears
 
         
 
-        public void SetFormToNotify(Form? form, bool extraIteration) {
+        public void SetFormToNotify(Form? form) {
             FormToNotify = form;
-            ExtraIteration = extraIteration;
         }
 
         private void NotifyForm() {
-            FormToNotify?.MakeDirty(ExtraIteration);
+            FormToNotify?.MakeDirty();
         }
     }
 }

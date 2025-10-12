@@ -3,8 +3,9 @@
 using System;
 using System.Collections.Generic;
 using FUI;
-using FUI.Gears;
+
 using static FUI.Shortcuts;
+using static FUI.Basic;
 using FUI.Modifiers;
 
 internal class DebugForm : Form {
@@ -134,9 +135,9 @@ internal class DebugForm : Form {
                 }
 
 
-                if (ExpandableGroupHeader("ExpandableGroupHeader")) {
+                /*if (ExpandableGroupHeader("ExpandableGroupHeader")) {
                     Label("Expanded");
-                }
+                }*/
                 GapTop(2);
 
                 Button("Button", () => { }, P.Up(20));
@@ -170,11 +171,11 @@ internal class DebugForm : Form {
 
 
                 GapTop(2);
-                Label("The quick brown fox jumps over the lazy dog", P.Up(Theme.Instance.LineHeight), new SetTextOverflow(TMPro.TextOverflowModes.Linked));
+                Label("The quick brown fox jumps over the lazy dog", P.Up(Theme.LineHeight), new SetTextOverflow(TMPro.TextOverflowModes.Linked));
 
 
-                Label("Red text", P.Up(Theme.Instance.LineHeight), new SetColor(Color.red));
-                Label("Bold text", P.Up(Theme.Instance.LineHeight), new SetFontStyle(TMPro.FontStyles.Bold));
+                Label("Red text", P.Up(Theme.LineHeight), new SetColor(Color.red));
+                Label("Bold text", P.Up(Theme.LineHeight), new SetFontStyle(TMPro.FontStyles.Bold));
 
                 //Label($"Width: {GetWidth()}");
                 var size = GetSize();

@@ -5,11 +5,21 @@ using UnityEngine;
 namespace FUI {
     public class MarkdownConverter {
 
-        public Color UrlColor = Theme.Instance.PrimaryColor;
+        public Color UrlColor = Color.green;
         public Color SeparatorColor = Color.gray;
-        public Color CodeBackgroundColor = Theme.Instance.LabelColor.Alpha(0.25f);
+        public Color CodeBackgroundColor = new Color(0.25f, 0.25f, 0.25f);
 
         int _indent = 0;
+
+        public MarkdownConverter() {
+            var form = Form.Current;
+            var theme = form?.Theme ?? Theme.Default;
+            UrlColor = theme.PrimaryColor;
+            //SeparatorColor = SeparatorColor;
+            //CodeBackgroundColor = CodeBackgroundColor;
+        }
+
+
         public string Convert(string markdownText) {
             /*var settings = new CommonMark.CommonMarkSettings {
                 AdditionalFeatures =

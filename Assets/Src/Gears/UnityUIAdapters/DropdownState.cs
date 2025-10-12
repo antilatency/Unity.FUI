@@ -1,7 +1,7 @@
 ﻿using TMPro;
 using UnityEngine;
 
-namespace FUI.Gears {
+/*namespace FUI.Gears {
     public class DropdownState : AbstractUserInput<int> {
 
         public TMP_Dropdown Target;
@@ -21,4 +21,4 @@ namespace FUI.Gears {
             NotifyForm();
         }
     }
-}
+}*/

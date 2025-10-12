@@ -1,10 +1,9 @@
+#nullable enable
 using FUI.Modifiers;
-
 using UnityEngine;
-
+using static FUI.Basic;
 
 namespace FUI {
-#nullable enable
 
     public static partial class Shortcuts {
 
@@ -16,7 +15,7 @@ namespace FUI {
 
         public static void Image(Positioner positioner, Texture texture, Vector4 multiplier, Vector4 increment, bool toSrgb) {
             var form = Form.Current;
-            var element = form.Element(null
+            var element = Element(null
                 , new AddComponent<RoundedRectangle>()
                 , new SetCustomShader("FUI/Image"
                     , ("Texture", texture)
@@ -27,7 +26,5 @@ namespace FUI {
             );
             positioner(element, form.CurrentBorders, () => new Vector2(texture.width, texture.height));
         }
-
-
     }
 }

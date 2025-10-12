@@ -1,11 +1,10 @@
-using System;
-using System.Linq.Expressions;
+#nullable enable
 
 using FUI.Modifiers;
 
 using UnityEngine;
 using UnityEngine.UI;
-#nullable enable
+using static FUI.Basic;
 
 
 
@@ -32,11 +31,9 @@ namespace FUI {
 
     public static partial class Shortcuts {
 
-        public static void VectorCanvas(VectorCanvas.DrawingDelegate drawingDelegate, Positioner? positioner = null) {
-            var form = Form.Current;
-            var element = form.Element(null, new AddVectorCanvas(drawingDelegate), new SetRaycastTarget(false));
-            (positioner ?? P.Fill)
-                (element, form.CurrentBorders, () => new Vector2(100, 100));
+        public static RectTransform VectorCanvas(VectorCanvas.DrawingDelegate drawingDelegate, Positioner? positioner = null) {
+            var element = Element(positioner ?? P.Fill, null, new AddVectorCanvas(drawingDelegate), new SetRaycastTarget(false));
+            return element;
         }
     }
 

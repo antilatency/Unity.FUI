@@ -80,7 +80,26 @@ namespace FUI {
             }
         };
 
+        public static Positioner Center(float? width = null, float? height = null) {
+            return (rectTransform, borders, sizeGetter) => {
+                Vector2 size;
+                if (!width.HasValue || !height.HasValue) {
+                    size = sizeGetter?.Invoke() ?? Vector2.zero;
+                    if (width.HasValue)
+                        size.x = width.Value;
+                    if (height.HasValue)
+                        size.y = height.Value;
+                } else {
+                    size = new Vector2(width.Value, height.Value);
+                }
 
+                rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
+                rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+                rectTransform.pivot = new Vector2(0.5f, 0.5f);
+                rectTransform.sizeDelta = size;
+                rectTransform.anchoredPosition = Vector2.zero;
+            };
+        }
 
         public static Positioner Absolute(Vector2 position, float? width = null, float? height = null, Vector2? anchor = null, Vector2? pivot = null) {
 

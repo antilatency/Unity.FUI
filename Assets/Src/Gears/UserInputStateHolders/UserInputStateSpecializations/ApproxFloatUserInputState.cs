@@ -1,4 +1,4 @@
-using UnityEngine;
+/*using UnityEngine;
 
 namespace FUI.Gears {
     public class ApproxFloatUserInputState : UserInputState<float> {
@@ -7,3 +7,4 @@ namespace FUI.Gears {
         }
     }
 }
+*/

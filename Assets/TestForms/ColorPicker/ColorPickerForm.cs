@@ -2,6 +2,7 @@ using UnityEngine;
 using FUI;
 using FUI.Gears;
 using static FUI.Shortcuts;
+using static FUI.Basic;
 using FUI.Modifiers;
 
 internal class ColorPickerForm : Form {
@@ -11,24 +12,24 @@ internal class ColorPickerForm : Form {
 
     static Vector2 ColorPickerHueSaturation(Vector2 value, Positioner positioner, bool extraIteration = false) {
         var form = Form.Current;
-
-        var background = form.Element(null
+        var theme = form.Theme;
+        var background = Element(null
             ,new AddComponent<RoundedRectangle>()
             ,new AddComponent<Slider>()
             ,new SetCustomShader("UI/HueSaturationRect")
         );
 
-        positioner(background, form.CurrentBorders, ()=>new Vector2(80, Theme.Instance.LineHeight));
+        positioner(background, form.CurrentBorders, ()=>new Vector2(80, theme.LineHeight));
 
         form.BeginControls(background);
-        var handle = form.Element(null
+        var handle = Element(null
             , new AddComponent<RoundedRectangle>()
             , new SetColor(Color.black)
             , new SetRaycastTarget(false)
         );
         form.EndControls();
-
-        var slider = background.GetComponent<Slider>();
+        throw new System.NotImplementedException("returnAction not implemented");
+        /*var slider = background.GetComponent<Slider>();
         slider.SetFormToNotify(form, extraIteration);
         if (slider.NewUserInput) {
             value = slider.Value;
@@ -38,7 +39,7 @@ internal class ColorPickerForm : Form {
         value = ToGrid(value, new Vector2Int(8, 8));
         if (!slider.Moving) {
             slider.Value = value;
-        }
+        }*/
 
         handle.anchorMin = value;
         handle.anchorMax = value;

@@ -1,5 +1,6 @@
 using UnityEngine;
 using FUI.Gears;
+using static FUI.Basic;
 using static FUI.Shortcuts;
 using TMPro;
 using System;
@@ -9,67 +10,76 @@ using System.Collections.Generic;
 #nullable enable
 namespace FUI {
     public class MenuDialog : EnumDialog {
-        public float Width = 200;        
+        public float Width = 200;
 
-        public static void Open<T>(GameObject parentControlTransform, T value, Action<T> returnAction, float width, string[]? options = null) {
+        /*public static void Open<T>(GameObject parentControlTransform, T value, Action<T> returnAction, float width, string[]? options = null) {
             var form = EnumDialog.Open<T, MenuDialog>(parentControlTransform, value, returnAction, options);
             form.Width = width;
+        }*/
+
+
+        public void Configure<T>(GameObject parentControlTransform, T value, Action<T> returnAction, float width, string[]? options = null) {
+            Configure(parentControlTransform, value, returnAction, options);
+            Width = width;
         }
 
-        protected override void PositionDialogWindow() {
-            if (WindowTransform == null || _parentControlTransform == null) return;
-            PositionWindowAround(WindowTransform, _parentControlTransform, Width);
+
+        protected override void UpdatePosition(RectTransform window) {
+            if (_parentControlTransform == null) return;
+            PositionWindowAround(window, _parentControlTransform, Width);
         }
     }
 
     public class DropDownDialog : EnumDialog {
-        public static void Open<T>(GameObject parentControlTransform, T value, Action<T> returnAction, string[]? options = null) {
+        /*public static void Open<T>(GameObject parentControlTransform, T value, Action<T> returnAction, string[]? options = null) {
             Open<T, DropDownDialog>(parentControlTransform, value, returnAction, options);
-        }
+        }*/
 
-        protected override void PositionDialogWindow() {
-            if (WindowTransform == null || _parentControlTransform == null) return;
-            PositionWindowUnder(WindowTransform, _parentControlTransform);
+        protected override void UpdatePosition(RectTransform window) {
+            if (_parentControlTransform == null) return;
+            PositionWindowUnder(window, _parentControlTransform);
         }
     }
 
-    public abstract class EnumDialog : Dialog<int> {
+    public abstract class EnumDialog : DialogDinamicReturn<int> {
 
         protected RectTransform _parentControlTransform = null!;
         private string[] _options = null!;
         private Dictionary<int, int>? _indexToEnumValue;
 
-        
-
-        protected static DialogType Open<T, DialogType>(GameObject parentControlTransform, T value, Action<T> returnAction, string[]? options = null) where DialogType : EnumDialog {
-            var form = FormStack.Instance.Push<DialogType>();
-
+        public virtual void Configure<T>(GameObject parentControl, T value, Action<T> returnAction, string[]? options = null) {
             if (value is Enum) {
-                form.Value = EnumHelper.ValueToIndex(value);
-                form._indexToEnumValue = EnumHelper.IndexToValue(value.GetType());
+                Value = EnumHelper.ValueToIndex(value);
+                _indexToEnumValue = EnumHelper.IndexToValue(value.GetType());
                 if (options == null) {
                     options = EnumHelper.NamesTrimmed(value.GetType());
                 }
-            }
-            else {
-                form.Value = Convert.ToInt32(value);
+            } else {
+                Value = Convert.ToInt32(value);
                 if (options == null) {
                     throw new Exception("Options must be provided for non-enum types");
                 }
             }
 
-            form.SetReturn(returnAction);
-            form._options = options;
-
-            form._parentControlTransform = parentControlTransform.GetComponent<RectTransform>();
-            return form;
+            SetReturn(returnAction);
+            _options = options;
+            _parentControlTransform = parentControl.GetComponent<RectTransform>();
         }
 
+        /*protected static DialogType Open<T, DialogType>(GameObject parentControlTransform, T value, Action<T> returnAction, string[]? options = null) where DialogType : EnumDialog {
+            var form = FormStack.Instance.Push<DialogType>();
 
+            
+
+            
+            return form;
+        }*/
+
+        
         
 
 
-        protected override void PopulateDialogWindow() {
+        protected override void Populate() {
 
             for (int i = 0; i < _options.Length; i++) {
                 int index = i;

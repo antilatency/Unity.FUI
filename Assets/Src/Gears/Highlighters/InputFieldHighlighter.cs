@@ -6,28 +6,44 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace FUI.Modifiers {
-    public class AddInputFieldHighlighter : Modifier {
+    public class AddFocusHoverHighlighter : Modifier {
         public override void Create(GameObject gameObject) {
-            var highlighter = gameObject.AddComponent<InputFieldHighlighter>();
+            var highlighter = gameObject.AddComponent<FocusHoverHighlighter>();
             highlighter.UpdateBinding(Form.Current);
         }
 
         public override void Update(GameObject gameObject) {
-            var highlighter = gameObject.GetComponent<InputFieldHighlighter>();
+            var highlighter = gameObject.GetComponent<FocusHoverHighlighter>();
             highlighter?.UpdateBinding(Form.Current);
+        }
+    }
+
+    public class SetInputFieldSelectionColor : SetterModifier {
+        public Color SelectionColor;
+        public SetInputFieldSelectionColor(Color selectionColor) {
+            SelectionColor = selectionColor;
+        }
+        public override void Set(GameObject gameObject) {
+            var inputField = gameObject.GetComponent<FUI_InputField>();
+            if (inputField != null) {
+                inputField.selectionColor = SelectionColor;
+            }
         }
     }
 }
 
-
+namespace FUI {
+    public interface IFocusHandler : IEventSystemHandler {
+        void OnFocusChanged(bool focused);
+    }
+}
 namespace FUI.Gears {
     //[RequireComponent(typeof(RoundedRectangleWithOutline))]
-    public class InputFieldHighlighter : AbstractHighlighter, IPointerEnterHandler, IPointerExitHandler, IPointerMoveHandler {
+    public class FocusHoverHighlighter : AbstractHighlighter, IFocusHandler, IPointerEnterHandler, IPointerExitHandler, IPointerMoveHandler {
 
 
         Theme _theme;
         public Theme Theme { get { return _theme; } set { if (SetPropertyUtility.SetClass(ref _theme, value)) UpdateAppearance(); } }
-        FUI_InputField input;
         RoundedRectangleWithOutline background;
         bool _focused;
         public bool Focused { get { return _focused; } set { if (SetPropertyUtility.SetStruct(ref _focused, value)) UpdateAppearance(); } }
@@ -55,6 +71,10 @@ namespace FUI.Gears {
             Hovered = !Enumerable.Range(0, 3).Any(x => Input.GetMouseButton(x)) && eventData.hovered.Contains(this.gameObject);
         }
 
+        void IFocusHandler.OnFocusChanged(bool focused) {
+            Focused = focused;
+        }
+
         public void ThemeChanged(Theme theme) {
             if (theme == _theme)
                 UpdateAppearance();
@@ -62,10 +82,10 @@ namespace FUI.Gears {
 
         public void UpdateBinding(Form form) {
             Theme = form.Theme;
-            CheckComponent(ref input);
+            /*CheckComponent(ref input);
             input.onFocusChanged = (s, f) => {
                 Focused = f;
-            };
+            };*/
         }
 
         public void UpdateAppearance() {
@@ -74,9 +94,6 @@ namespace FUI.Gears {
             background.OutlineWidth = _focused ? -_theme.OutlineThickness : 0;
             background.OutlineColor = _theme.InputOutlineColor;
             background.color = _hovered ? _theme.InputHoveredColor : _theme.InputColor;
-
-            CheckComponent(ref input);
-            input.selectionColor = _theme.InputSelectionColor;
         }
 
 
@@ -90,6 +107,8 @@ namespace FUI.Gears {
                     ? HoveredColor
                     : InitialColor;*/
         }
+
+        
     }
 
 }

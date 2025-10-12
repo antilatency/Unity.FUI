@@ -1,3 +1,3 @@
-﻿namespace FUI.Gears {
-    public class DoubleUserInputState : UserInputState<double> { }
-}
+﻿// namespace FUI.Gears {
+//     public class DoubleUserInputState : UserInputState<double> { }
+// }

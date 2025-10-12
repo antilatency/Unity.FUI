@@ -1,3 +1,5 @@
+using System;
+
 using UnityEngine;
 
 namespace FUI {
@@ -10,7 +12,7 @@ namespace FUI {
     [CreateAssetMenu(fileName = "Theme", menuName = "FUI/Theme")]
     public class Theme : ScriptableObject {
 
-        private static Theme _instance;
+        /*private static Theme _instance;
         public static Theme Instance {
             get {
                 if (_instance == null) {
@@ -18,15 +20,30 @@ namespace FUI {
                 }
                 return _instance;
             }
+        }*/
+        private static Theme _default;
+        public static Theme Default {
+            get {
+                if (_default == null) {
+                    _default = Resources.Load<Theme>("FUI.DefaultTheme");
+                    if (_default == null)
+                        throw new Exception("Default theme (FUI.DefaultTheme) not found in resources.");
+                }
+                return _default;
+            }
         }
 
-        public static void BroadcastToScene(string methodName, object parameter = null) {
-            foreach (GameObject gameobject in GameObject.FindObjectsOfType<GameObject>()){
+        private static void BroadcastToScene(string methodName, object parameter = null) {
+            foreach (GameObject gameobject in GameObject.FindObjectsOfType<GameObject>()) {
                 gameobject.SendMessage(methodName, parameter, SendMessageOptions.DontRequireReceiver);
             }
         }
 
         public void OnValidate() {
+            #if UNITY_EDITOR
+            if (!UnityEditor.EditorApplication.isPlaying)
+                return; // Skip runtime updates in edit mode
+            #endif
             BroadcastToScene("ThemeChanged", this);
 
         }

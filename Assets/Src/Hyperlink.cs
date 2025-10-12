@@ -15,7 +15,9 @@ namespace FUI
 
         public static string Create(string text, string uri, Color? color = null) {
             if (!color.HasValue) {
-                color = Theme.Instance.PrimaryColor;
+                var form = Form.Current;
+                var theme = form?.Theme ?? Theme.Default;
+                color = theme.PrimaryColor;
             }
             return $"<color=#{ColorUtility.ToHtmlStringRGBA(color.Value)}><u><link=\"{uri}\">{text}</link></u></color>";
         }

@@ -1,3 +1,3 @@
-namespace FUI.Gears {
-    public class Vector2UserInputState : UserInputState<UnityEngine.Vector2> { }
-}
+// namespace FUI.Gears {
+//     public class Vector2UserInputState : UserInputState<UnityEngine.Vector2> { }
+// }

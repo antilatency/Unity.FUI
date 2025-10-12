@@ -1,4 +1,4 @@
-using UnityEngine;
+/*using UnityEngine;
 
 namespace FUI.Gears {
     public class ApproxVector2UserInputState : UserInputState<UnityEngine.Vector2> {
@@ -6,4 +6,4 @@ namespace FUI.Gears {
             return Mathf.Approximately(a.x, b.x) && Mathf.Approximately(a.y, b.y);
         }
     }
-}
+}*/

@@ -2,10 +2,8 @@ using FUI;
 using FUI.Gears;
 using FUI.Modifiers;
 
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using static FUI.Basic;
 using static FUI.Shortcuts;
 using static UnityEngine.EventSystems.PointerEventData;
 
@@ -69,7 +67,7 @@ public class ZoomPanForm : Form {
                     }));
                 }
 
-                var subForm = SubForm<ListExampleForm>(P.Absolute(Vector2.zero, 300, 200, Vector2.right));
+                SubForm<ListExampleForm>().ApplyPositioner(P.Absolute(Vector2.zero, 300, 200, Vector2.right));
 
                 CircleOutline(
                     P.Absolute(new Vector2(-30, 50), 50, 50)
@@ -83,7 +81,7 @@ public class ZoomPanForm : Form {
                 LabeledInputField("input", TestFloat, x => AssignAndMakeDirty(ref TestFloat, x));
                 Button("Button", () => { });
 
-                Label($"subForm Num Items = {subForm.Items?.Count ?? 0}");
+                //Label($"subForm Num Items = {subForm.Items?.Count ?? 0}");
             }
 
         }
