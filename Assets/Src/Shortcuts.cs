@@ -294,7 +294,7 @@ namespace FUI {
             )) {
                 Label("\uf424", P.Fill
                     , new SetFontSize(theme.LineHeight * 0.6f)
-                    , new SetTextAlignmentCenter()
+                    , new SetTextAlignmentCenterMiddle()
                     );
                 return group.Value;
             }
@@ -624,7 +624,7 @@ namespace FUI {
             )) {
                 Padding(buttonHorizontalPadding, buttonHorizontalPadding, 0, 0);
 
-                Label("\uf0d7", P.Right(), new SetColor(textColor), new SetTextAlignmentCenter());
+                Label("\uf0d7", P.Right(), new SetColor(textColor), new SetTextAlignmentCenterMiddle());
 
                 Label(name, P.RigidFill
                     , new SetColor(textColor)

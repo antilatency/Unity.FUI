@@ -65,25 +65,43 @@ namespace FUI {
                 Set(gameObject);
             }
         }
+
+        public abstract class SetterModifier<T> : Modifier  where T : Component {
+            public abstract void Set(T component);
+            public override void Create(GameObject gameObject) {
+                Set(gameObject.GetComponent<T>());
+            }
+            public override void Update(GameObject gameObject) {
+                Set(gameObject.GetComponent<T>());
+            }
+        }
+
         public abstract class ImmutableSetterModifier : Modifier {
             public abstract void Set(GameObject gameObject);
             public override void Create(GameObject gameObject) {
                 Set(gameObject);
             }
+            public override void Update(GameObject gameObject) { }
+        }
+        public abstract class ImmutableSetterModifier<T> : Modifier where T : Component {
+            public abstract void Set(T component);
+            public override void Create(GameObject gameObject) {
+                Set(gameObject.GetComponent<T>());
+            }
             public override void Update(GameObject gameObject) {}
         }
 
 
-        public class SetColor : SetterModifier {
+        public class SetColor : SetterModifier<Graphic> {
             public Color Color;
             public SetColor(Color color) {
                 Color = color;
             }
-            public override void Set(GameObject gameObject) => gameObject.GetComponent<Graphic>().color = Color;
+            public override void Set(Graphic component) => component.color = Color;
 
         }
 
-        public class SetRectangleCorners : SetterModifier {
+        public class SetRectangleCorners : SetterModifier<RoundedRectangle> {
             public float TopLeft;
             public float TopRight;
             public float BottomLeft;
@@ -100,88 +118,98 @@ namespace FUI {
                 BottomLeft = bottomLeft;
                 BottomRight = bottomRight;
             }
-            public override void Set(GameObject gameObject) => gameObject.GetComponent<RoundedRectangle>().SetCorners(TopLeft, TopRight, BottomLeft, BottomRight);
+            public override void Set(RoundedRectangle component) => component.SetCorners(TopLeft, TopRight, BottomLeft, BottomRight);
         }
 
-        public class SetText : SetterModifier {
+        public class SetText : SetterModifier<TMP_Text> {
             public string Text;
             public SetText(string text) {
                 Text = text;
             }
-            public override void Set(GameObject gameObject) => gameObject.GetComponent<TMP_Text>().text = Text;
+            public override void Set(TMP_Text component) => component.text = Text;
         }
 
-        public class SetFontStyle : SetterModifier {
+        public class SetFontStyle : SetterModifier<TMP_Text> {
             public FontStyles FontStyle;
             public SetFontStyle(FontStyles fontStyle) {
                 FontStyle = fontStyle;
             }
-            public override void Set(GameObject gameObject) => gameObject.GetComponent<TMP_Text>().fontStyle = FontStyle;
+            public override void Set(TMP_Text component) => component.fontStyle = FontStyle;
         }
 
-        public class SetFontSize : SetterModifier {
+        public class SetFontSize : SetterModifier<TMP_Text> {
             public float FontSize;
             public SetFontSize(float fontSize) {
                 FontSize = fontSize;
             }
-            public override void Set(GameObject gameObject) => gameObject.GetComponent<TMP_Text>().fontSize = FontSize;
+            public override void Set(TMP_Text component) => component.fontSize = FontSize;
         }
 
-        public class SetWordWrapping : SetterModifier {
+        public class SetWordWrapping : SetterModifier<TMP_Text> {
             public bool Wrapping;
             public SetWordWrapping(bool wrapping) {
                 Wrapping = wrapping;
             }
-            public override void Set(GameObject gameObject) => gameObject.GetComponent<TMP_Text>().enableWordWrapping = Wrapping;
+            public override void Set(TMP_Text component) => component.enableWordWrapping = Wrapping;
         }
 
-        public class SetRichTextEnabled : SetterModifier {
+        public class SetRichTextEnabled : SetterModifier<TMP_Text> {
             public bool RichText;
             public SetRichTextEnabled(bool richText) {
                 RichText = richText;
             }
-            public override void Set(GameObject gameObject) => gameObject.GetComponent<TMP_Text>().richText = RichText;
+            public override void Set(TMP_Text component) => component.richText = RichText;
         }
 
-        public class SetTextAlignment : SetterModifier {
+        public class SetTextAlignment : SetterModifier<TMP_Text> {
             public HorizontalAlignmentOptions HorizontalAlignment;
             public VerticalAlignmentOptions VerticalAlignment;
             public SetTextAlignment(HorizontalAlignmentOptions horizontalAlignment = HorizontalAlignmentOptions.Left, VerticalAlignmentOptions verticalAlignment = VerticalAlignmentOptions.Middle) {
                 HorizontalAlignment = horizontalAlignment;
                 VerticalAlignment = verticalAlignment;
             }
-            public override void Set(GameObject gameObject) {
-                var text = gameObject.GetComponent<TMP_Text>();
-                text.horizontalAlignment = HorizontalAlignment;
-                text.verticalAlignment = VerticalAlignment;
+            public override void Set(TMP_Text component) {
+                component.horizontalAlignment = HorizontalAlignment;
+                component.verticalAlignment = VerticalAlignment;
             }
         }
 
-        public class SetTextAlignmentCenter : ImmutableSetterModifier {
-            public override void Set(GameObject gameObject) {
-                var text = gameObject.GetComponent<TMP_Text>();
-                text.horizontalAlignment = HorizontalAlignmentOptions.Center;
-                text.verticalAlignment = VerticalAlignmentOptions.Middle;
+        public class SetTextAlignmentCenterMiddle : ImmutableSetterModifier<TMP_Text> {
+            public override void Set(TMP_Text component) {
+                component.horizontalAlignment = HorizontalAlignmentOptions.Center;
+                component.verticalAlignment = VerticalAlignmentOptions.Middle;
+            }
+        }
+        public class SetTextAlignmentLeftMiddle : ImmutableSetterModifier<TMP_Text> {
+            public override void Set(TMP_Text component) {
+                component.horizontalAlignment = HorizontalAlignmentOptions.Left;
+                component.verticalAlignment = VerticalAlignmentOptions.Middle;
+            }
+        }
+        public class SetTextAlignmentRightMiddle : ImmutableSetterModifier<TMP_Text> {
+            public override void Set(TMP_Text component) {
+                component.horizontalAlignment = HorizontalAlignmentOptions.Right;
+                component.verticalAlignment = VerticalAlignmentOptions.Middle;
             }
         }
 
-        public class SetTextOverflow : SetterModifier {
+        public class SetTextOverflow : SetterModifier<TMP_Text> {
             public TextOverflowModes OverflowMode;
             public SetTextOverflow(TextOverflowModes overflowMode) {
                 OverflowMode = overflowMode;
             }
-            public override void Set(GameObject gameObject) => gameObject.GetComponent<TMP_Text>().overflowMode = OverflowMode;
+            public override void Set(TMP_Text component) => component.overflowMode = OverflowMode;
         }
 
-        public class SetTextOverflowEllipsis : ImmutableSetterModifier {
-            public override void Set(GameObject gameObject) => gameObject.GetComponent<TMP_Text>().overflowMode = TextOverflowModes.Ellipsis;
+        public class SetTextOverflowEllipsis : ImmutableSetterModifier<TMP_Text> {
+            public override void Set(TMP_Text component) => component.overflowMode = TextOverflowModes.Ellipsis;
         }
 
-        public class SetTextOverflowOverflow : ImmutableSetterModifier {
-            public override void Set(GameObject gameObject) => gameObject.GetComponent<TMP_Text>().overflowMode = TextOverflowModes.Overflow;
+        public class SetTextOverflowOverflow : ImmutableSetterModifier<TMP_Text> {
+            public override void Set(TMP_Text component) => component.overflowMode = TextOverflowModes.Overflow;
         }
 
-        public class SetTextMargin : SetterModifier {
+        public class SetTextMargin : SetterModifier<TMP_Text> {
             public float Left;
             public float Right;
             public float Top;
@@ -192,9 +220,8 @@ namespace FUI {
                 Top = top;
                 Bottom = bottom;
             }
-            public override void Set(GameObject gameObject) {
-                var text = gameObject.GetComponent<TMP_Text>();
-                text.margin = new Vector4(Left, Top, Right, Bottom);
+            public override void Set(TMP_Text component) {
+                component.margin = new Vector4(Left, Top, Right, Bottom);
             }
         }
 
