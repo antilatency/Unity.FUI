@@ -23,10 +23,12 @@ namespace FUI {
             public override void Create(GameObject gameObject) {
                 var canvas = gameObject.AddComponent<VectorCanvas>();
                 canvas.OnDrawing = DrawingDelegate;
+                canvas.MakeDirty();
             }
             public override void Update(GameObject gameObject) {
                 var canvas = gameObject.GetComponent<VectorCanvas>();
                 canvas.OnDrawing = DrawingDelegate;
+                canvas.MakeDirty();
             }
         }
     }
@@ -60,15 +62,10 @@ namespace FUI {
     public class VectorCanvas : MaskableGraphic {
 
         //public delegate void DrawingDelegate(VectorCanvasContext context);
-        public Action<VectorCanvasContext>? _onDrawing;
-        public Action<VectorCanvasContext>? OnDrawing {
-            get => _onDrawing;
-            set {
-                if (_onDrawing != value) {
-                    _onDrawing = value;
-                    SetVerticesDirty();
-                }
-            }
+        public Action<VectorCanvasContext>? OnDrawing;
+
+        public void MakeDirty() {
+            SetVerticesDirty();
         }
 
         protected override void OnPopulateMesh(VertexHelper vertexHelper) {
