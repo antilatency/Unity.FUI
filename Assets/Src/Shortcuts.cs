@@ -2,9 +2,11 @@
 using FUI.Modifiers;
 
 using System;
+using System.Collections;
 
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 using static FUI.Basic;
 
@@ -13,17 +15,14 @@ namespace FUI {
 
 
     public static partial class Shortcuts {
-
-        public static RectTransform Label(string text, Positioner? positioner = null, params Modifier[] additionalModifiers) {
-            return Label(text, positioner, new ModifiersList(additionalModifiers));
+        public static RectTransform Text(string text, Positioner? positioner = null, params Modifier[] additionalModifiers) {
+            return Text(text, positioner, new ModifiersList(additionalModifiers));
         }
-
-        public static RectTransform Label(string text, Positioner? positioner = null, ModifiersList? additionalModifiers = null) {
+        public static RectTransform Text(string text, Positioner? positioner = null, ModifiersList? additionalModifiers = null) {
             var form = Form.Current;
             var modifiers = new ModifiersList() {
                 new AddComponent<TextMeshProUGUI>(),
                 new SetText(text),
-                new SetTextOverflowEllipsis(),
                 additionalModifiers
             };
 
@@ -35,6 +34,22 @@ namespace FUI {
                 size.y = Mathf.Ceil(size.y);
                 return size;
             });
+            return result;
+        }
+
+
+        public static RectTransform Label(string text, Positioner? positioner = null, params Modifier[] additionalModifiers) {
+            return Label(text, positioner, new ModifiersList(additionalModifiers));
+        }
+
+        public static RectTransform Label(string text, Positioner? positioner = null, ModifiersList? additionalModifiers = null) {
+            var form = Form.Current;
+            var modifiers = new ModifiersList() {
+                new SetTextOverflowEllipsis(),
+                additionalModifiers
+            };
+
+            var result = Text(text, positioner, modifiers);
             return result;
         }
 
@@ -113,10 +128,10 @@ namespace FUI {
                         )
                         ) {
                     Padding(buttonHorizontalPadding, buttonHorizontalPadding, 0, 0);
-                    Label(text
+                    Text(text
                         , P.Fill
                         , new SetColor(textColor)
-                        , new SetTextAlignment(TMPro.HorizontalAlignmentOptions.Center)
+                        , new SetTextAlignmentCenterMiddle()
                         , new SetTextOverflowOverflow()
                         );
                     return group.Value;
@@ -171,9 +186,9 @@ namespace FUI {
             )
             ) {
                 Padding(buttonHorizontalPadding, buttonHorizontalPadding, 0, 0);
-                Label(text, P.RigidFill
+                Text(text, P.RigidFill
                     , new SetColor(textColor)
-                    , new SetTextAlignment(HorizontalAlignmentOptions.Center)
+                    , new SetTextAlignmentCenterMiddle()
                     , new SetTextOverflowOverflow()
                     );
 
@@ -292,7 +307,7 @@ namespace FUI {
                     returnAction(newValue);
                 })
             )) {
-                Label("\uf424", P.Fill
+                Text("\uf424", P.Fill
                     , new SetFontSize(theme.LineHeight * 0.6f)
                     , new SetTextAlignmentCenterMiddle()
                     );
@@ -624,11 +639,12 @@ namespace FUI {
             )) {
                 Padding(buttonHorizontalPadding, buttonHorizontalPadding, 0, 0);
 
-                Label("\uf0d7", P.Right(), new SetColor(textColor), new SetTextAlignmentCenterMiddle());
+                Text("\uf0d7", P.Right(), new SetColor(textColor), new SetTextAlignmentCenterMiddle());
 
-                Label(name, P.RigidFill
+                Text(name, P.RigidFill
                     , new SetColor(textColor)
-                    , new SetTextAlignment(HorizontalAlignmentOptions.Left)
+                    , new SetTextOverflowEllipsis()
+                    , new SetTextAlignmentLeftMiddle()
                     );
                 return group.Value;
             }
@@ -663,11 +679,11 @@ namespace FUI {
                 if (paddings) {
                     Padding(buttonHorizontalPadding, buttonHorizontalPadding, 0, 0);
                 }
-                Label(text, P.RigidFill
+                Text(text, P.RigidFill
                     , new SetColor(textColor)
-                    , new SetTextAlignment(HorizontalAlignmentOptions.Center)
+                    , new SetTextAlignmentCenterMiddle()
                     , new SetTextOverflowOverflow()
-                    );
+                );
             }
         }
 
@@ -688,9 +704,9 @@ namespace FUI {
                 if (paddings) {
                     Padding(buttonHorizontalPadding, buttonHorizontalPadding, 0, 0);
                 }
-                Label(text, P.Fill
+                Text(text, P.RigidFill
                     , new SetColor(textColor)
-                    , new SetTextAlignment(HorizontalAlignmentOptions.Center)
+                    , new SetTextAlignmentCenterMiddle()
                     , new SetTextOverflowOverflow()
                 );
             }
@@ -720,11 +736,13 @@ namespace FUI {
                     , new AddComponent<RoundedRectangle>()
                     , new SetRectangleCorners(Mathf.Max(0, radius - thickness))
                     , new SetColor(color)
+                    , new AddRectMask()
                     )) {
                     if (!string.IsNullOrEmpty(text)) {
-                        Label(text!, P.Fill
+                        Text(text!, P.Fill
                             , new SetColor(color.ContrastColor())
-                            , new SetTextAlignment(HorizontalAlignmentOptions.Center)
+                            , new SetTextAlignmentCenterMiddle()
+                            , new SetTextOverflowOverflow()
                         );
                     }
                 }
