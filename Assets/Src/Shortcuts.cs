@@ -14,8 +14,8 @@ namespace FUI {
 
     public static partial class Shortcuts {
 
-        public static void Label(string text, Positioner? positioner = null, params Modifier[] additionalModifiers) {
-            Label(text, positioner, new ModifiersList(additionalModifiers));
+        public static RectTransform Label(string text, Positioner? positioner = null, params Modifier[] additionalModifiers) {
+            return Label(text, positioner, new ModifiersList(additionalModifiers));
         }
 
         public static RectTransform Label(string text, Positioner? positioner = null, ModifiersList? additionalModifiers = null) {
