@@ -11,7 +11,6 @@ namespace FUI {
                 form.initialized = true;
                 form.Rebuild();
             }
-
             return form;
         }
     }

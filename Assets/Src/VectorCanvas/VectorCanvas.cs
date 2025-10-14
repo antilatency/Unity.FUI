@@ -1,5 +1,7 @@
 #nullable enable
 
+using System;
+
 using FUI.Modifiers;
 
 using UnityEngine;
@@ -14,24 +16,24 @@ namespace FUI {
 
     namespace Modifiers {
         public class AddVectorCanvas : Modifier {
-            public VectorCanvas.DrawingDelegate DrawingDelegate;
-            public AddVectorCanvas(VectorCanvas.DrawingDelegate drawingDelegate) {
+            public Action<VectorCanvasContext> DrawingDelegate;
+            public AddVectorCanvas(Action<VectorCanvasContext> drawingDelegate) {
                 DrawingDelegate = drawingDelegate;
             }
             public override void Create(GameObject gameObject) {
-                gameObject.AddComponent<VectorCanvas>();
+                var canvas = gameObject.AddComponent<VectorCanvas>();
+                canvas.OnDrawing = DrawingDelegate;
             }
             public override void Update(GameObject gameObject) {
                 var canvas = gameObject.GetComponent<VectorCanvas>();
                 canvas.OnDrawing = DrawingDelegate;
-                canvas.SetVerticesDirty();
             }
         }
     }
 
     public static partial class Shortcuts {
 
-        public static RectTransform VectorCanvas(VectorCanvas.DrawingDelegate drawingDelegate, Positioner? positioner = null) {
+        public static RectTransform VectorCanvas(Action<VectorCanvasContext> drawingDelegate, Positioner? positioner = null) {
             var element = Element(positioner ?? P.Fill, null, new AddVectorCanvas(drawingDelegate), new SetRaycastTarget(false));
             return element;
         }
@@ -57,9 +59,17 @@ namespace FUI {
     [RequireComponent(typeof(CanvasRenderer))]
     public class VectorCanvas : MaskableGraphic {
 
-        public delegate void DrawingDelegate(VectorCanvasContext context);
-
-        public DrawingDelegate? OnDrawing;
+        //public delegate void DrawingDelegate(VectorCanvasContext context);
+        public Action<VectorCanvasContext>? _onDrawing;
+        public Action<VectorCanvasContext>? OnDrawing {
+            get => _onDrawing;
+            set {
+                if (_onDrawing != value) {
+                    _onDrawing = value;
+                    SetVerticesDirty();
+                }
+            }
+        }
 
         protected override void OnPopulateMesh(VertexHelper vertexHelper) {
             var context = new VectorCanvasContext(vertexHelper, rectTransform.rect);

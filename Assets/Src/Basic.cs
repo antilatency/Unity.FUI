@@ -222,7 +222,10 @@ namespace FUI {
             });
         }
 
-
+        public static T Dialog<T>() where T : Dialog {
+            var dialog = FormStack.Instance.Push<T>();
+            return dialog;
+        }
 
 
         public static Disposable ScrollRectVertical(Positioner positioner) {

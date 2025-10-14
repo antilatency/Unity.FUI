@@ -156,45 +156,37 @@ namespace FUI {
     }
 
 
-    public abstract class Dialog<T> : Dialog {
-        public T? Value;
+    public abstract class AbstractValueDialog<T> : Dialog {
+        public T Value;
+        public abstract void Return(T value);
+        //public abstract void Configure(T value, Action<T> returnAction);
+    }
+
+    public abstract class AbstractValueDialogGenericReturn<T> : AbstractValueDialog<T> {
 
         [SerializeField]
         private SerializableAction<T> _return = null!;
 
-        public void SetReturn(Action<T> action) {
-            _return = action;
-        }
-        public void Return(T value) {
-            _return?.Invoke(value);
-        }
+        public override void Return(T value) => _return?.Invoke(value);        
 
         public void Configure(T value, Action<T> returnAction) {
             Value = value;
-            SetReturn(returnAction);
+            _return = new SerializableAction<T>(returnAction);
         }
-
     }
-    
-    public abstract class DialogDinamicReturn<T> : Dialog {
-        public T? Value;
+
+    public abstract class AbstractValueDialogDynamicReturn<T> : AbstractValueDialog<T> {
 
         [SerializeField]
         private SerializableAction _return = null!;
 
-        public void SetReturn(Delegate action) {
-            _return = new SerializableAction(action);
-        }
-        public void Return(T value) {
-            _return?.Invoke(value);
-        }
+        public override void Return(T value) => _return?.Invoke(value);
 
-        public void Configure(T value, Action<T> returnAction) {
+
+        public void Configure(T value, Delegate returnAction) {
             Value = value;
-            SetReturn(returnAction);
+            _return = new SerializableAction(returnAction);
         }
-
-
     }
 
 

@@ -5,6 +5,7 @@ using static FUI.Basic;
 using UnityEngine;
 using FUI.Gears;
 using FUI.Modifiers;
+using System;
 
 #nullable enable
 
@@ -28,7 +29,7 @@ public class ThemeTest : Form {
         }
     }
 
-    class YesNoMessageForm : Dialog<bool> {
+    class YesNoMessageForm : AbstractValueDialogGenericReturn<bool> {
         protected override void Populate() {
 
             Padding(8);
@@ -56,9 +57,11 @@ public class ThemeTest : Form {
         }
     }
 
+
     protected override void Build() {
 
         using (WindowBackground()) {
+
             using (Group(P.Left(0, 0.25f))) {
                 Padding(4);
                 Label("Buttons");
@@ -80,22 +83,22 @@ public class ThemeTest : Form {
 
                 GapTop(4);
 
-
                 using (Group(P.Up(Theme.LineHeight))) {
 
                     Button("\uf0c7", () => { }, P.Left());
 
                     Button("\uf142", (g, e) => {
-                        Dialog.Create<MenuDialog>().Configure(g, SelectedIndex, (value) => {
+                        Dialog<MenuDialog>().Configure(g, SelectedIndex, (value) => {
                             SelectedIndex = value;
                             MakeDirty();
                         }, 50, options);
                     }, P.Right());
+
                 }
 
                 GapTop(4);
                 Button("Show Yes/No Dialog", (g, e) => {
-                    Dialog.Create<YesNoMessageForm>().Configure(true, x => { 
+                    Dialog<YesNoMessageForm>().Configure(true, x => {
                         Debug.Log("Dialog closed with result: " + x);
                     });
                 });
@@ -116,7 +119,7 @@ public class ThemeTest : Form {
                 GapTop();
                 LabeledCheckbox("Bool", Selected, x => AssignAndMakeDirty(ref Selected, x));
                 GapTop();
-                Slider(FloatValue/2, x => AssignAndMakeDirty(ref FloatValue, Mathf.Clamp(2*x, 0, 2)));
+                Slider(FloatValue / 2, x => AssignAndMakeDirty(ref FloatValue, Mathf.Clamp(2 * x, 0, 2)));
             }
 
             using (Group(P.Left(0, 0.25f))) {
@@ -130,6 +133,8 @@ public class ThemeTest : Form {
                     .ApplyPositioner(P.Up());
 
             }
+
+
 
         }
     }

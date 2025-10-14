@@ -41,43 +41,32 @@ namespace FUI {
         }
     }
 
-    public abstract class EnumDialog : DialogDinamicReturn<int> {
+    public abstract class EnumDialog : AbstractValueDialogDynamicReturn<int> {
 
         protected RectTransform _parentControlTransform = null!;
         private string[] _options = null!;
         private Dictionary<int, int>? _indexToEnumValue;
 
         public virtual void Configure<T>(GameObject parentControl, T value, Action<T> returnAction, string[]? options = null) {
+            int index;
             if (value is Enum) {
-                Value = EnumHelper.ValueToIndex(value);
+                index = EnumHelper.ValueToIndex(value);
                 _indexToEnumValue = EnumHelper.IndexToValue(value.GetType());
                 if (options == null) {
                     options = EnumHelper.NamesTrimmed(value.GetType());
                 }
-            } else {
-                Value = Convert.ToInt32(value);
+            }
+            else {
+                index = Convert.ToInt32(value);
                 if (options == null) {
                     throw new Exception("Options must be provided for non-enum types");
                 }
             }
 
-            SetReturn(returnAction);
+            base.Configure(index, returnAction);
             _options = options;
             _parentControlTransform = parentControl.GetComponent<RectTransform>();
         }
-
-        /*protected static DialogType Open<T, DialogType>(GameObject parentControlTransform, T value, Action<T> returnAction, string[]? options = null) where DialogType : EnumDialog {
-            var form = FormStack.Instance.Push<DialogType>();
-
-            
-
-            
-            return form;
-        }*/
-
-        
-        
-
 
         protected override void Populate() {
 
