@@ -209,29 +209,32 @@ namespace FUI {
             public override void Update(GameObject gameObject) { }
         }
 
-        public class AddMask : Modifier {
+        public abstract class AddComponentConfigured<T> : Modifier where T : Component {
+            public override void Create(GameObject gameObject) {
+                var component = gameObject.AddComponent<T>();
+                Configure(component);
+            }
+            public override void Update(GameObject gameObject) {
+                var component = gameObject.GetComponent<T>();
+                Configure(component);
+            }
+            public abstract void Configure(T component);
+        }
+
+        public class AddMask : AddComponentConfigured<Mask> {
             public bool ShowMaskGraphic;
             public AddMask(bool showMaskGraphic) {
                 ShowMaskGraphic = showMaskGraphic;
             }
-            public override void Create(GameObject gameObject) {
-                var mask = gameObject.AddComponent<Mask>();
-                mask.showMaskGraphic = ShowMaskGraphic;
-            }
-            public override void Update(GameObject gameObject) {
-                var mask = gameObject.GetComponent<Mask>();
-                mask.showMaskGraphic = ShowMaskGraphic;
+            public override void Configure(Mask component) {
+                component.showMaskGraphic = ShowMaskGraphic;
             }
         }
 
-        public class AddRectMask : Modifier {
-            public override void Create(GameObject gameObject) {
-                gameObject.AddComponent<RectMask2D>();
-            }
-            public override void Update(GameObject gameObject) { }
+        public class AddRectMask : AddComponent<RectMask2D> {
         }
 
-        public class AddCircle : Modifier {
+        public class AddCircle : AddComponentConfigured<Circle> {
             public float Angle;
             public float StartAngle;
             public int NumSegments;
@@ -240,21 +243,14 @@ namespace FUI {
                 StartAngle = startAngle;
                 NumSegments = numSegments;
             }
-            public override void Create(GameObject gameObject) {
-                var circle = gameObject.AddComponent<Circle>();
-                circle.NumSegments = NumSegments;
-                circle.StartAngle = StartAngle;
-                circle.Angle = Angle;
-            }
-            public override void Update(GameObject gameObject) {
-                var circle = gameObject.GetComponent<Circle>();
-                circle.NumSegments = NumSegments;
-                circle.StartAngle = StartAngle;
-                circle.Angle = Angle;
+            public override void Configure(Circle component) {
+                component.NumSegments = NumSegments;
+                component.StartAngle = StartAngle;
+                component.Angle = Angle;
             }
         }
 
-        public class AddCircleOutline : Modifier {
+        public class AddCircleOutline : AddComponentConfigured<CircleOutline> {
             public float InnerThickness;
             public float OuterThickness;
             public float Angle;
@@ -267,25 +263,16 @@ namespace FUI {
                 StartAngle = startAngle;
                 NumSegments = numSegments;
             }
-            public override void Create(GameObject gameObject) {
-                var circle = gameObject.AddComponent<CircleOutline>();
-                circle.NumSegments = NumSegments;
-                circle.StartAngle = StartAngle;
-                circle.Angle = Angle;
-                circle.InnerThickness = InnerThickness;
-                circle.OuterThickness = OuterThickness;
-            }
-            public override void Update(GameObject gameObject) {
-                var circle = gameObject.GetComponent<CircleOutline>();
-                circle.NumSegments = NumSegments;
-                circle.StartAngle = StartAngle;
-                circle.Angle = Angle;
-                circle.InnerThickness = InnerThickness;
-                circle.OuterThickness = OuterThickness;
+            public override void Configure(CircleOutline component) {
+                component.NumSegments = NumSegments;
+                component.StartAngle = StartAngle;
+                component.Angle = Angle;
+                component.InnerThickness = InnerThickness;
+                component.OuterThickness = OuterThickness;
             }
         }
 
-        public class AddCubicSpline : Modifier {
+        public class AddCubicSpline : AddComponentConfigured<CubicSpline> {
             public Vector2 PointA;
             public Vector2 TangentA;
             public Vector2 PointB;
@@ -308,150 +295,100 @@ namespace FUI {
                 OuterThickness = outerThickness;
                 NumSegments = numSegments;
             }
-            public override void Create(GameObject gameObject) {
-                var spline = gameObject.AddComponent<CubicSpline>();
-                spline.PointA = PointA;
-                spline.TangentA = TangentA;
-                spline.PointB = PointB;
-                spline.TangentB = TangentB;
-                spline.NumSegments = NumSegments;
-                spline.InnerThickness = InnerThickness;
-                spline.OuterThickness = OuterThickness;
-            }
-            public override void Update(GameObject gameObject) {
-                var spline = gameObject.GetComponent<CubicSpline>();
-                spline.PointA = PointA;
-                spline.TangentA = TangentA;
-                spline.PointB = PointB;
-                spline.TangentB = TangentB;
-                spline.NumSegments = NumSegments;
-                spline.InnerThickness = InnerThickness;
-                spline.OuterThickness = OuterThickness;
+            public override void Configure(CubicSpline component) {
+                component.PointA = PointA;
+                component.TangentA = TangentA;
+                component.PointB = PointB;
+                component.TangentB = TangentB;
+                component.NumSegments = NumSegments;
+                component.InnerThickness = InnerThickness;
+                component.OuterThickness = OuterThickness;
             }
         }
 
-        public class AddDraggable : Modifier {
+        public class AddDraggable : AddComponentConfigured<Draggable> {
             public Action<GameObject, PointerEventData> DragAction;
             public PointerEventUtils.PointerEventFilter? EventFilter;
             public AddDraggable(Action<GameObject, PointerEventData> dragAction, PointerEventUtils.PointerEventFilter? eventFilter = null) {
                 DragAction = dragAction;
                 EventFilter = eventFilter;
             }
-            public override void Create(GameObject gameObject) {
-                var draggable = gameObject.AddComponent<Draggable>();
-                draggable.DragAction = DragAction;
-                draggable.EventFilter = EventFilter;
-            }
-            public override void Update(GameObject gameObject) {
-                var draggable = gameObject.GetComponent<Draggable>();
-                draggable.DragAction = DragAction;
-                draggable.EventFilter = EventFilter;
+            public override void Configure(Draggable component) {
+                component.DragAction = DragAction;
+                component.EventFilter = EventFilter;
             }
         }
 
-        public class AddPointerEventObserver : Modifier {
+        public class AddPointerEventObserver : AddComponentConfigured<PointerEventObserver> {
             public Func<GameObject, PointerEventData, bool> Handler;
             public AddPointerEventObserver(Func<GameObject, PointerEventData, bool> handler) {
                 Handler = handler;
             }
-            public override void Create(GameObject gameObject) {
-                var receiver = gameObject.AddComponent<PointerEventObserver>();
-                receiver.Handler = Handler;
-            }
-            public override void Update(GameObject gameObject) {
-                var receiver = gameObject.GetComponent<PointerEventObserver>();
-                receiver.Handler = Handler;
+            public override void Configure(PointerEventObserver component) {
+                component.Handler = Handler;
             }
         }
 
-        public class AddClickHandler : Modifier {
+        public class AddClickHandler : AddComponentConfigured<PointerClickHandler> {
             public Action OnClick;
             public AddClickHandler(Action onClick) {
                 OnClick = onClick;
             }
-            public override void Create(GameObject gameObject) {
-                var handler = gameObject.AddComponent<PointerClickHandler>();
-                handler.OnClick = OnClick;
-            }
-            public override void Update(GameObject gameObject) {
-                var handler = gameObject.GetComponent<PointerClickHandler>();
-                handler.OnClick = OnClick;
+            public override void Configure(PointerClickHandler component) {
+                component.OnClick = OnClick;
             }
         }
 
-        public class AddClickHandlerEx : Modifier {
+        public class AddClickHandlerEx : AddComponentConfigured<PointerClickHandlerEx> {
             public ButtonAction OnClick;
             public AddClickHandlerEx(ButtonAction onClick) {
                 OnClick = onClick;
             }
-            public override void Create(GameObject gameObject) {
-                var handler = gameObject.AddComponent<PointerClickHandlerEx>();
-                handler.OnClick = OnClick;
-            }
-            public override void Update(GameObject gameObject) {
-                var handler = gameObject.GetComponent<PointerClickHandlerEx>();
-                handler.OnClick = OnClick;
+            public override void Configure(PointerClickHandlerEx component) {
+                component.OnClick = OnClick;
             }
         }
 
-        public class AddPressReleaseHandler : Modifier {
+        public class AddPressReleaseHandler : AddComponentConfigured<PointerPressReleaseHandler> {
             public Action OnPress;
             public Action OnRelease;
             public AddPressReleaseHandler(Action onPress, Action onRelease) {
                 OnPress = onPress;
                 OnRelease = onRelease;
             }
-            public override void Create(GameObject gameObject) {
-                var handler = gameObject.AddComponent<PointerPressReleaseHandler>();
-                handler.OnPress = OnPress;
-                handler.OnRelease = OnRelease;
-            }
-            public override void Update(GameObject gameObject) {
-                var handler = gameObject.GetComponent<PointerPressReleaseHandler>();
-                handler.OnPress = OnPress;
-                handler.OnRelease = OnRelease;
+            public override void Configure(PointerPressReleaseHandler component) {
+                component.OnPress = OnPress;
+                component.OnRelease = OnRelease;
             }
         }
 
-        public class AddPressReleaseHandlerEx : Modifier {
+        public class AddPressReleaseHandlerEx : AddComponentConfigured<PointerPressReleaseHandlerEx> {
             public Action<GameObject, PointerEventData> OnPress;
             public Action<GameObject, PointerEventData> OnRelease;
             public AddPressReleaseHandlerEx(Action<GameObject, PointerEventData> onPress, Action<GameObject, PointerEventData> onRelease) {
                 OnPress = onPress;
                 OnRelease = onRelease;
             }
-            public override void Create(GameObject gameObject) {
-                var handler = gameObject.AddComponent<PointerPressReleaseHandlerEx>();
-                handler.OnPress = OnPress;
-                handler.OnRelease = OnRelease;
-            }
-            public override void Update(GameObject gameObject) {
-                var handler = gameObject.GetComponent<PointerPressReleaseHandlerEx>();
-                handler.OnPress = OnPress;
-                handler.OnRelease = OnRelease;
+            public override void Configure(PointerPressReleaseHandlerEx component) {
+                component.OnPress = OnPress;
+                component.OnRelease = OnRelease;
             }
         }
 
-        public class SetCustomShader : Modifier {
+        public class SetCustomShader : AddComponentConfigured<CustomShader> {
             public string ShaderName;
             public (string name, object value)[] Parameters;
             public SetCustomShader(string shaderName, params (string name, object value)[] parameters) {
                 ShaderName = shaderName;
                 Parameters = parameters;
             }
-            public override void Create(GameObject gameObject) {
-                var component = gameObject.AddComponent<CustomShader>();
-                component.ShaderName = ShaderName;
-                component.SetParameters(Parameters);
-            }
-            public override void Update(GameObject gameObject) {
-                var component = gameObject.GetComponent<CustomShader>();
+            public override void Configure(CustomShader component) {
                 component.ShaderName = ShaderName;
                 component.SetParameters(Parameters);
             }
         }
 
-        public class AddPressedHoveredHighlighter : Modifier {
+        public class AddPressedHoveredHighlighter : AddComponentConfigured<PressedHoveredHighlighter> {
             public Color InitialColor;
             public Color HoveredColor;
             public Color PressedColor;
@@ -460,47 +397,20 @@ namespace FUI {
                 HoveredColor = hoveredColor;
                 PressedColor = pressedColor;
             }
-            private void AssignColors(PressedHoveredHighlighter highlighter) {
-                highlighter.InitialColor = InitialColor;
-                highlighter.HoveredColor = HoveredColor;
-                highlighter.PressedColor = PressedColor;
-            }
-            public override void Create(GameObject gameObject) {
-                var highlighter = gameObject.AddComponent<PressedHoveredHighlighter>();
-                AssignColors(highlighter);
-            }
-            public override void Update(GameObject gameObject) {
-                var highlighter = gameObject.GetComponent<PressedHoveredHighlighter>();
-                AssignColors(highlighter);
+            public override void Configure(PressedHoveredHighlighter component) {
+                component.InitialColor = InitialColor;
+                component.HoveredColor = HoveredColor;
+                component.PressedColor = PressedColor;
             }
         }
 
-        /*public class SetFormToNotify : Modifier {
-            public bool ExtraIteration;
-            public SetFormToNotify(bool extraIteration = false) {
-                ExtraIteration = extraIteration;
-            }
-            public override void Create(GameObject gameObject) {
-                var notifier = gameObject.GetComponent<AbstractFormNotifier>();
-                notifier.SetFormToNotify(Form.Current, ExtraIteration);
-            }
-            public override void Update(GameObject gameObject) {
-                var notifier = gameObject.GetComponent<AbstractFormNotifier>();
-                notifier.SetFormToNotify(Form.Current, ExtraIteration);
-            }
-        }*/
-        
-        public class SetRaycastTarget : Modifier {
+
+        public class SetRaycastTarget : SetterModifier {
             public bool Value;
             public SetRaycastTarget(bool value) {
                 Value = value;
             }
-            public override void Create(GameObject gameObject) {
-                gameObject.GetComponent<Graphic>().raycastTarget = Value;
-            }
-            public override void Update(GameObject gameObject) {
-                gameObject.GetComponent<Graphic>().raycastTarget = Value;
-            }
+            public override void Set(GameObject gameObject) => gameObject.GetComponent<Graphic>().raycastTarget = Value;
         }
 
 
