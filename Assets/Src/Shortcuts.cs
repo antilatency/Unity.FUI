@@ -19,22 +19,10 @@ namespace FUI {
             return Text(text, positioner, new ModifiersList(additionalModifiers));
         }
         public static RectTransform Text(string text, Positioner? positioner, ModifiersList additionalModifiers) {
-            var form = Form.Current;
-            var modifiers = new ModifiersList() {
-                new AddComponent<TextMeshProUGUI>(),
+            return TextElement(positioner, new ModifiersList() {
                 new SetText(text),
                 additionalModifiers
-            };
-
-            var result = Element(null, modifiers);
-            (positioner ?? DefaultControlPositioner).Invoke(result, form.CurrentBorders, () => {
-                var component = result.GetComponent<TMP_Text>();
-                var size = component.GetPreferredValues();
-                size.x = Mathf.Ceil(size.x);
-                size.y = Mathf.Ceil(size.y);
-                return size;
             });
-            return result;
         }
 
 

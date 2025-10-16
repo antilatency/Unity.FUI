@@ -6,6 +6,8 @@ using System.Linq;
 using FUI.Gears;
 using FUI.Modifiers;
 
+using TMPro;
+
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -14,7 +16,7 @@ using static FUI.Helpers;
 namespace FUI {
 
     public static partial class Basic {
-        
+
         public static Positioner DefaultControlPositioner => P.Up(Form.Current.Theme.LineHeight);
 
         public class ElementSeed {
@@ -226,7 +228,7 @@ namespace FUI {
             var dialog = FormStack.Instance.Push<T>();
             return dialog;
         }
-        
+
         public static RectTransform ScrollBarVertical(Positioner positioner, float minHandleSize = 8) {
             var h = minHandleSize / 2;
             var form = Form.Current;
@@ -255,10 +257,10 @@ namespace FUI {
                     //scrollBarComponent.size = 0.5f;
                 }
                 return scrollBar.Value;
-            }            
+            }
         }
 
-        public static Disposable<RectTransform> ScrollRectVertical2(Positioner positioner) {
+        public static Disposable<RectTransform> ScrollRectVertical(Positioner positioner) {
             var form = Form.Current;
             var theme = form.Theme;
             var scrollRect = Element(null
@@ -275,21 +277,21 @@ namespace FUI {
             scrollRectComponent.verticalScrollbarSpacing = 2;
 
             var viewport = Element(null
-                , new AddRectMask()        
+                , new AddRectMask()
             );
             viewport.pivot = Vector2.zero;
             viewport.anchorMin = Vector2.zero;
             viewport.anchorMax = Vector2.one;
             form.BeginControls(viewport);
 
-            
+
             var content = Element();
             content.pivot = new Vector2(0, 1);
             content.anchorMin = new Vector2(0, 1);
             content.anchorMax = new Vector2(1, 1);
             content.sizeDelta = new Vector2(0, 0);
 
-            
+
             scrollRectComponent.viewport = viewport;
             scrollRectComponent.content = content;
             scrollRectComponent.horizontal = false;
@@ -316,7 +318,7 @@ namespace FUI {
         }
 
 
-        public static Disposable ScrollRectVertical(Positioner positioner) {
+        /*public static Disposable ScrollRectVertical(Positioner positioner) {
 
             RectTransform GetChildrenContainer(RectTransform rectTransform) {
                 var redirect = rectTransform.GetComponent<ChildrenRedirect>();
@@ -336,7 +338,7 @@ namespace FUI {
                 content.sizeDelta = new Vector2(0, innerSize.y);
                 positioner(element, form.CurrentBorders, () => innerSize);
             });
-        }
+        }*/
 
 
 
@@ -385,6 +387,54 @@ namespace FUI {
 
             return transform;
         }
+
+
+        public static RectTransform TextElement(Positioner? positioner, ModifiersList? additionalModifiers = null) {
+            var form = Form.Current;
+            var modifiers = new ModifiersList() {
+                new AddComponent<TextMeshProUGUI>(),
+                additionalModifiers
+            };
+
+            var result = Element(null, modifiers);
+            (positioner ?? DefaultControlPositioner).Invoke(result, form.CurrentBorders, () => {
+                var component = result.GetComponent<TMP_Text>();
+                var size = component.GetPreferredValues();
+                size.x = Mathf.Ceil(size.x);
+                size.y = Mathf.Ceil(size.y);
+                return size;
+            });
+            return result;
+        }
+        
+        /*public static RectTransform InputField(string value, FUI_InputField.TextDelegate returnAction, Positioner? positioner = null) {
+
+            using (var inputField = Group(positioner ?? DefaultControlPositioner
+                , new AddComponent<FUI_InputField>()
+                , new AddFocusHoverHighlighter()
+                
+                )) {
+                var inputFieldComponent = inputField.Value.GetComponent<FUI_InputField>();
+                inputFieldComponent.onEndEdit = returnAction;
+                //inputField.onSubmit = returnAction;
+                inputFieldComponent.onValueChanged = returnAction;
+                Padding(2, 2, 0,0);
+                var text = TextElement(P.Fill
+                    , new ModifiersList { new SetTextAlignmentLeftMiddle() }
+                );
+                var textComponent = text.GetComponent<TMP_Text>();
+                inputFieldComponent.textComponent = textComponent;
+
+                var selected = EventSystem.current.currentSelectedGameObject == inputField.Value.gameObject;
+                var editing = inputFieldComponent.isFocused && selected;
+
+                if (!editing) {
+                    inputFieldComponent.SetTextWithoutNotify(value);
+                }
+
+                return inputField.Value;
+            }
+        }*/
 
 
     }

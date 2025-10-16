@@ -8,12 +8,12 @@ namespace FUI {
 
 
         public GameObject InputField;
-        public GameObject Dropdown;
-        public GameObject Label;
+        //public GameObject Dropdown;
+        //public GameObject Label;
 
-        public GameObject FontAwesomeIcon;
+        //public GameObject FontAwesomeIcon;
 
-        public GameObject ScrollRect;
+        //public GameObject ScrollRect;
 
 
         private static PrefabLibrary _instance = null!;
