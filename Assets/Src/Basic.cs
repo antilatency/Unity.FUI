@@ -113,8 +113,8 @@ namespace FUI {
             return Element(original, new ModifiersList(modifiers));
         }
 
-        public static RectTransform Element(GameObject? original = null, ModifiersList? modifiers = null) {
-            var seed = BeginCreateElement(original, modifiers ?? new ModifiersList());
+        public static RectTransform Element(GameObject? original, ModifiersList modifiers) {
+            var seed = BeginCreateElement(original, modifiers);
             seed.ApplyModifiers();
             return (RectTransform)(seed.Created ?? seed.Found)!.transform;
         }
@@ -218,13 +218,101 @@ namespace FUI {
             form.BeginControls(group);
             return new Disposable<RectTransform>(group, _ => {
                 var innerSize = form.EndControls();
-                positioner(group, form.CurrentBorders, () => innerSize);
+                positioner.Invoke(group, form.CurrentBorders, () => innerSize);
             });
         }
 
         public static T Dialog<T>() where T : Dialog {
             var dialog = FormStack.Instance.Push<T>();
             return dialog;
+        }
+        
+        public static RectTransform ScrollBarVertical(Positioner positioner, float minHandleSize = 8) {
+            var h = minHandleSize / 2;
+            var form = Form.Current;
+            var theme = form.Theme;
+            using (var scrollBar = Group(positioner
+                , new AddComponent<UnityEngine.UI.Scrollbar>()
+                )
+            ) {
+                Padding(0, 0, h, h);
+                using (var scrollingArea = Group(P.Fill)) {
+                    //Padding(0, 0, -h, -h);
+                    var handle = Element(null
+                        , new AddComponent<RoundedRectangle>()
+                        , new SetColor(theme.ButtonColor)
+                        , new SetRectangleCorners(theme.Radius)
+                        , new SetRaycastTarget(true)
+                    );
+                    handle.pivot = Vector2.zero;
+                    handle.offsetMin = new Vector2(0, -h);
+                    handle.offsetMax = new Vector2(0, h);
+
+                    var scrollBarComponent = scrollBar.Value.GetComponent<UnityEngine.UI.Scrollbar>();
+                    scrollBarComponent.handleRect = handle;
+                    scrollBarComponent.direction = UnityEngine.UI.Scrollbar.Direction.BottomToTop;
+                    scrollBarComponent.transition = UnityEngine.UI.Selectable.Transition.None;
+                    //scrollBarComponent.size = 0.5f;
+                }
+                return scrollBar.Value;
+            }            
+        }
+
+        public static Disposable<RectTransform> ScrollRectVertical2(Positioner positioner) {
+            var form = Form.Current;
+            var theme = form.Theme;
+            var scrollRect = Element(null
+                , new AddComponent<UnityEngine.UI.ScrollRect>()
+                , new AddComponent<RoundedRectangle>()
+                , new SetColor(Color.clear)
+            );
+            var scrollRectComponent = scrollRect.GetComponent<UnityEngine.UI.ScrollRect>();
+
+            form.BeginControls(scrollRect);
+
+            var scrollBar = ScrollBarVertical(P.Right(8));
+            scrollRectComponent.verticalScrollbar = scrollBar.GetComponent<UnityEngine.UI.Scrollbar>();
+            scrollRectComponent.verticalScrollbarSpacing = 2;
+
+            var viewport = Element(null
+                , new AddRectMask()        
+            );
+            viewport.pivot = Vector2.zero;
+            viewport.anchorMin = Vector2.zero;
+            viewport.anchorMax = Vector2.one;
+            form.BeginControls(viewport);
+
+            
+            var content = Element();
+            content.pivot = new Vector2(0, 1);
+            content.anchorMin = new Vector2(0, 1);
+            content.anchorMax = new Vector2(1, 1);
+            content.sizeDelta = new Vector2(0, 0);
+
+            
+            scrollRectComponent.viewport = viewport;
+            scrollRectComponent.content = content;
+            scrollRectComponent.horizontal = false;
+            scrollRectComponent.vertical = true;
+            scrollRectComponent.movementType = UnityEngine.UI.ScrollRect.MovementType.Elastic;
+            scrollRectComponent.elasticity = 0.1f;
+            scrollRectComponent.scrollSensitivity = 30;
+            scrollRectComponent.verticalScrollbarVisibility = UnityEngine.UI.ScrollRect.ScrollbarVisibility.AutoHideAndExpandViewport;
+            scrollRectComponent.inertia = true;
+            scrollRectComponent.decelerationRate = 0.135f;
+
+            //scrollRectComponent.verticalScrollbar
+
+            form.BeginControls(content);
+
+            return new Disposable<RectTransform>(scrollRect, _ => {
+                ShrinkContainer(false, true);
+                var contentSize = form.EndControls();
+                var viewportSize = form.EndControls();
+                var scrollRectSize = form.EndControls();
+
+                positioner.Invoke(scrollRect, form.CurrentBorders, () => new Vector2(contentSize.x, Math.Min(contentSize.y, form.Theme.LineHeight * 10)));
+            });
         }
 
 

@@ -122,16 +122,15 @@ public class ThemeTest : Form {
                 Slider(FloatValue / 2, x => AssignAndMakeDirty(ref FloatValue, Mathf.Clamp(2 * x, 0, 2)));
             }
 
-            using (Group(P.Left(0, 0.25f))) {
+            using (ScrollRectVertical2(P.Left(0, 0.25f))) {
                 Padding(4);
-                SubForm<Vector3Form>()
-                    .Execute(Vector3Value, x => AssignAndMakeDirty(ref Vector3Value, x))
-                    .ApplyPositioner(P.Up());
-                GapTop();
-                SubForm<Vector3Form>()
+                for (int i = 0; i < 10; i++) {
+                    if (i > 0) GapTop();
+                    SubForm<Vector3Form>()
                     .Execute(Vector3Value, x => AssignAndMakeDirty(ref Vector3Value, x))
                     .ApplyPositioner(P.Up());
 
+                }
             }
 
 
