@@ -129,7 +129,7 @@ namespace FUI {
 #if UNITY_EDITOR
             GameObject created = (GameObject)UnityEditor.PrefabUtility.InstantiatePrefab(original, parent);
 #else
-            GameObject created = (GameObject)Instantiate(original, parent);
+            GameObject created = UnityEngine.Object.Instantiate(original, parent);
 #endif
             if (created == null)
                 throw new InvalidOperationException($"The created control is null.");
