@@ -8,7 +8,7 @@ using static UnityEngine.EventSystems.PointerEventData;
 #nullable enable
 
 namespace FUI.Modifiers {
-    public class AddZoomPanViewport : Modifier {
+    public class AddZoomPanViewport : AddComponentConfigured<ZoomPanViewport> {
         public Vector2 contentSize;
         public PointerEventUtils.PointerEventFilter? scrollFilter = null;
         public PointerEventUtils.PointerEventFilter? dragFilter = null;
@@ -17,11 +17,16 @@ namespace FUI.Modifiers {
             this.scrollFilter = scrollFilter;
             this.dragFilter = dragFilter;
         }
-        public override void Create(GameObject gameObject) {
+        /*public override void Create(GameObject gameObject) {
             gameObject.AddComponent<ZoomPanViewport>();
         }
         public override void Update(GameObject gameObject) {
             var component = gameObject.GetComponent<ZoomPanViewport>();
+            component.ContentSize = contentSize;
+            component.ScrollFilter = scrollFilter;
+            component.DragFilter = dragFilter;
+        }*/
+        public override void Configure(ZoomPanViewport component) {
             component.ContentSize = contentSize;
             component.ScrollFilter = scrollFilter;
             component.DragFilter = dragFilter;
