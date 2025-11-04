@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 
 using TMPro;
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -658,7 +659,7 @@ namespace FUI {
                     , new SetRectangleCorners(theme.Radius)
                     , new AddRectMask()
                     , new AddPressedHoveredHighlighter(
-                        backgroundColor,    
+                        backgroundColor,
                         backgroundColorHovered,
                         backgroundColorPressed
                         )
@@ -705,33 +706,34 @@ namespace FUI {
             var form = Form.Current;
             var theme = form.Theme;
             outlineColor = outlineColor ?? color;
-            var outlineHoveredColor = form.Theme.HoverColor(outlineColor.Value);
-            var outlinePressedColor = form.Theme.PressedColor(outlineColor.Value);
             var thickness = theme.OutlineThickness;
             var radius = theme.Radius;
 
             using (Group(positioner ?? DefaultControlPositioner
                 , new AddComponent<RoundedRectangle>()
-                , new SetRectangleCorners(radius)
-                , new AddPressedHoveredHighlighter(
-                    outlineColor.Value,
-                    outlineHoveredColor,
-                    outlinePressedColor
-                    )
-                , new AddClickHandler(action)
+                , new SetRectangleCorners(radius) 
+                , new SetColor(outlineColor.Value)
                 )) {
+                    
                 Padding(thickness);
+                var hoverColor = form.Theme.HoverColor(color);
                 using (Group(P.Fill
                     , new AddComponent<RoundedRectangle>()
                     , new SetRectangleCorners(Mathf.Max(0, radius - thickness))
-                    , new SetColor(color)
                     , new AddRectMask()
+                    , new AddPressedHoveredHighlighter(
+                        color,
+                        form.Theme.HoverColor(color),
+                        form.Theme.PressedColor(color)
+                    ),
+                    new AddClickHandler(action)
                     )) {
                     if (!string.IsNullOrEmpty(text)) {
                         Text(text!, P.Fill
                             , new SetColor(color.ContrastColor())
                             , new SetTextAlignmentCenterMiddle()
                             , new SetTextOverflowOverflow()
+                            , new SetRaycastTarget(false)
                         );
                     }
                 }
