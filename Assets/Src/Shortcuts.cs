@@ -704,7 +704,7 @@ namespace FUI {
         public static void ColorButton(Color color, Action action, string? text = null, Positioner? positioner = null, Color? outlineColor = null) {
             var form = Form.Current;
             var theme = form.Theme;
-            outlineColor = outlineColor ?? Color.white;
+            outlineColor = outlineColor ?? color;
             var outlineHoveredColor = outlineColor.Value.Multiply(0.8f);
             var outlinePressedColor = outlineColor.Value.Multiply(0.6f);
             var thickness = theme.OutlineThickness;
