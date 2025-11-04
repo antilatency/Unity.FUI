@@ -705,8 +705,8 @@ namespace FUI {
             var form = Form.Current;
             var theme = form.Theme;
             outlineColor = outlineColor ?? color;
-            var outlineHoveredColor = outlineColor.Value.Multiply(0.8f);
-            var outlinePressedColor = outlineColor.Value.Multiply(0.6f);
+            var outlineHoveredColor = form.Theme.HoverColor(outlineColor.Value);
+            var outlinePressedColor = form.Theme.PressedColor(outlineColor.Value);
             var thickness = theme.OutlineThickness;
             var radius = theme.Radius;
 
