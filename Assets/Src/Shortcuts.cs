@@ -34,6 +34,7 @@ namespace FUI {
             var form = Form.Current;
             var modifiers = new ModifiersList() {
                 new SetTextOverflowEllipsis(),
+                new SetTextAlignmentLeftMiddle(),
                 additionalModifiers
             };
 
