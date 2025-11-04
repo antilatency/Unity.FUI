@@ -658,7 +658,7 @@ namespace FUI {
                     , new SetRectangleCorners(theme.Radius)
                     , new AddRectMask()
                     , new AddPressedHoveredHighlighter(
-                        backgroundColor,
+                        backgroundColor,    
                         backgroundColorHovered,
                         backgroundColorPressed
                         )
@@ -701,12 +701,12 @@ namespace FUI {
             }
         }
 
-        public static void ColorButton(Color color, Action action, string? text = null, Positioner? positioner = null) {
+        public static void ColorButton(Color color, Action action, string? text = null, Positioner? positioner = null, Color? outlineColor = null) {
             var form = Form.Current;
             var theme = form.Theme;
-            var outlineColor = Color.white;
-            var outlineHoveredColor = Color.white.Multiply(0.8f);
-            var outlinePressedColor = Color.white.Multiply(0.6f);
+            outlineColor = outlineColor ?? Color.white;
+            var outlineHoveredColor = outlineColor.Value.Multiply(0.8f);
+            var outlinePressedColor = outlineColor.Value.Multiply(0.6f);
             var thickness = theme.OutlineThickness;
             var radius = theme.Radius;
 
@@ -714,7 +714,7 @@ namespace FUI {
                 , new AddComponent<RoundedRectangle>()
                 , new SetRectangleCorners(radius)
                 , new AddPressedHoveredHighlighter(
-                    outlineColor,
+                    outlineColor.Value,
                     outlineHoveredColor,
                     outlinePressedColor
                     )
