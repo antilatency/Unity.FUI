@@ -723,8 +723,8 @@ namespace FUI {
                     , new AddRectMask()
                     , new AddPressedHoveredHighlighter(
                         color,
-                        form.Theme.HoverColor(color),
-                        form.Theme.PressedColor(color)
+                        color.Multiply(0.8f),
+                        color.Multiply(0.6f)
                     ),
                     new AddClickHandler(action)
                     )) {
