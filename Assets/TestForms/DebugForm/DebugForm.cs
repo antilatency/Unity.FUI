@@ -184,7 +184,7 @@ internal class DebugForm : Form {
                 using (Group(P.Up(Theme.LineHeight))) {
                     ColorButton(new Color(0f, 0.6f, 0f), () => {
                         Debug.Log("Click!");
-                    }, "Click me!", positioner: P.Left(150));
+                    }, "Click me!", positioner: P.Left(150), thickness: 2);
                     GapLeft(10);
                     ContentButton(new AddPressedHoveredHighlighter(Color.white.Alpha(0), Color.white.Alpha(0.05f), Color.white.Alpha(0.1f)), () => {
                         Text("Transparent Button", P.Fill, new SetColor(Color.white), new SetTextAlignmentCenterMiddle());

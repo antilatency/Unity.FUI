@@ -702,15 +702,15 @@ namespace FUI {
             }
         }
 
-        private static void ColorButton(Color color, Action action, float radius, string? text = null, Positioner? positioner = null) {
+        public static void ColorButton(Color color, Action action, string? text = null, Positioner? positioner = null, float? thickness = null) {
             var form = Form.Current;
             var theme = form.Theme;
-            var thickness = theme.OutlineThickness;
-            var buttonRadius = Mathf.Max(0, theme.Radius - thickness);
+            thickness ??= theme.OutlineThickness;
+            var radius = theme.Radius;
 
             using (Group(positioner ?? DefaultControlPositioner
                 , new AddComponent<RoundedRectangle>()
-                , new SetRectangleCorners(theme.Radius)
+                , new SetRectangleCorners(radius)
                 , new SetColor(color)
                 , new AddPressedHoveredHighlighter(
                       color,
@@ -720,10 +720,10 @@ namespace FUI {
                 ,new AddClickHandler(action)
                 )) {
 
-                Padding(thickness);
-                using (Group(positioner ?? P.Up(theme.LineHeight)
+                Padding(thickness.Value);
+                using (Group(P.Fill
                     , new AddComponent<RoundedRectangle>()
-                    , new SetRectangleCorners(radius)
+                    , new SetRectangleCorners(Mathf.Max(0, theme.Radius - thickness.Value))
                     , new SetColor(color)
                     , new AddRectMask()
                     )) {
@@ -738,14 +738,6 @@ namespace FUI {
                 }
             }
         }
-
-        public static void ColorButton(Color color, Action action, string? text = null, Positioner? positioner = null) {
-            var form = Form.Current;
-            var theme = form.Theme;
-            ColorButton(color, action, theme.Radius, text: text, positioner: positioner);
-        }
-
-
 
         public static void ContentButton(AddPressedHoveredHighlighter backgroundHighlighter, Action populateContent, Action action, Positioner? positioner = null) {
             var form = Form.Current;
