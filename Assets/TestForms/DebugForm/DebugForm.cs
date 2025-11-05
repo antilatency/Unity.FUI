@@ -181,12 +181,15 @@ internal class DebugForm : Form {
                 var size = GetSize();
                 Label($"Size: {size.x}x{size.y}");
 
-                using (Group(P.Up(Theme.LineHeight)))
-
+                using (Group(P.Up(Theme.LineHeight))) {
                     ColorButton(new Color(0f, 0.6f, 0f), () => {
                         Debug.Log("Click!");
-                    }, "Click me!", P.Left(150), outlineColor: new Color(0f,0.6f, 0.6f));
-
+                    }, "Click me!", positioner: P.Left(150));
+                    GapLeft(10);
+                    ContentButton(new AddPressedHoveredHighlighter(Color.white.Alpha(0), Color.white.Alpha(0.05f), Color.white.Alpha(0.1f)), () => {
+                        Text("Transparent Button", P.Fill, new SetColor(Color.white), new SetTextAlignmentCenterMiddle());
+                    }, () => { Debug.Log("Click!"); }, P.Left(200));
+                }
             }
 
             void Swap(int i) {

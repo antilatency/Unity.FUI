@@ -702,42 +702,81 @@ namespace FUI {
             }
         }
 
-        public static void ColorButton(Color color, Action action, string? text = null, Positioner? positioner = null, Color? outlineColor = null) {
+        private static void ColorButton(Color color, Action action, float radius, string? text = null, Positioner? positioner = null) {
             var form = Form.Current;
             var theme = form.Theme;
-            outlineColor = outlineColor ?? color;
+
+            using (Group(positioner ?? P.Up(theme.LineHeight)
+                , new AddComponent<RoundedRectangle>()
+                , new SetRectangleCorners(radius)
+                , new AddRectMask()
+                , new AddPressedHoveredHighlighter(
+                    color,
+                    color.Multiply(0.8f),
+                    color.Multiply(0.6f)
+                ),
+                new AddClickHandler(action)
+                )) {
+                if (!string.IsNullOrEmpty(text)) {
+                    Text(text!, P.Fill
+                        , new SetColor(color.ContrastColor())
+                        , new SetTextAlignmentCenterMiddle()
+                        , new SetTextOverflowOverflow()
+                        , new SetRaycastTarget(false)
+                    );
+                }
+            }
+        }
+
+        public static void ColorButton(Color color, Action action, string? text = null, Positioner? positioner = null) {
+            var form = Form.Current;
+            var theme = form.Theme;
+            ColorButton(color, action, theme.Radius, text: text, positioner: positioner);
+        }
+
+        public static void OutlinedColorButton(Color color, Action action, Color outlineColor, string? text = null, Positioner? positioner = null) {
+            var form = Form.Current;
+            var theme = form.Theme;
             var thickness = theme.OutlineThickness;
-            var radius = theme.Radius;
+            var buttonRadius = Mathf.Max(0, theme.Radius - thickness);
 
             using (Group(positioner ?? DefaultControlPositioner
                 , new AddComponent<RoundedRectangle>()
-                , new SetRectangleCorners(radius) 
-                , new SetColor(outlineColor.Value)
+                , new SetRectangleCorners(theme.Radius)
+                , new SetColor(outlineColor)
                 )) {
-                    
+
                 Padding(thickness);
-                var hoverColor = form.Theme.HoverColor(color);
-                using (Group(P.Fill
+                ColorButton(color, action, buttonRadius, text: text, positioner: positioner);
+            }
+        }
+
+
+        public static void ContentButton(AddPressedHoveredHighlighter backgroundHighlighter, Action populateContent, Action action, Positioner? positioner = null) {
+            var form = Form.Current;
+            var theme = form.Theme;
+
+            using (Group(positioner ?? DefaultControlPositioner
                     , new AddComponent<RoundedRectangle>()
-                    , new SetRectangleCorners(Mathf.Max(0, radius - thickness))
+                    , new SetRectangleCorners(theme.Radius)
                     , new AddRectMask()
-                    , new AddPressedHoveredHighlighter(
-                        color,
-                        color.Multiply(0.8f),
-                        color.Multiply(0.6f)
-                    ),
-                    new AddClickHandler(action)
-                    )) {
-                    if (!string.IsNullOrEmpty(text)) {
-                        Text(text!, P.Fill
-                            , new SetColor(color.ContrastColor())
-                            , new SetTextAlignmentCenterMiddle()
-                            , new SetTextOverflowOverflow()
-                            , new SetRaycastTarget(false)
-                        );
-                    }
+                    , backgroundHighlighter
+                    , new AddClickHandler(action)
+                    )
+                    ) {
+
+                using (Group(P.Fill)) {
+                    populateContent();
                 }
             }
+        }
+
+       public static void ContentButton(Color backgroundColor, Action populateContent, Action action, Positioner? positioner = null) {
+            var form = Form.Current;
+            var theme = form.Theme;
+            var contentColor = backgroundColor.ContrastColor();
+            var backgroundHighlighter = new AddPressedHoveredHighlighter(backgroundColor, backgroundColor.Multiply(0.8f), backgroundColor.Multiply(0.6f));
+            ContentButton(backgroundHighlighter, populateContent, action, positioner);
         }
 
 
