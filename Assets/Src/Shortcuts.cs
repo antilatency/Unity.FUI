@@ -771,11 +771,27 @@ namespace FUI {
             }
         }
 
-       public static void ContentButton(Color backgroundColor, Action populateContent, Action action, Positioner? positioner = null) {
+        public static void ContentButton(Color backgroundColor, Action populateContent, Action action, Positioner? positioner = null) {
             var form = Form.Current;
             var theme = form.Theme;
             var contentColor = backgroundColor.ContrastColor();
             var backgroundHighlighter = new AddPressedHoveredHighlighter(backgroundColor, backgroundColor.Multiply(0.8f), backgroundColor.Multiply(0.6f));
+            ContentButton(backgroundHighlighter, populateContent, action, positioner);
+        }
+
+        public static void ContentButton(Action populateContent, Action action, Positioner? positioner = null) {
+            var form = Form.Current;
+            var theme = form.Theme;
+            var backgroundColor = theme.ButtonColor;
+            var backgroundColorHovered = theme.ButtonHoveredColor;
+            var backgroundColorPressed = theme.ButtonPressedColor;
+
+            var backgroundHighlighter = new AddPressedHoveredHighlighter(
+                        backgroundColor,
+                        backgroundColorHovered,
+                        backgroundColorPressed
+                );
+
             ContentButton(backgroundHighlighter, populateContent, action, positioner);
         }
 
