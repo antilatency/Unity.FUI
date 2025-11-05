@@ -705,25 +705,36 @@ namespace FUI {
         private static void ColorButton(Color color, Action action, float radius, string? text = null, Positioner? positioner = null) {
             var form = Form.Current;
             var theme = form.Theme;
+            var thickness = theme.OutlineThickness;
+            var buttonRadius = Mathf.Max(0, theme.Radius - thickness);
 
-            using (Group(positioner ?? P.Up(theme.LineHeight)
+            using (Group(positioner ?? DefaultControlPositioner
                 , new AddComponent<RoundedRectangle>()
-                , new SetRectangleCorners(radius)
-                , new AddRectMask()
+                , new SetRectangleCorners(theme.Radius)
+                , new SetColor(color)
                 , new AddPressedHoveredHighlighter(
-                    color,
-                    color.Multiply(0.8f),
-                    color.Multiply(0.6f)
-                ),
-                new AddClickHandler(action)
+                      color,
+                      color.Multiply(0.8f),
+                      color.Multiply(0.6f)
+                )
+                ,new AddClickHandler(action)
                 )) {
-                if (!string.IsNullOrEmpty(text)) {
-                    Text(text!, P.Fill
-                        , new SetColor(color.ContrastColor())
-                        , new SetTextAlignmentCenterMiddle()
-                        , new SetTextOverflowOverflow()
-                        , new SetRaycastTarget(false)
-                    );
+
+                Padding(thickness);
+                using (Group(positioner ?? P.Up(theme.LineHeight)
+                    , new AddComponent<RoundedRectangle>()
+                    , new SetRectangleCorners(radius)
+                    , new SetColor(color)
+                    , new AddRectMask()
+                    )) {
+                    if (!string.IsNullOrEmpty(text)) {
+                        Text(text!, P.Fill
+                            , new SetColor(color.ContrastColor())
+                            , new SetTextAlignmentCenterMiddle()
+                            , new SetTextOverflowOverflow()
+                            , new SetRaycastTarget(false)
+                        );
+                    }
                 }
             }
         }
@@ -734,22 +745,6 @@ namespace FUI {
             ColorButton(color, action, theme.Radius, text: text, positioner: positioner);
         }
 
-        public static void OutlinedColorButton(Color color, Action action, Color outlineColor, string? text = null, Positioner? positioner = null) {
-            var form = Form.Current;
-            var theme = form.Theme;
-            var thickness = theme.OutlineThickness;
-            var buttonRadius = Mathf.Max(0, theme.Radius - thickness);
-
-            using (Group(positioner ?? DefaultControlPositioner
-                , new AddComponent<RoundedRectangle>()
-                , new SetRectangleCorners(theme.Radius)
-                , new SetColor(outlineColor)
-                )) {
-
-                Padding(thickness);
-                ColorButton(color, action, buttonRadius, text: text, positioner: positioner);
-            }
-        }
 
 
         public static void ContentButton(AddPressedHoveredHighlighter backgroundHighlighter, Action populateContent, Action action, Positioner? positioner = null) {
@@ -774,7 +769,7 @@ namespace FUI {
         public static void ContentButton(Color backgroundColor, Action populateContent, Action action, Positioner? positioner = null) {
             var form = Form.Current;
             var theme = form.Theme;
-            var contentColor = backgroundColor.ContrastColor();
+
             var backgroundHighlighter = new AddPressedHoveredHighlighter(backgroundColor, backgroundColor.Multiply(0.8f), backgroundColor.Multiply(0.6f));
             ContentButton(backgroundHighlighter, populateContent, action, positioner);
         }
