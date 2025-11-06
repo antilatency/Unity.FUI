@@ -739,7 +739,7 @@ namespace FUI {
             }
         }
 
-        public static void ContentButton(AddPressedHoveredHighlighter backgroundHighlighter, Action populateContent, Action action, Positioner? positioner = null) {
+        public static void ContentButton(Color initialColor, Color hoveredColor, Color pressedColor, Action populateContent, Action action, Positioner? positioner = null) {
             var form = Form.Current;
             var theme = form.Theme;
 
@@ -747,7 +747,7 @@ namespace FUI {
                     , new AddComponent<RoundedRectangle>()
                     , new SetRectangleCorners(theme.Radius)
                     , new AddRectMask()
-                    , backgroundHighlighter
+                    , new AddPressedHoveredHighlighter(initialColor, hoveredColor, pressedColor)
                     , new AddClickHandler(action)
                     )
                     ) {
@@ -758,28 +758,17 @@ namespace FUI {
             }
         }
 
-        public static void ContentButton(Color backgroundColor, Action populateContent, Action action, Positioner? positioner = null) {
-            var form = Form.Current;
-            var theme = form.Theme;
-
-            var backgroundHighlighter = new AddPressedHoveredHighlighter(backgroundColor, backgroundColor.Multiply(0.8f), backgroundColor.Multiply(0.6f));
-            ContentButton(backgroundHighlighter, populateContent, action, positioner);
+        public static void ContentButton(Color color, Action populateContent, Action action, Positioner? positioner = null) {
+            ContentButton(color, color.Multiply(0.8f), color.Multiply(0.6f), populateContent, action, positioner);
         }
 
         public static void ContentButton(Action populateContent, Action action, Positioner? positioner = null) {
             var form = Form.Current;
             var theme = form.Theme;
-            var backgroundColor = theme.ButtonColor;
-            var backgroundColorHovered = theme.ButtonHoveredColor;
-            var backgroundColorPressed = theme.ButtonPressedColor;
-
-            var backgroundHighlighter = new AddPressedHoveredHighlighter(
-                        backgroundColor,
-                        backgroundColorHovered,
-                        backgroundColorPressed
-                );
-
-            ContentButton(backgroundHighlighter, populateContent, action, positioner);
+            var color = theme.ButtonColor;
+            var hoveredColor = theme.ButtonHoveredColor;
+            var pressedColor = theme.ButtonPressedColor;
+            ContentButton(color, hoveredColor, pressedColor, populateContent, action, positioner);
         }
 
 
