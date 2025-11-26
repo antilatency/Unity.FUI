@@ -45,7 +45,7 @@ namespace FUI {
             });
         }
 
-        protected virtual void UpdatePosition(RectTransform window){}
+        protected virtual void UpdatePosition(RectTransform window) { }
 
         protected override void Update() {
             try {
@@ -167,7 +167,7 @@ namespace FUI {
         [SerializeField]
         private SerializableAction<T> _return = null!;
 
-        public override void Return(T value) => _return?.Invoke(value);        
+        public override void Return(T value) => _return?.Invoke(value);
 
         public void Configure(T value, Action<T> returnAction) {
             Value = value;
