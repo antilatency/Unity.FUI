@@ -12,7 +12,7 @@ internal class DebugForm : Form {
 
     //public ArtNetLightingDeviceDefinition.Model Data = new();
 
-    public enum TestEnum { 
+    public enum TestEnum {
         A = 2,
         B = 4,
         C = 8,
@@ -78,7 +78,7 @@ internal class DebugForm : Form {
 
 
         using (WindowBackground()) {
-            
+
 
 
             using (Group(P.Right(50))) {
@@ -89,7 +89,7 @@ internal class DebugForm : Form {
                 Rectangle(P.ColumnElement(3, 5, 2 * 10), Color.blue);
             }
 
-            
+
 
             using (Panel(P.Left(50))) {
 
@@ -147,14 +147,14 @@ internal class DebugForm : Form {
 
                 LabeledCheckbox("Bool", TestBool, x => AssignAndMakeDirty(ref TestBool, x));
                 GapTop(2);
-                ToggleButton(TestBool, "Toggle", "Toggle",  x => AssignAndMakeDirty(ref TestBool, x));
+                ToggleButton(TestBool, "Toggle", "Toggle", x => AssignAndMakeDirty(ref TestBool, x));
                 GapTop(2);
 
                 Label(TestInt.ToString());
                 GapTop(2);
 
                 LabeledInputField("Int", TestInt, x => AssignAndMakeDirty(ref TestInt, x));
-                
+
                 GapTop(2);
                 LabeledInputFieldSpinbox("Float", TestFloat, x => AssignAndMakeDirty(ref TestFloat, x), 0.001f, null, "0.###");
 
@@ -164,7 +164,7 @@ internal class DebugForm : Form {
 
                 LabeledDropdown("Enum", testEnum, x => AssignAndMakeDirty(ref testEnum, x));
 
-                ToggleGroupButtons(testEnum, x=> AssignAndMakeDirty(ref testEnum, x), null, 4, 0);
+                ToggleGroupButtons(testEnum, x => AssignAndMakeDirty(ref testEnum, x), null, 4, 0);
 
                 Label($"Enum Value: {(int)testEnum}");
 
@@ -181,6 +181,15 @@ internal class DebugForm : Form {
                 var size = GetSize();
                 Label($"Size: {size.x}x{size.y}");
 
+                using (Group(P.Up(Theme.LineHeight))) {
+                    ColorButton(new Color(0f, 0.6f, 0f), () => {
+                        Debug.Log("Click!");
+                    }, "Click me!", positioner: P.Left(150), thickness: 2);
+                    GapLeft(10);
+                    ContentButton(Color.white.Alpha(0), Color.white.Alpha(0.05f), Color.white.Alpha(0.1f), () => {
+                        Text("Transparent Button", P.Fill, new SetColor(Color.white), new SetTextAlignmentCenterMiddle());
+                    }, () => { Debug.Log("Click!"); }, P.Left(200));
+                }
             }
 
             void Swap(int i) {

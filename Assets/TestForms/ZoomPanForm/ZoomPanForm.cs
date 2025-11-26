@@ -42,10 +42,10 @@ public class ZoomPanForm : Form {
                     return allowed;
                 }
             )) {
-                Rectangle(P.Absolute(Vector2.zero, 50, null, Vector2.zero, Vector2.one - Vector2.zero), Color.red);
-                Rectangle(P.Absolute(Vector2.zero, 50, null, Vector2.up, Vector2.one - Vector2.up), Color.green);
-                Rectangle(P.Absolute(Vector2.zero, 50, null, Vector2.one, Vector2.one - Vector2.one), Color.blue);
-                Rectangle(P.Absolute(Vector2.zero, 50, null, Vector2.right, Vector2.one - Vector2.right), Color.white);
+                Rectangle(P.Absolute(Vector2.zero, 50, 50, Vector2.zero, Vector2.one - Vector2.zero), Color.red);
+                Rectangle(P.Absolute(Vector2.zero, 50, 50, Vector2.up, Vector2.one - Vector2.up), Color.green);
+                Rectangle(P.Absolute(Vector2.zero, 50, 50, Vector2.one, Vector2.one - Vector2.one), Color.blue);
+                Rectangle(P.Absolute(Vector2.zero, 50, 50, Vector2.right, Vector2.one - Vector2.right), Color.white);
 
                 using (Group(P.Absolute(Vector2.zero, 100, 100, Vector2.zero))) {
                     Element(P.Fill, null

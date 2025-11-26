@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 
 using TMPro;
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -34,6 +35,7 @@ namespace FUI {
             var form = Form.Current;
             var modifiers = new ModifiersList() {
                 new SetTextOverflowEllipsis(),
+                new SetTextAlignmentLeftMiddle(),
                 additionalModifiers
             };
 
@@ -700,29 +702,28 @@ namespace FUI {
             }
         }
 
-        public static void ColorButton(Color color, Action action, string? text = null, Positioner? positioner = null) {
+        public static void ColorButton(Color color, Action action, string? text = null, Positioner? positioner = null, float? thickness = null) {
             var form = Form.Current;
             var theme = form.Theme;
-            var outlineColor = Color.white;
-            var outlineHoveredColor = Color.white.Multiply(0.8f);
-            var outlinePressedColor = Color.white.Multiply(0.6f);
-            var thickness = theme.OutlineThickness;
+            thickness ??= theme.OutlineThickness;
             var radius = theme.Radius;
 
             using (Group(positioner ?? DefaultControlPositioner
                 , new AddComponent<RoundedRectangle>()
                 , new SetRectangleCorners(radius)
+                , new SetColor(color)
                 , new AddPressedHoveredHighlighter(
-                    outlineColor,
-                    outlineHoveredColor,
-                    outlinePressedColor
-                    )
-                , new AddClickHandler(action)
+                      color,
+                      color.Multiply(0.8f),
+                      color.Multiply(0.6f)
+                )
+                ,new AddClickHandler(action)
                 )) {
-                Padding(thickness);
+
+                Padding(thickness.Value);
                 using (Group(P.Fill
                     , new AddComponent<RoundedRectangle>()
-                    , new SetRectangleCorners(Mathf.Max(0, radius - thickness))
+                    , new SetRectangleCorners(Mathf.Max(0, theme.Radius - thickness.Value))
                     , new SetColor(color)
                     , new AddRectMask()
                     )) {
@@ -731,10 +732,43 @@ namespace FUI {
                             , new SetColor(color.ContrastColor())
                             , new SetTextAlignmentCenterMiddle()
                             , new SetTextOverflowOverflow()
+                            , new SetRaycastTarget(false)
                         );
                     }
                 }
             }
+        }
+
+        public static void ContentButton(Color initialColor, Color hoveredColor, Color pressedColor, Action populateContent, Action action, Positioner? positioner = null) {
+            var form = Form.Current;
+            var theme = form.Theme;
+
+            using (Group(positioner ?? DefaultControlPositioner
+                    , new AddComponent<RoundedRectangle>()
+                    , new SetRectangleCorners(theme.Radius)
+                    , new AddRectMask()
+                    , new AddPressedHoveredHighlighter(initialColor, hoveredColor, pressedColor)
+                    , new AddClickHandler(action)
+                    )
+                    ) {
+
+                using (Group(P.Fill)) {
+                    populateContent();
+                }
+            }
+        }
+
+        public static void ContentButton(Color color, Action populateContent, Action action, Positioner? positioner = null) {
+            ContentButton(color, color.Multiply(0.8f), color.Multiply(0.6f), populateContent, action, positioner);
+        }
+
+        public static void ContentButton(Action populateContent, Action action, Positioner? positioner = null) {
+            var form = Form.Current;
+            var theme = form.Theme;
+            var color = theme.ButtonColor;
+            var hoveredColor = theme.ButtonHoveredColor;
+            var pressedColor = theme.ButtonPressedColor;
+            ContentButton(color, hoveredColor, pressedColor, populateContent, action, positioner);
         }
 
 
