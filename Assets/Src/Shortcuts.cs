@@ -3,6 +3,7 @@ using FUI.Modifiers;
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 using TMPro;
 
@@ -717,7 +718,7 @@ namespace FUI {
                       color.Multiply(0.8f),
                       color.Multiply(0.6f)
                 )
-                ,new AddClickHandler(action)
+                , new AddClickHandler(action)
                 )) {
 
                 Padding(thickness.Value);
@@ -798,6 +799,21 @@ namespace FUI {
 
         }
 
+        public static RectTransform Viewport3D(Positioner positioner, RenderTexture renderTexture, CameraState cameraState, params Modifier[] additionalModifiers) {
+            return Element(positioner, null
+                , new AddComponent<RoundedRectangle>()
+                , new AddRenderTextureResizer(renderTexture)
+                , new AddCameraStateController(cameraState)
+                , new SetCustomShader("FUI/Image"
+                    , ("Texture", renderTexture)
+                    , ("TO_SRGB", false)
+                    , ("Multiplier", new Vector4(1, 1, 1, 1))
+                    , ("Increment", new Vector4(0, 0, 0, 1))
+                )
+            );
+        }
+
+
         public static Disposable FitInside(Positioner positioner, Vector2 contentSize) {
             var form = Form.Current;
             var background = Element(null
@@ -846,6 +862,16 @@ namespace FUI {
                 Padding(padding);
                 for (int i = 0; i < count; i++) {
                     elementBuilder(i, P.RowElement(count, gap, padding));
+                }
+            }
+        }
+        
+        public static void Row<T>(IList<T> items, Action<int, T, Positioner> elementBuilder, Positioner? positioner = null, float gap = 1, float padding = 0) {
+            var form = Form.Current;
+            using (Group(positioner ?? DefaultControlPositioner)) {
+                Padding(padding);
+                for (int i = 0; i < items.Count; i++) {
+                    elementBuilder(i, items[i], P.RowElement(items.Count, gap, padding));
                 }
             }
         }

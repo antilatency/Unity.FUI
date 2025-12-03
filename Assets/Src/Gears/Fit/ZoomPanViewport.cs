@@ -85,7 +85,11 @@ namespace FUI.Gears {
 
 
         void IDragHandler.OnDrag(PointerEventData eventData) {
-            if (DragFilter != null && !DragFilter(gameObject, eventData)) {
+            if (!PointerEventUtils.HandleDragFilter(gameObject, eventData, DragFilter)) {
+                return;
+            }
+
+            /*if (DragFilter != null && !DragFilter(gameObject, eventData)) {
                 var parent = gameObject.transform.parent;
                 ExecuteEvents.ExecuteHierarchy(
                     parent.gameObject,
@@ -93,7 +97,7 @@ namespace FUI.Gears {
                     ExecuteEvents.dragHandler
                 );
                 return;
-            }
+            }*/
             Move(eventData.delta);
             /*Draggable.HandleDragWithAllowedButtons(
                 gameObject,
@@ -106,7 +110,10 @@ namespace FUI.Gears {
         }
 
         void IScrollHandler.OnScroll(PointerEventData eventData) {
-            if (ScrollFilter != null && !ScrollFilter(gameObject, eventData)) {
+            if (!PointerEventUtils.HandleScrollFilter(gameObject, eventData, ScrollFilter)) {
+                return;
+            }
+            /*if (ScrollFilter != null && !ScrollFilter(gameObject, eventData)) {
                 var parent = gameObject.transform.parent;
                 ExecuteEvents.ExecuteHierarchy(
                     parent.gameObject,
@@ -114,7 +121,7 @@ namespace FUI.Gears {
                     ExecuteEvents.scrollHandler
                 );
                 return;
-            }
+            }*/
 
 
             var cursorInContent = GetMousePositionInContent(eventData);
