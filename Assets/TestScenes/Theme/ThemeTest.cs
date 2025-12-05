@@ -29,33 +29,7 @@ public class ThemeTest : Form {
         }
     }
 
-    class YesNoMessageForm : AbstractValueDialogGenericReturn<bool> {
-        protected override void Populate() {
 
-            Padding(8);
-            Label("Are you sure?");
-            GapTop(8);
-            using (Group(P.Up(Theme.LineHeight))) {
-                Button("Yes", (g, e) => {
-                    Return(true);
-                    Close();
-                }, P.Left(0, 0.5f));
-                GapLeft(4);
-                Button("No", (g, e) => {
-                    Return(false);
-                    Close();
-                }, P.Fill);
-            }
-        }
-
-        protected override Disposable<RectTransform> WindowElement() {
-            return Group(P.Center(200)
-            , new AddComponent<RoundedRectangle>()
-            , new SetColor(Theme.PopupBackgroundColor)
-            , new SetRectangleCorners(Theme.Radius)
-            );
-        }
-    }
 
 
     protected override void Build() {
@@ -98,9 +72,9 @@ public class ThemeTest : Form {
 
                 GapTop(4);
                 Button("Show Yes/No Dialog", (g, e) => {
-                    Dialog<YesNoMessageForm>().Configure(true, x => {
+                    Dialog<MessageDialogYesNo>().Configure(x => {
                         Debug.Log("Dialog closed with result: " + x);
-                    });
+                    }, "Do you want to proceed?", "Proceed", "Cancel");
                 });
             }
 
