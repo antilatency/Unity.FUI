@@ -80,7 +80,7 @@ namespace FUI.Gears {
             MarkDirty();
         }
 
-        void UpdateContentTransform() { 
+        public void UpdateContentTransform() { 
             var content = Content;
             content.sizeDelta = _contentSize;
             float scale = CombinedScale;
