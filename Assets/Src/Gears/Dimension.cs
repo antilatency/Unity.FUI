@@ -1,13 +1,11 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 #nullable enable
 
-namespace FUI.Gears
-{
-    public class Dimension : UIBehaviour, IFormNotifier
-    {
-        public enum DimensionsMask
-        {
+namespace FUI.Gears {
+    public class Dimension : UIBehaviour, IFormNotifier {
+        public enum DimensionsMask {
             None = 0,
             Width = 1 << 0,
             Height = 1 << 1,
@@ -19,16 +17,32 @@ namespace FUI.Gears
         protected Form? FormToNotify;
 
 
-        float _width = float.NaN;
-        float _height = float.NaN;
+        private float _lastWidth = float.NaN;
+        private float _lastHeight = float.NaN;
 
-        public float Width => _width;
-        public float Height => _height;
+        public float Width {
+            get {
+                if (!Mask.HasFlag(DimensionsMask.Width))
+                    return float.NaN;
+
+                _lastWidth = ((RectTransform)transform).rect.width;
+                return _lastWidth;
+            }
+        }
+
+        public float Height {
+            get {
+                if (!Mask.HasFlag(DimensionsMask.Height))
+                    return float.NaN;
+
+                _lastHeight = ((RectTransform)transform).rect.height;
+                return _lastHeight;
+            }
+        }
 
         public DimensionsMask Mask = DimensionsMask.None;
 
-        protected override void OnRectTransformDimensionsChange()
-        {
+        protected override void OnRectTransformDimensionsChange() {
             RectTransform rectTransform = (RectTransform)transform;
             Rect rect = rectTransform.rect;
             var size = rect.size;
@@ -37,17 +51,15 @@ namespace FUI.Gears
             if (Mask == DimensionsMask.None)
                 return;
 
-            if (Mask.HasFlag(DimensionsMask.Width))
-            {
-                if (!Mathf.Approximately(_width, size.x)) {
-                    _width = size.x;
+            if (Mask.HasFlag(DimensionsMask.Width)) {
+                if (!Mathf.Approximately(_lastWidth, size.x)) {
+                    _lastWidth = size.x;
                     notify = true;
                 }
             }
-            if (Mask.HasFlag(DimensionsMask.Height))
-            {
-                if (!Mathf.Approximately(_height, size.y)) {
-                    _height = size.y;
+            if (Mask.HasFlag(DimensionsMask.Height)) {
+                if (!Mathf.Approximately(_lastHeight, size.y)) {
+                    _lastHeight = size.y;
                     notify = true;
                 }
             }
@@ -56,7 +68,7 @@ namespace FUI.Gears
                 NotifyForm();
         }
 
-        
+
 
         public void SetFormToNotify(Form? form) {
             FormToNotify = form;
