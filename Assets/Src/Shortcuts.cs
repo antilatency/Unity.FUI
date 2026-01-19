@@ -469,12 +469,15 @@ namespace FUI {
         }
 
 
-        public static T SubForm<T>() where T : Form {
+        public static T SubForm<T>(bool setParentTheme = true) where T : Form {
             //var form = Form.Current;
             var subform = Element(null
                 , new AddComponent<T>()
             );
+
             var result = subform.GetComponent<T>();
+            if (setParentTheme) result.Theme = Form.Current.Theme;
+
             /*positioner(subform, form.CurrentBorders, () => result.RigidSize);*/
             return result;
         }
@@ -646,7 +649,7 @@ namespace FUI {
             Button(text, (go, e) => action(), positioner, paddings);
         }
 
-        public static void Button(string text, ButtonAction action, Positioner? positioner = null, bool paddings = true) {
+        public static void Button(string text, ButtonAction action, Positioner? positioner = null, bool paddings = true, int? radius = null) {
             var form = Form.Current;
             var theme = form.Theme;
             var buttonHorizontalPadding = theme.ButtonHorizontalPadding;
@@ -657,7 +660,7 @@ namespace FUI {
 
             using (Group(positioner ?? DefaultControlPositioner
                     , new AddComponent<RoundedRectangle>()
-                    , new SetRectangleCorners(theme.Radius)
+                    , new SetRectangleCorners(radius ?? theme.Radius)
                     , new AddRectMask()
                     , new AddPressedHoveredHighlighter(
                         backgroundColor,
@@ -865,7 +868,7 @@ namespace FUI {
                 }
             }
         }
-        
+
         public static void Row<T>(IList<T> items, Action<int, T, Positioner> elementBuilder, Positioner? positioner = null, float gap = 1, float padding = 0) {
             var form = Form.Current;
             using (Group(positioner ?? DefaultControlPositioner)) {
