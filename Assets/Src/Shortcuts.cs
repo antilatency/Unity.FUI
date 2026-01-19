@@ -645,8 +645,8 @@ namespace FUI {
         }
 
 
-        public static void Button(string text, Action action, Positioner? positioner = null, bool paddings = true) {
-            Button(text, (go, e) => action(), positioner, paddings);
+        public static void Button(string text, Action action, Positioner? positioner = null, bool paddings = true, int? radius = null) {
+            Button(text, (go, e) => action(), positioner, paddings, radius);
         }
 
         public static void Button(string text, ButtonAction action, Positioner? positioner = null, bool paddings = true, int? radius = null) {
