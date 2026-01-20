@@ -188,7 +188,7 @@ internal class DebugForm : Form {
                     GapLeft(10);
                     ContentButton(Color.white.Alpha(0), Color.white.Alpha(0.05f), Color.white.Alpha(0.1f), () => {
                         Text("Transparent Button", P.Fill, new SetColor(Color.white), new SetTextAlignmentCenterMiddle());
-                    }, () => { Debug.Log("Click!"); }, P.Left(200));
+                    }, (g, e) => { Debug.Log("Click!"); }, P.Left(200));
                 }
             }
 

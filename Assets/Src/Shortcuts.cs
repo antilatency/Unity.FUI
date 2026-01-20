@@ -743,7 +743,7 @@ namespace FUI {
             }
         }
 
-        public static void ContentButton(Color initialColor, Color hoveredColor, Color pressedColor, Action populateContent, Action action, Positioner? positioner = null) {
+        public static void ContentButton(Color initialColor, Color hoveredColor, Color pressedColor, Action populateContent, ButtonAction action, Positioner? positioner = null) {
             var form = Form.Current;
             var theme = form.Theme;
 
@@ -752,7 +752,7 @@ namespace FUI {
                     , new SetRectangleCorners(theme.Radius)
                     , new AddRectMask()
                     , new AddPressedHoveredHighlighter(initialColor, hoveredColor, pressedColor)
-                    , new AddClickHandler(action)
+                    , new AddClickHandlerEx(action)
                     )
                     ) {
 
@@ -762,11 +762,11 @@ namespace FUI {
             }
         }
 
-        public static void ContentButton(Color color, Action populateContent, Action action, Positioner? positioner = null) {
+        public static void ContentButton(Color color, Action populateContent, ButtonAction action, Positioner? positioner = null) {
             ContentButton(color, color.Multiply(0.8f), color.Multiply(0.6f), populateContent, action, positioner);
         }
 
-        public static void ContentButton(Action populateContent, Action action, Positioner? positioner = null) {
+        public static void ContentButton(Action populateContent, ButtonAction action, Positioner? positioner = null) {
             var form = Form.Current;
             var theme = form.Theme;
             var color = theme.ButtonColor;
