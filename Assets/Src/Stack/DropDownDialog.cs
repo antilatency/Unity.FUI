@@ -89,8 +89,8 @@ namespace FUI {
                     if (_indexToEnumValue != null) {
                         returnValue = _indexToEnumValue[index];
                     }
-                    Return(returnValue);
                     Close();
+                    Return(returnValue);
                 };
 
                 using (Group(DefaultControlPositioner
