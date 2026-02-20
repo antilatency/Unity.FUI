@@ -3,6 +3,6 @@
 - Added support for Unity 6.3 and newer
 - Removed unnecessary package dependencies
 
-## 1.0.1
+## 1.0.0
 
 - Initial version
