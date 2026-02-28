@@ -30,25 +30,6 @@ namespace FUI.Gears {
             DragAction(gameObject, eventData);
         }
 
-        /*public static void HandleDragWithAllowedButtons(
-            GameObject gameObject,
-            PointerEventData eventData,
-            InputButtonMask allowedButtons,
-            Action<GameObject, PointerEventData> dragAction
-        ) {
-            if (((int)allowedButtons & (1 << (int)eventData.button)) != 0) {
-                dragAction?.Invoke(gameObject, eventData);
-            }
-            else {
-                var parent = gameObject.transform.parent;
-                ExecuteEvents.ExecuteHierarchy(
-                    parent.gameObject,
-                    eventData,
-                    ExecuteEvents.dragHandler
-                );
-            }
-        }*/
-
     }
 
 }

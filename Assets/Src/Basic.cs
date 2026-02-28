@@ -408,39 +408,6 @@ namespace FUI {
         }
 
 
-
-
-        
-        /*public static RectTransform InputField(string value, FUI_InputField.TextDelegate returnAction, Positioner? positioner = null) {
-
-            using (var inputField = Group(positioner ?? DefaultControlPositioner
-                , new AddComponent<FUI_InputField>()
-                , new AddFocusHoverHighlighter()
-                
-                )) {
-                var inputFieldComponent = inputField.Value.GetComponent<FUI_InputField>();
-                inputFieldComponent.onEndEdit = returnAction;
-                //inputField.onSubmit = returnAction;
-                inputFieldComponent.onValueChanged = returnAction;
-                Padding(2, 2, 0,0);
-                var text = TextElement(P.Fill
-                    , new ModifiersList { new SetTextAlignmentLeftMiddle() }
-                );
-                var textComponent = text.GetComponent<TMP_Text>();
-                inputFieldComponent.textComponent = textComponent;
-
-                var selected = EventSystem.current.currentSelectedGameObject == inputField.Value.gameObject;
-                var editing = inputFieldComponent.isFocused && selected;
-
-                if (!editing) {
-                    inputFieldComponent.SetTextWithoutNotify(value);
-                }
-
-                return inputField.Value;
-            }
-        }*/
-
-
     }
 
 }

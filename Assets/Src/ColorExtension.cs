@@ -45,7 +45,7 @@ namespace FUI {
             if (light == null) light = Color.white;
             if (dark == null) dark = Color.black;
 
-            float luminance = (0.299f * color.r + 0.587f * color.g + 0.114f * color.b);
+            float luminance = 0.299f * color.r + 0.587f * color.g + 0.114f * color.b;
             return luminance > 0.5f ? dark.Value : light.Value;
         }
     }
