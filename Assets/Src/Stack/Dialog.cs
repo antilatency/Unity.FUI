@@ -17,7 +17,9 @@ namespace FUI {
         protected virtual bool CloseOnClickOutside => true;
 
         public static T Create<T>() where T : Dialog {
+            var theme = FormStack.Instance.Top?.Theme;
             var dialog = FormStack.Instance.Push<T>();
+            if (theme != null) dialog.Theme = theme;
             return dialog;
         }
 
