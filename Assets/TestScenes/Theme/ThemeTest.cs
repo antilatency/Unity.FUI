@@ -29,9 +29,6 @@ public class ThemeTest : Form {
         }
     }
 
-
-
-
     protected override void Build() {
 
         using (WindowBackground()) {

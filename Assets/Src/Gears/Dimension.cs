@@ -4,7 +4,7 @@ using UnityEngine.UI;
 #nullable enable
 
 namespace FUI.Gears {
-    public class Dimension : UIBehaviour, IFormNotifier {
+    public class Dimension : UIBehaviour/*, IFormNotifier*/ {
         public enum DimensionsMask {
             None = 0,
             Width = 1 << 0,

@@ -4,9 +4,9 @@ using UnityEngine.EventSystems;
 
 namespace FUI.Gears {
     
-    public interface IFormNotifier {
+    /*public interface IFormNotifier {
         void SetFormToNotify(Form? form);
-    }
+    }*/
 
     /*public abstract class AbstractFormNotifier : MonoBehaviour, IFormNotifier {
         [HideInInspector]

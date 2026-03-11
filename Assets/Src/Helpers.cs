@@ -3,17 +3,6 @@ using System;
 
 namespace FUI {
     public static partial class Helpers { 
-        public static double DoubleFromString(string value) {
-            if (!double.TryParse(value, out var result))
-                result = default;
-            return result;
-        }
-
-        public static int IntFromString(string value) {
-            if (!int.TryParse(value, out var result))
-                result = default;
-            return result;
-        }
 
         public static T ConvertFromString<T>(string value) {
             if (typeof(T) == typeof(string)) return (T)(object)value;
