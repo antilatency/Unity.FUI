@@ -224,8 +224,8 @@ namespace FUI {
             });
         }
 
-        public static T Dialog<T>() where T : Dialog {
-            var theme = FormStack.Instance.Top?.Theme;
+        public static T Dialog<T>(Theme? theme = null) where T : Dialog {
+            theme ??= FormStack.Instance.Top?.Theme;
             var dialog = FormStack.Instance.Push<T>();
             if (theme != null) dialog.Theme = theme;
             return dialog;
