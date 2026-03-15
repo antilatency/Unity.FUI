@@ -73,6 +73,12 @@ public class ThemeTest : Form {
                         Debug.Log("Dialog closed with result: " + x);
                     }, "Do you want to proceed?", "Proceed", "Cancel");
                 });
+                GapTop(4);
+                Button("Show Yes/No Dialog (default theme)", (g, e) => {
+                    Dialog<MessageDialogYesNo>(Theme.Default).Configure(x => {
+                        Debug.Log("Dialog closed with result: " + x);
+                    }, "Do you want to proceed?", "Proceed", "Cancel");
+                });
             }
 
             using (Group(P.Left(0, 0.25f))) {
