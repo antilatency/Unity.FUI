@@ -57,5 +57,5 @@
         "Temp/": true
     },
     "dotnet.preferCSharpExtension": true,
-    "dotnet.defaultSolution": "Unity.FUI.sln"
+    "dotnet.defaultSolution": "Unity.FUI.slnx"
 }

@@ -6,10 +6,10 @@ namespace FUI {
 
     public interface IThemeListener {
         Theme Theme { get; }
-        void ThemeChanged();
+        void ThemeChanged(Theme theme);
     }
 
-    [CreateAssetMenu(fileName = "Theme", menuName = "FUI/Theme")]
+    [CreateAssetMenu(fileName = "Theme", menuName = "FUI/Theme", order = 100)]
     public class Theme : ScriptableObject {
 
         /*private static Theme _instance;
@@ -33,18 +33,21 @@ namespace FUI {
             }
         }
 
-        private static void BroadcastToScene(string methodName, object parameter = null) {
+        private void BroadcastToScene() {
             foreach (GameObject gameobject in GameObject.FindObjectsOfType<GameObject>()) {
-                gameobject.SendMessage(methodName, parameter, SendMessageOptions.DontRequireReceiver);
+                foreach (var component in gameobject.GetComponents<MonoBehaviour>()) {
+                    if (component is IThemeListener themeListener) {
+                        themeListener.ThemeChanged(this);
+                    }
+                }
             }
         }
-
         public void OnValidate() {
             #if UNITY_EDITOR
             if (!UnityEditor.EditorApplication.isPlaying)
                 return; // Skip runtime updates in edit mode
             #endif
-            BroadcastToScene("ThemeChanged", this);
+            BroadcastToScene();
 
         }
 

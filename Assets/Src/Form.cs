@@ -52,7 +52,7 @@ namespace FUI {
     }
 
     [RequireComponent(typeof(RectTransform))]
-    public abstract class Form : MonoBehaviour {
+    public abstract class Form : MonoBehaviour, IThemeListener {
         [SerializeField]
         private Theme _theme;
         public Theme Theme {
