@@ -54,7 +54,7 @@ namespace FUI {
     [RequireComponent(typeof(RectTransform))]
     public abstract class Form : MonoBehaviour, IThemeListener {
         [SerializeField]
-        private Theme _theme;
+        private Theme? _theme = null;
         public Theme Theme {
             get {
                 if (_theme == null) {
@@ -122,84 +122,6 @@ namespace FUI {
 
             }
         }
-
-
-
-
-        /*public RectTransform Element(GameObject? original = null, params Modifier[] modifiers) {
-            return Element(original, (IEnumerable<Modifier>)modifiers);
-        }
-
-        public RectTransform Element(GameObject? original, IEnumerable<Modifier> modifiers) {
-            var stackItem = Stack.Peek();
-            var parent = stackItem.Root;
-            var index = stackItem.FirstNotValidatedControlIndex;
-
-            var markIdentifier = string.Join('~', modifiers.Select(x => x.Id));
-            if (original != null) {
-                markIdentifier = original.GetInstanceID().ToString() + markIdentifier;
-            }
-
-
-            (int index, Mark? mark) FindIndex() {
-                for (int i = stackItem.FirstNotValidatedControlIndex; i < parent.childCount; i++) {
-                    var child = parent.GetChild(i);
-                    var mark = child.GetComponent<Mark>();
-                    if (mark?.Identifier == markIdentifier) {
-                        return (i, mark);
-                    }
-                }
-                return (-1, null);
-            }
-
-            var (indexFound, mark) = FindIndex();
-            GameObject gameObject;
-            RectTransform result;
-
-            if (mark != null) {
-                var numElementsToDelete = indexFound - stackItem.FirstNotValidatedControlIndex;
-                for (int i = 0; i < numElementsToDelete; i++) {
-                    var child = parent.GetChild(stackItem.FirstNotValidatedControlIndex);
-                    DestroyImmediate(child.gameObject);
-                }
-                result = (mark.transform as RectTransform)!;
-                gameObject = result.gameObject;
-
-                stackItem.FirstNotValidatedControlIndex++;
-
-
-            } else {
-                if (original != null) {
-                    gameObject = InstantiatePrefab(original, stackItem.Root);
-                } else {
-                    gameObject = new GameObject("fuiElement", typeof(RectTransform));
-                    gameObject.transform.SetParent(stackItem.Root, false);
-
-                }
-                result = (RectTransform)gameObject.transform;
-
-                foreach (var m in modifiers) {
-                    m.Creator?.Invoke(gameObject);
-                }
-
-                gameObject.AddComponent<Mark>().Identifier = markIdentifier;
-                result.SetSiblingIndex(index);
-
-
-                stackItem.FirstNotValidatedControlIndex++;
-
-            }
-
-            foreach (var m in modifiers) {
-                if (m.Updater != null)
-                    m.Updater(gameObject);
-            }
-
-            //
-
-            return result;
-
-        }*/
 
 
 
@@ -279,7 +201,7 @@ namespace FUI {
             var count = t.childCount - index;
             while (count > 0) {
                 var child = t.GetChild(index);
-                DestroyImmediate(child.gameObject);
+                UnityEngine.Object.DestroyImmediate(child.gameObject);
                 count--;
             }
             return stackItem.Borders.GetRigidSize();

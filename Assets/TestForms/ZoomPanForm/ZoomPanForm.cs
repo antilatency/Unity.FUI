@@ -25,7 +25,7 @@ public class ZoomPanForm : Form {
 
         using (WindowBackground()) {
 
-            using (Panel(P.Left(150))) {
+            using (Group(P.Left(150))) {
                 Padding(4);
                 Label("Allowed Buttons");
                 GapTop(4);
@@ -48,7 +48,7 @@ public class ZoomPanForm : Form {
                 Rectangle(P.Absolute(Vector2.zero, 50, 50, Vector2.right, Vector2.one - Vector2.right), Color.white);
 
                 using (Group(P.Absolute(Vector2.zero, 100, 100, Vector2.zero))) {
-                    Element(P.Fill, null
+                    Element(P.Fill, null, false
                     , new AddComponent<RoundedRectangle>()
                     , new SetColor(Color.yellow)
                     , new AddPointerEventObserver((g, e) => {

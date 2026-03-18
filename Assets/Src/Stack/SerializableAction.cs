@@ -124,7 +124,7 @@ public class SerializableAction : SerializableActionBase {
         _action = action;
     }
 
-    public void Invoke(params object[] args) {
+    public void Invoke(params object?[] args) {
         if (_action != null) {
             _action.DynamicInvoke(args);
             return;
@@ -164,7 +164,7 @@ public class SerializableAction<T> : SerializableActionBase {
         }
 
         if (GetMethod(out var method, out var target)) {
-            method.Invoke(target, new object[] { arg });
+            method.Invoke(target, new object?[] { arg });
             return;
         } else { 
             Debug.LogError($"Call to method failed.\n{_methodName}\n{_targetTypeName} ");

@@ -146,11 +146,11 @@ namespace FUI {
         }
 
         public class SetWordWrapping : SetterModifier<TMP_Text> {
-            public bool Wrapping;
-            public SetWordWrapping(bool wrapping) {
+            public TextWrappingModes Wrapping;
+            public SetWordWrapping(TextWrappingModes wrapping) {
                 Wrapping = wrapping;
             }
-            public override void Set(TMP_Text component) => component.enableWordWrapping = Wrapping;
+            public override void Set(TMP_Text component) => component.textWrappingMode = Wrapping;
         }
 
         public class SetRichTextEnabled : SetterModifier<TMP_Text> {
@@ -391,8 +391,8 @@ namespace FUI {
 
         public class AddPressReleaseHandlerEx : AddComponentConfigured<PointerPressReleaseHandlerEx> {
             public Action<GameObject, PointerEventData> OnPress;
-            public Action<GameObject, PointerEventData> OnRelease;
-            public AddPressReleaseHandlerEx(Action<GameObject, PointerEventData> onPress, Action<GameObject, PointerEventData> onRelease) {
+            public Action<GameObject, PointerEventData?> OnRelease;
+            public AddPressReleaseHandlerEx(Action<GameObject, PointerEventData> onPress, Action<GameObject, PointerEventData?> onRelease) {
                 OnPress = onPress;
                 OnRelease = onRelease;
             }

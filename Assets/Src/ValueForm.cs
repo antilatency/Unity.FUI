@@ -17,7 +17,7 @@ namespace FUI {
 
     public abstract class ValueForm<T> : Form where T : IEquatable<T> {
         public bool initialized = false;
-        public T Value;
+        public T Value = default!;
         public Action<T> _returnAction = null!;
 
         protected void AssignAndReturn<F>(ref F field, F fieldValue) {

@@ -11,7 +11,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-using static FUI.Helpers;
 
 namespace FUI {
 
@@ -101,15 +100,7 @@ namespace FUI {
                     seed.Created.transform.SetParent(parent, false);
 
                 }
-
-
-                /*foreach (var m in modifiers) {
-                    m.Creator?.Invoke(gameObject);
-                }*/
-
-                //gameObject.AddComponent<Mark>().Identifier = markIdentifier;
                 seed.Created.transform.SetSiblingIndex(stackItem.FirstNotValidatedControlIndex);
-
 
                 stackItem.FirstNotValidatedControlIndex++;
 
@@ -132,6 +123,10 @@ namespace FUI {
             var result = Element(original, isContainer, modifiers);
             positioner?.Invoke(result, Form.Current.CurrentBorders, null);
             return result;
+        }
+
+        public static RectTransform Element(Positioner positioner, params Modifier[] modifiers) {
+            return Element(positioner, null, false, modifiers);
         }
 
         private static GameObject InstantiatePrefab(GameObject original, Transform parent) {
@@ -362,7 +357,7 @@ namespace FUI {
             var transform = InputField(valueText, (s) => {
                 try {
                     if (fromString == null) {
-                        returnAction(ConvertFromString<T>(s));
+                        returnAction(Helpers.ConvertFromString<T>(s));
                     }
                     else {
                         returnAction(fromString(s));

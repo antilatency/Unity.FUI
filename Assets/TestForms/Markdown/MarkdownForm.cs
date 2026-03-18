@@ -31,7 +31,7 @@ public class MarkdownForm : Form {
                 Padding(4);
                 Label(unityText, P.Up()
                     , new SetRichTextEnabled(true)
-                    , new SetWordWrapping(true)
+                    , new SetWordWrapping(TMPro.TextWrappingModes.Normal)
                     , new AddClickHandlerEx(Hyperlink.Handle));
 
             }

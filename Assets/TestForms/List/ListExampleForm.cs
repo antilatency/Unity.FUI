@@ -3,9 +3,8 @@
 using System;
 using System.Collections.Generic;
 using FUI;
-using static FUI.Shortcuts;
 
-internal class ListExampleForm : Form {
+public class ListExampleForm : Form {
 
     [Serializable]
     public class Item {

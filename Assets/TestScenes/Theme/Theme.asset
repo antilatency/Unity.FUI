@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 026fc1a3de0dc374081245ef9a729252, type: 3}
   m_Name: Theme
   m_EditorClassIdentifier: FUI::FUI.Theme
-  WindowBackgroundColor: {r: 0.1882353, g: 0.1882353, b: 0.1882353, a: 1}
-  PopupBackgroundColor: {r: 0.20784314, g: 0.20784314, b: 0.20784314, a: 1}
+  WindowBackgroundColor: {r: 0.103773594, g: 0.103773594, b: 0.103773594, a: 1}
+  PopupBackgroundColor: {r: 0.0754717, g: 0.0754717, b: 0.0754717, a: 1}
   PrimaryColor: {r: 0.76862746, g: 0.22957811, b: 0.20784314, a: 1}
   newButtonColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   LabelColor: {r: 1, g: 1, b: 1, a: 1}
@@ -36,14 +36,6 @@ MonoBehaviour:
   SelectedButtonPressedColor: {r: 0.95686275, g: 0.64157915, b: 0.45882356, a: 1}
   SelectedButtonTextColor: {r: 0, g: 0, b: 0, a: 1}
   Radius: 4
-  HoverBrightness: 1.1
-  HoverSaturation: 1.1
-  PressedBrightness: 1.3
-  PressedSaturation: 1.3
-  TransparentButtonColor: {r: 1, g: 1, b: 1, a: 0}
-  TransparentButtonColorHovered: {r: 1, g: 1, b: 1, a: 0.1}
-  TransparentButtonColorPressed: {r: 1, g: 1, b: 1, a: 0.2}
-  PanelBackgroundColor: {r: 1, g: 1, b: 1, a: 0.1}
   LineHeight: 20
   DefaultGap: 4
   OutlineThickness: 1

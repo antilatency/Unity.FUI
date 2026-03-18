@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 
 using FUI.Gears;
-using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 

@@ -252,6 +252,6 @@ SubShader {
 	}
 }
 
-Fallback "TextMeshPro/Mobile/Distance Field"
+
 //CustomEditor "TMPro.EditorUtilities.TMP_SDFShaderGUI"
 }

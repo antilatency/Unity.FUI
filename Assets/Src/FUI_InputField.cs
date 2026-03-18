@@ -19,12 +19,8 @@ Intentional FUI-specific differences that must be preserved:
 4. This fork is optimized for declarative runtime composition from FUI helpers such as Basic.InputField(...), rather than inspector-driven event wiring.
 
 Guidance when syncing from newer TMP_InputField.cs versions:
-1. Prefer to pull upstream bug fixes for text editing, selection, caret handling, soft keyboard behavior, and platform-specific compatibility.
-2. Treat missing newer upstream features such as ICancelHandler support, shouldActivateOnSelect, keepTextSelectionVisible, newer touchscreen keyboard helpers, and newer platform branches as likely drift unless the current FUI behavior clearly depends on their absence.
-3. Keep the public FUI-facing API stable unless the corresponding FUI helpers, modifiers, and forms are updated in the same change.
-4. After every merge, re-check Assets/Src/Basic.cs plus any modifiers or highlighters that interact with FUI_InputField.
-
-In short: preserve the FUI callback/focus API, but aggressively consider upstream correctness and platform fixes.
+Preserve the FUI callback/focus API, but aggressively consider upstream correctness and platform fixes.
+Nullable support is intentional. Keep #nullable enable, use ? for runtime-optional references/state, and use Unity/deserialization-safe initialization such as null! for serialized references that Unity assigns before runtime use.
 */
 
 using System;
@@ -51,6 +47,7 @@ namespace FUI{
         IEndDragHandler,
         IPointerClickHandler,
         ISubmitHandler,
+        ICancelHandler,
         ICanvasElement,
         ILayoutElement,
         IScrollHandler
@@ -123,40 +120,47 @@ namespace FUI{
 
         protected TouchScreenKeyboard? m_SoftKeyboard;
         static private readonly char[] kSeparators = { ' ', '.', ',', '\t', '\r', '\n' };
+    #if UNITY_ANDROID
+        static private bool s_IsQuestDeviceEvaluated = false;
+    #endif // if UNITY_ANDROID
+
+        static private bool s_IsQuestDevice = false;
 
         #region Exposed properties
         /// <summary>
         /// Text Text used to display the input's value.
         /// </summary>
 
-        protected RectTransform m_RectTransform;
+        protected RectTransform m_RectTransform = null!;
 
         [SerializeField]
-        protected RectTransform m_TextViewport;
+        protected RectTransform m_TextViewport = null!;
 
-        protected RectMask2D m_TextComponentRectMask;
+        protected RectMask2D? m_TextComponentRectMask;
 
-        protected RectMask2D m_TextViewportRectMask;
+        protected RectMask2D? m_TextViewportRectMask;
         private Rect m_CachedViewportRect;
 
         [SerializeField]
-        protected TMP_Text m_TextComponent;
+        protected TMP_Text m_TextComponent = null!;
 
-        protected RectTransform m_TextComponentRectTransform;
-
-        [SerializeField]
-        protected Graphic m_Placeholder;
+        protected RectTransform m_TextComponentRectTransform = null!;
 
         [SerializeField]
-        protected Scrollbar m_VerticalScrollbar;
+        protected Graphic m_Placeholder = null!;
 
         [SerializeField]
-        protected TMP_ScrollbarEventHandler m_VerticalScrollbarEventHandler;
+        protected Scrollbar? m_VerticalScrollbar;
+
+        [SerializeField]
+        protected TMP_ScrollbarEventHandler? m_VerticalScrollbarEventHandler;
         //private bool m_ForceDeactivation;
 
         private bool m_IsDrivenByLayoutComponents = false;
         [SerializeField]
-        private LayoutGroup m_LayoutGroup;
+        private LayoutGroup? m_LayoutGroup;
+
+        private IScrollHandler? m_IScrollHandlerParent;
 
 
         /// <summary>
@@ -276,7 +280,7 @@ namespace FUI{
         /// Custom validation callback.
         /// </summary>
         [SerializeField]
-        private OnValidateInput m_OnValidateInput;
+        private OnValidateInput? m_OnValidateInput;
 
         [SerializeField]
         private Color m_CaretColor = new Color(50f / 255f, 50f / 255f, 50f / 255f, 1f);
@@ -316,13 +320,13 @@ namespace FUI{
         protected int m_CaretPosition = 0;
         protected int m_CaretSelectPosition = 0;
 
-        private RectTransform caretRectTrans = null;
-        protected UIVertex[] m_CursorVerts = null;
-        private CanvasRenderer m_CachedInputRenderer;
+        private RectTransform? caretRectTrans;
+        protected UIVertex[]? m_CursorVerts;
+        private CanvasRenderer? m_CachedInputRenderer;
         private Vector2 m_LastPosition;
 
         [NonSerialized]
-        protected Mesh m_Mesh;
+        protected Mesh? m_Mesh;
         private bool m_AllowInput = false;
         //bool m_HasLostFocus = false;
         private bool m_ShouldActivateNextUpdate = false;
@@ -331,13 +335,13 @@ namespace FUI{
         private const float kHScrollSpeed = 0.05f;
         private const float kVScrollSpeed = 0.10f;
         protected bool m_CaretVisible;
-        private Coroutine m_BlinkCoroutine = null;
+        private Coroutine? m_BlinkCoroutine;
         private float m_BlinkStartTime = 0.0f;
-        private Coroutine m_DragCoroutine = null;
+        private Coroutine? m_DragCoroutine;
         private string m_OriginalText = "";
         private bool m_WasCanceled = false;
         private bool m_HasDoneFocusTransition = false;
-        private WaitForSecondsRealtime m_WaitForSecondsRealtime;
+        private WaitForSecondsRealtime? m_WaitForSecondsRealtime;
         private bool m_PreventCallback = false;
 
         private bool m_TouchKeyboardAllowsInPlaceEditing = false;
@@ -349,10 +353,15 @@ namespace FUI{
         private float m_KeyDownStartTime;
         private float m_DoubleClickDelay = 0.5f;
 
+        private bool m_IsApplePlatform = false;
+        private KeyCode m_LastKeyCode;
+        private bool m_IsKeyboardBeingClosedInHoloLens = false;
+
         // Doesn't include dot and @ on purpose! See usage for details.
         const string kEmailSpecialCharacters = "!#$%&'*+-/=?^_`{|}~";
+        const string kOculusQuestDeviceModel = "Oculus Quest";
 
-        private BaseInput inputSystem
+        private BaseInput? inputSystem
         {
             get
             {
@@ -399,6 +408,21 @@ namespace FUI{
         }
 
         /// <summary>
+        /// Should the inputfield be automatically activated upon selection.
+        /// </summary>
+        public virtual bool shouldActivateOnSelect
+        {
+            get
+            {
+                return m_ShouldActivateOnSelect && Application.platform != RuntimePlatform.tvOS;
+            }
+            set
+            {
+                m_ShouldActivateOnSelect = value;
+            }
+        }
+
+        /// <summary>
         /// Should the mobile keyboard input be hidden.
         /// </summary>
         public bool shouldHideMobileInput
@@ -410,6 +434,9 @@ namespace FUI{
                     case RuntimePlatform.Android:
                     case RuntimePlatform.IPhonePlayer:
                     case RuntimePlatform.tvOS:
+                    #if UNITY_2022_1_OR_NEWER
+                    case RuntimePlatform.WebGLPlayer:
+                    #endif
                         return m_HideMobileInput;
                     default:
                         return true;
@@ -423,6 +450,9 @@ namespace FUI{
                     case RuntimePlatform.Android:
                     case RuntimePlatform.IPhonePlayer:
                     case RuntimePlatform.tvOS:
+                    #if UNITY_2022_1_OR_NEWER
+                    case RuntimePlatform.WebGLPlayer:
+                    #endif
                         SetPropertyUtility.SetStruct(ref m_HideMobileInput, value);
                         break;
                     default:
@@ -441,17 +471,27 @@ namespace FUI{
                     case RuntimePlatform.Android:
                     case RuntimePlatform.IPhonePlayer:
                     case RuntimePlatform.tvOS:
+                    #if UNITY_XR_VISIONOS_SUPPORTED
+                    case RuntimePlatform.VisionOS:
+                    #endif
                     case RuntimePlatform.WSAPlayerX86:
                     case RuntimePlatform.WSAPlayerX64:
                     case RuntimePlatform.WSAPlayerARM:
-                    case RuntimePlatform.Stadia:
                     #if UNITY_2020_2_OR_NEWER
                     case RuntimePlatform.PS4:
                         #if !(UNITY_2020_2_1 || UNITY_2020_2_2)
                         case RuntimePlatform.PS5:
                         #endif
                     #endif
+                    #if UNITY_2019_4_OR_NEWER
+                    case RuntimePlatform.GameCoreXboxOne:
+                    case RuntimePlatform.GameCoreXboxSeries:
+                    #endif
                     case RuntimePlatform.Switch:
+                    case RuntimePlatform.Switch2:
+                    #if UNITY_2022_1_OR_NEWER
+                    case RuntimePlatform.WebGLPlayer:
+                    #endif
                         return m_HideSoftKeyboard;
                     default:
                         return true;
@@ -465,17 +505,27 @@ namespace FUI{
                     case RuntimePlatform.Android:
                     case RuntimePlatform.IPhonePlayer:
                     case RuntimePlatform.tvOS:
+                    #if UNITY_XR_VISIONOS_SUPPORTED
+                    case RuntimePlatform.VisionOS:
+                    #endif
                     case RuntimePlatform.WSAPlayerX86:
                     case RuntimePlatform.WSAPlayerX64:
                     case RuntimePlatform.WSAPlayerARM:
-                    case RuntimePlatform.Stadia:
                     #if UNITY_2020_2_OR_NEWER
                     case RuntimePlatform.PS4:
                         #if !(UNITY_2020_2_1 || UNITY_2020_2_2)
                         case RuntimePlatform.PS5:
                         #endif
                     #endif
+                    #if UNITY_2019_4_OR_NEWER
+                    case RuntimePlatform.GameCoreXboxOne:
+                    case RuntimePlatform.GameCoreXboxSeries:
+                    #endif
                     case RuntimePlatform.Switch:
+                    case RuntimePlatform.Switch2:
+                    #if UNITY_2022_1_OR_NEWER
+                    case RuntimePlatform.WebGLPlayer:
+                    #endif
                         SetPropertyUtility.SetStruct(ref m_HideSoftKeyboard, value);
                         break;
                     default:
@@ -496,19 +546,38 @@ namespace FUI{
             switch (Application.platform)
             {
                 case RuntimePlatform.Android:
+                    return InPlaceEditing() && m_HideSoftKeyboard;
                 case RuntimePlatform.IPhonePlayer:
                 case RuntimePlatform.tvOS:
+                #if UNITY_XR_VISIONOS_SUPPORTED
+                case RuntimePlatform.VisionOS:
+                #endif
+                    return m_HideSoftKeyboard;
                 #if UNITY_2020_2_OR_NEWER
                 case RuntimePlatform.PS4:
                     #if !(UNITY_2020_2_1 || UNITY_2020_2_2)
                     case RuntimePlatform.PS5:
                     #endif
                 #endif
+                #if UNITY_2019_4_OR_NEWER
+                case RuntimePlatform.GameCoreXboxOne:
+                case RuntimePlatform.GameCoreXboxSeries:
+                #endif
                 case RuntimePlatform.Switch:
+                case RuntimePlatform.Switch2:
                     return false;
+                #if UNITY_2022_1_OR_NEWER
+                case RuntimePlatform.WebGLPlayer:
+                    return m_SoftKeyboard == null || !m_SoftKeyboard.active;
+                #endif
                 default:
                     return true;
             }
+        }
+
+        private bool isUWP()
+        {
+            return Application.platform == RuntimePlatform.WSAPlayerX86 || Application.platform == RuntimePlatform.WSAPlayerX64 || Application.platform == RuntimePlatform.WSAPlayerARM;
         }
 
         /// <summary>
@@ -654,17 +723,20 @@ namespace FUI{
 
         public Graphic placeholder { get { return m_Placeholder; } set { SetPropertyUtility.SetClass(ref m_Placeholder, value); } }
 
-        public Scrollbar verticalScrollbar
+        public Scrollbar? verticalScrollbar
         {
             get { return m_VerticalScrollbar; }
             set
             {
+                if (ReferenceEquals(m_VerticalScrollbar, value))
+                    return;
+
                 if (m_VerticalScrollbar != null)
                     m_VerticalScrollbar.onValueChanged.RemoveListener(OnScrollbarValueChange);
 
-                SetPropertyUtility.SetClass(ref m_VerticalScrollbar, value);
+                m_VerticalScrollbar = value;
 
-                if (m_VerticalScrollbar)
+                if (m_VerticalScrollbar != null)
                 {
                     m_VerticalScrollbar.onValueChanged.AddListener(OnScrollbarValueChange);
 
@@ -696,7 +768,7 @@ namespace FUI{
 
         public TouchScreenKeyboardEvent onTouchScreenKeyboardStatusChanged { get { return m_OnTouchScreenKeyboardStatusChanged; } set { SetPropertyUtility.SetClass(ref m_OnTouchScreenKeyboardStatusChanged, value); } }
 
-        public OnValidateInput onValidateInput { get { return m_OnValidateInput; } set { SetPropertyUtility.SetClass(ref m_OnValidateInput, value); } }
+        public OnValidateInput? onValidateInput { get { return m_OnValidateInput; } set { m_OnValidateInput = value; } }
 
         public int characterLimit
         {
@@ -746,7 +818,7 @@ namespace FUI{
             }
         }
         [SerializeField]
-        protected TMP_FontAsset m_GlobalFontAsset;
+        protected TMP_FontAsset m_GlobalFontAsset = null!;
 
         /// <summary>
         /// Determines if the whole text will be selected when focused.
@@ -773,7 +845,19 @@ namespace FUI{
         private bool m_SelectionStillActive = false;
         private bool m_ReleaseSelection = false;
 
-        private GameObject m_PreviouslySelectedObject;
+        private GameObject? m_PreviouslySelectedObject;
+
+        /// <summary>
+        /// Determines if the text selection will remain visible when the input field loses focus and is deactivated.
+        /// </summary>
+        public bool keepTextSelectionVisible
+        {
+            get { return m_KeepTextSelectionVisible; }
+            set { m_KeepTextSelectionVisible = value; }
+        }
+
+        [SerializeField]
+        private bool m_KeepTextSelectionVisible;
 
         /// <summary>
         /// Controls whether the original text is restored when pressing "ESC".
@@ -834,6 +918,11 @@ namespace FUI{
 
         public InputType inputType { get { return m_InputType; } set { if (SetPropertyUtility.SetStruct(ref m_InputType, value)) SetToCustom(); } }
 
+        /// <summary>
+        /// The TouchScreenKeyboard being used to edit the Input Field.
+        /// </summary>
+        public TouchScreenKeyboard? touchScreenKeyboard { get { return m_SoftKeyboard; } }
+
         public TouchScreenKeyboardType keyboardType
         {
             get { return m_KeyboardType; }
@@ -844,20 +933,35 @@ namespace FUI{
             }
         }
 
+            /// <summary>
+            /// Determines if the keyboard is opened in alert mode.
+            /// </summary>
+            public bool isAlert;
+
         public CharacterValidation characterValidation { get { return m_CharacterValidation; } set { if (SetPropertyUtility.SetStruct(ref m_CharacterValidation, value)) SetToCustom(); } }
 
         /// <summary>
         /// Sets the Input Validation to use a Custom Input Validation script.
         /// </summary>
-        public TMP_InputValidator inputValidator
+        public TMP_InputValidator? inputValidator
         {
             get { return m_InputValidator; }
-            set {  if (SetPropertyUtility.SetClass(ref m_InputValidator, value)) SetToCustom(CharacterValidation.CustomValidator); }
+            set
+            {
+                if (ReferenceEquals(m_InputValidator, value))
+                    return;
+
+                m_InputValidator = value;
+                SetToCustom(CharacterValidation.CustomValidator);
+            }
         }
         [SerializeField]
-        protected TMP_InputValidator m_InputValidator = null;
+        protected TMP_InputValidator? m_InputValidator = null;
 
         public bool readOnly { get { return m_ReadOnly; } set { m_ReadOnly = value; } }
+
+        [SerializeField]
+        private bool m_ShouldActivateOnSelect = true;
 
         public bool richText { get { return m_RichText; } set { m_RichText = value; SetTextComponentRichTextMode(); } }
 
@@ -1007,8 +1111,7 @@ namespace FUI{
         #if UNITY_EDITOR
         // Remember: This is NOT related to text validation!
         // This is Unity's own OnValidate method which is invoked when changing values in the Inspector.
-        protected override void OnValidate()
-        {
+        protected override void OnValidate() {
             base.OnValidate();
             EnforceContentType();
 
@@ -1027,6 +1130,20 @@ namespace FUI{
         }
         #endif // if UNITY_EDITOR
 
+    #if UNITY_ANDROID
+        protected override void Awake()
+        {
+            base.Awake();
+
+            if (s_IsQuestDeviceEvaluated)
+                return;
+
+            // Quest reports in-place editing support even when the software keyboard is still required.
+            s_IsQuestDevice = SystemInfo.deviceModel == kOculusQuestDeviceModel;
+            s_IsQuestDeviceEvaluated = true;
+        }
+    #endif // if UNITY_ANDROID
+
         protected override void OnEnable()
         {
             //Debug.Log("*** OnEnable() *** - " + this.name);
@@ -1035,6 +1152,8 @@ namespace FUI{
 
             if (m_Text == null)
                 m_Text = string.Empty;
+
+            m_IsApplePlatform = SystemInfo.operatingSystemFamily == OperatingSystemFamily.MacOSX || SystemInfo.operatingSystem.Contains("iOS") || SystemInfo.operatingSystem.Contains("tvOS");
 
             // Check if Input Field is driven by any layout components
             ILayoutController layoutController = GetComponent<ILayoutController>();
@@ -1071,6 +1190,9 @@ namespace FUI{
 
             m_RectTransform = GetComponent<RectTransform>();
 
+            IScrollHandler[] scrollHandlers = GetComponentsInParent<IScrollHandler>();
+            m_IScrollHandlerParent = scrollHandlers.Length > 1 ? scrollHandlers[1] : null;
+
 
             // Get a reference to the RectMask 2D on the Viewport Text Area object.
             if (m_TextViewport != null)
@@ -1097,6 +1219,10 @@ namespace FUI{
 
                 UpdateLabel();
             }
+
+            #if UNITY_2019_1_OR_NEWER
+            m_TouchKeyboardAllowsInPlaceEditing = !s_IsQuestDevice && TouchScreenKeyboard.isInPlaceEditingAllowed;
+            #endif
 
             // Subscribe to event fired when text object has been regenerated.
             TMPro_EventManager.TEXT_CHANGED_EVENT.Add(ON_TEXT_CHANGED);
@@ -1155,7 +1281,7 @@ namespace FUI{
                     #endif
                 }
 
-                if (m_VerticalScrollbar)
+                if (m_VerticalScrollbar != null)
                     UpdateScrollbar();
             }
         }
@@ -1386,8 +1512,11 @@ namespace FUI{
 
         private bool InPlaceEditing()
         {
-            if (Application.platform == RuntimePlatform.WSAPlayerX86 || Application.platform == RuntimePlatform.WSAPlayerX64 || Application.platform == RuntimePlatform.WSAPlayerARM)
-                return !TouchScreenKeyboard.isSupported || m_TouchKeyboardAllowsInPlaceEditing;
+            if (m_TouchKeyboardAllowsInPlaceEditing)
+                return true;
+
+            if (isUWP())
+                return !TouchScreenKeyboard.isSupported;
 
             if (TouchScreenKeyboard.isSupported && shouldHideSoftKeyboard)
                 return true;
@@ -1398,9 +1527,44 @@ namespace FUI{
             return true;
         }
 
+        private bool InPlaceEditingChanged()
+        {
+            return !s_IsQuestDevice && m_TouchKeyboardAllowsInPlaceEditing != TouchScreenKeyboard.isInPlaceEditingAllowed;
+        }
+
+        private bool TouchScreenKeyboardShouldBeUsed()
+        {
+            switch (Application.platform)
+            {
+                case RuntimePlatform.Android:
+                case RuntimePlatform.WebGLPlayer:
+                    if (s_IsQuestDevice)
+                        return TouchScreenKeyboard.isSupported;
+
+                    return !TouchScreenKeyboard.isInPlaceEditingAllowed;
+                default:
+                    return TouchScreenKeyboard.isSupported;
+            }
+        }
+
+        void UpdateKeyboardStringPosition()
+        {
+            if (!m_HideMobileInput || m_SoftKeyboard == null || !m_SoftKeyboard.canSetSelection)
+                return;
+
+            if (Application.platform != RuntimePlatform.IPhonePlayer && Application.platform != RuntimePlatform.tvOS)
+                return;
+
+            var selectionStart = Mathf.Min(stringSelectPositionInternal, stringPositionInternal);
+            var selectionLength = Mathf.Abs(stringSelectPositionInternal - stringPositionInternal);
+            m_SoftKeyboard.selection = new RangeInt(selectionStart, selectionLength);
+        }
+
         void UpdateStringPositionFromKeyboard()
         {
-            // TODO: Might want to add null check here.
+            if (m_SoftKeyboard == null)
+                return;
+
             var selectionRange = m_SoftKeyboard.selection;
 
             //if (selectionRange.start == 0 && selectionRange.length == 0)
@@ -1455,6 +1619,9 @@ namespace FUI{
                 m_ShouldActivateNextUpdate = false;
             }
 
+            if (isFocused && InPlaceEditingChanged())
+                DeactivateInputField();
+
             // Handle double click to reset / deselect Input Field when ResetOnActivation is false.
             if (!isFocused && m_SelectionStillActive)
             {
@@ -1474,7 +1641,7 @@ namespace FUI{
                     m_PreviouslySelectedObject = selectedObject;
 
                     // Special handling for Vertical Scrollbar
-                    if (m_VerticalScrollbar && selectedObject == m_VerticalScrollbar.gameObject)
+                    if (m_VerticalScrollbar != null && selectedObject == m_VerticalScrollbar.gameObject)
                     {
                         // Do not release selection
                         return;
@@ -1488,7 +1655,7 @@ namespace FUI{
                     }
 
                     // Release current selection of selected object is another Input Field
-                    if (selectedObject.GetComponent<FUI_InputField>() != null)
+                    if (m_KeepTextSelectionVisible == false && selectedObject.GetComponent<FUI_InputField>() != null)
                         ReleaseSelection();
 
                     return;
@@ -1565,21 +1732,29 @@ namespace FUI{
                     if (!m_ReadOnly)
                         text = m_SoftKeyboard.text;
 
-                    if (m_SoftKeyboard.status == TouchScreenKeyboard.Status.LostFocus)
-                        SendTouchScreenKeyboardStatusChanged();
+                    TouchScreenKeyboard.Status status = m_SoftKeyboard.status;
 
-                    if (m_SoftKeyboard.status == TouchScreenKeyboard.Status.Canceled)
+                    if (m_LastKeyCode != KeyCode.Return && status == TouchScreenKeyboard.Status.Done && isUWP())
                     {
-                        m_ReleaseSelection = true;
-                        m_WasCanceled = true;
-                        SendTouchScreenKeyboardStatusChanged();
+                        status = TouchScreenKeyboard.Status.Canceled;
+                        m_IsKeyboardBeingClosedInHoloLens = true;
                     }
 
-                    if (m_SoftKeyboard.status == TouchScreenKeyboard.Status.Done)
+                    switch (status)
                     {
-                        m_ReleaseSelection = true;
-                        OnSubmit(null);
-                        SendTouchScreenKeyboardStatusChanged();
+                        case TouchScreenKeyboard.Status.LostFocus:
+                            SendTouchScreenKeyboardStatusChanged();
+                            break;
+                        case TouchScreenKeyboard.Status.Canceled:
+                            m_ReleaseSelection = true;
+                            m_WasCanceled = true;
+                            SendTouchScreenKeyboardStatusChanged();
+                            break;
+                        case TouchScreenKeyboard.Status.Done:
+                            m_ReleaseSelection = true;
+                            SendTouchScreenKeyboardStatusChanged();
+                            OnSubmit(null);
+                            break;
                     }
                 }
 
@@ -1602,6 +1777,7 @@ namespace FUI{
                     for (int i = 0; i < val.Length; ++i)
                     {
                         char c = val[i];
+                        bool hasValidateUpdatedText = false;
 
                         if (c == '\r' || c == 3)
                             c = '\n';
@@ -1609,18 +1785,22 @@ namespace FUI{
                         if (onValidateInput != null)
                             c = onValidateInput(m_Text, m_Text.Length, c);
                         else if (characterValidation != CharacterValidation.None)
-                            c = Validate(m_Text, m_Text.Length, c);
-
-                        if (lineType == LineType.MultiLineSubmit && c == '\n')
                         {
-                            m_SoftKeyboard.text = m_Text;
+                            string textBeforeValidate = m_Text;
+                            c = Validate(m_Text, m_Text.Length, c);
+                            hasValidateUpdatedText = textBeforeValidate != m_Text;
+                        }
+
+                        if (lineType != LineType.MultiLineNewline && c == '\n')
+                        {
+                            UpdateLabel();
 
                             OnSubmit(null);
                             OnDeselect(null);
                             return;
                         }
 
-                        if (c != 0)
+                        if (c != 0 && (characterValidation != CharacterValidation.CustomValidator || !hasValidateUpdatedText))
                             m_Text += c;
                     }
 
@@ -1637,7 +1817,15 @@ namespace FUI{
                     SendOnValueChangedAndUpdateLabel();
                 }
             }
-            else if (m_HideMobileInput && Application.platform == RuntimePlatform.Android)
+            else if (m_HideMobileInput && m_SoftKeyboard != null && m_SoftKeyboard.canSetSelection &&
+                     Application.platform != RuntimePlatform.IPhonePlayer && Application.platform != RuntimePlatform.tvOS)
+            {
+                var selectionStart = Mathf.Min(stringSelectPositionInternal, stringPositionInternal);
+                var selectionLength = Mathf.Abs(stringSelectPositionInternal - stringPositionInternal);
+                m_SoftKeyboard.selection = new RangeInt(selectionStart, selectionLength);
+            }
+            else if ((m_HideMobileInput && Application.platform == RuntimePlatform.Android) ||
+                     (m_SoftKeyboard != null && m_SoftKeyboard.canSetSelection && (Application.platform == RuntimePlatform.IPhonePlayer || Application.platform == RuntimePlatform.tvOS)))
             {
                 UpdateStringPositionFromKeyboard();
             }
@@ -1720,6 +1908,7 @@ namespace FUI{
             if (m_DragPositionOutOfBounds && m_DragCoroutine == null)
                 m_DragCoroutine = StartCoroutine(MouseDragOutsideRect(eventData));
 
+            UpdateKeyboardStringPosition();
             eventData.Use();
 
             #if TMP_DEBUG_MODE
@@ -1908,6 +2097,7 @@ namespace FUI{
             }
 
             UpdateLabel();
+            UpdateKeyboardStringPosition();
             eventData.Use();
 
             #if TMP_DEBUG_MODE
@@ -1924,10 +2114,11 @@ namespace FUI{
         protected EditState KeyPressed(Event evt)
         {
             var currentEventModifiers = evt.modifiers;
-            bool ctrl = SystemInfo.operatingSystemFamily == OperatingSystemFamily.MacOSX ? (currentEventModifiers & EventModifiers.Command) != 0 : (currentEventModifiers & EventModifiers.Control) != 0;
+            bool ctrl = m_IsApplePlatform ? (currentEventModifiers & EventModifiers.Command) != 0 : (currentEventModifiers & EventModifiers.Control) != 0;
             bool shift = (currentEventModifiers & EventModifiers.Shift) != 0;
             bool alt = (currentEventModifiers & EventModifiers.Alt) != 0;
             bool ctrlOnly = ctrl && !alt && !shift;
+            m_LastKeyCode = evt.keyCode;
 
             switch (evt.keyCode)
             {
@@ -2205,25 +2396,12 @@ namespace FUI{
         }
 
 
-        private T GetComponentInParents<T>(Transform transform) {
-            var parent = transform.parent;
-            if (!parent)
-                return default;
-            var result = parent.GetComponent<T>();
-            if (result!=null)
-                return result;
-            return GetComponentInParents<T>(parent);
-        }
-
-
         public virtual void OnScroll(PointerEventData eventData)
         {
             // Return if Single Line
             if (m_LineType == LineType.SingleLine) {
-                var parentScrollHandler = GetComponentInParents<IScrollHandler>(transform);
-
-                if (parentScrollHandler != null)
-                    parentScrollHandler.OnScroll(eventData);
+                if (m_IScrollHandlerParent != null)
+                    m_IScrollHandlerParent.OnScroll(eventData);
 
                 return;
             }
@@ -2242,7 +2420,7 @@ namespace FUI{
 
             AdjustTextPositionRelativeToViewport(m_ScrollPosition);
 
-            if (m_VerticalScrollbar)
+            if (m_VerticalScrollbar != null)
             {
                 m_VerticalScrollbar.value = m_ScrollPosition;
             }
@@ -3206,7 +3384,7 @@ namespace FUI{
 
         protected void SendTouchScreenKeyboardStatusChanged()
         {
-            if (onTouchScreenKeyboardStatusChanged != null)
+            if (onTouchScreenKeyboardStatusChanged != null && m_SoftKeyboard != null)
                 onTouchScreenKeyboardStatusChanged.Invoke(m_SoftKeyboard.status);
         }
 
@@ -3288,7 +3466,7 @@ namespace FUI{
                     }
                 }
 
-                if (m_IsTextComponentUpdateRequired || m_VerticalScrollbar)
+                if (m_IsTextComponentUpdateRequired || m_VerticalScrollbar != null)
                 {
                     m_IsTextComponentUpdateRequired = false;
                     m_TextComponent.ForceMeshUpdate();
@@ -3304,7 +3482,7 @@ namespace FUI{
         void UpdateScrollbar()
         {
             // Update Scrollbar
-            if (m_VerticalScrollbar)
+            if (m_VerticalScrollbar != null)
             {
                 Rect viewportRect = m_TextViewport.rect;
 
@@ -3598,9 +3776,13 @@ namespace FUI{
             if (m_CaretVisible == false || m_TextComponent.canvas == null || m_ReadOnly)
                 return;
 
-            if (m_CursorVerts == null)
+            UIVertex[]? cursorVerts = m_CursorVerts;
+            if (cursorVerts == null)
             {
                 CreateCursorVerts();
+                cursorVerts = m_CursorVerts;
+                if (cursorVerts == null)
+                    return;
             }
 
             float width = m_CaretWidth;
@@ -3667,18 +3849,18 @@ namespace FUI{
             // Minor tweak to address caret potentially being too thin based on canvas scaler values.
             float scale = m_TextComponent.canvas.scaleFactor;
 
-            m_CursorVerts[0].position = new Vector3(startPosition.x, bottom, 0.0f);
-            m_CursorVerts[1].position = new Vector3(startPosition.x, top, 0.0f);
-            m_CursorVerts[2].position = new Vector3(startPosition.x + width, top, 0.0f);
-            m_CursorVerts[3].position = new Vector3(startPosition.x + width, bottom, 0.0f);
+            cursorVerts[0].position = new Vector3(startPosition.x, bottom, 0.0f);
+            cursorVerts[1].position = new Vector3(startPosition.x, top, 0.0f);
+            cursorVerts[2].position = new Vector3(startPosition.x + width, top, 0.0f);
+            cursorVerts[3].position = new Vector3(startPosition.x + width, bottom, 0.0f);
 
             // Set Vertex Color for the caret color.
-            m_CursorVerts[0].color = caretColor;
-            m_CursorVerts[1].color = caretColor;
-            m_CursorVerts[2].color = caretColor;
-            m_CursorVerts[3].color = caretColor;
+            cursorVerts[0].color = caretColor;
+            cursorVerts[1].color = caretColor;
+            cursorVerts[2].color = caretColor;
+            cursorVerts[3].color = caretColor;
 
-            vbo.AddUIVertexQuad(m_CursorVerts);
+            vbo.AddUIVertexQuad(cursorVerts);
 
             // Update position of IME window when necessary.
             if (m_ShouldUpdateIMEWindowPosition || currentLine != m_PreviousIMEInsertionLine)
@@ -3687,7 +3869,7 @@ namespace FUI{
                 m_PreviousIMEInsertionLine = currentLine;
 
                 // Calculate position of IME Window in screen space.
-                Camera cameraRef;
+                Camera? cameraRef;
                 if (m_TextComponent.canvas.renderMode == RenderMode.ScreenSpaceOverlay)
                     cameraRef = null;
                 else
@@ -3698,7 +3880,10 @@ namespace FUI{
                         cameraRef = Camera.current;
                 }
 
-                Vector3 cursorPosition = m_CachedInputRenderer.gameObject.transform.TransformPoint(m_CursorVerts[0].position);
+                if (m_CachedInputRenderer == null)
+                    return;
+
+                Vector3 cursorPosition = m_CachedInputRenderer.gameObject.transform.TransformPoint(cursorVerts[0].position);
                 Vector2 screenPosition = RectTransformUtility.WorldToScreenPoint(cameraRef, cursorPosition);
                 screenPosition.y = Screen.height - screenPosition.y;
 
@@ -4083,7 +4268,11 @@ namespace FUI{
             if (EventSystem.current.currentSelectedGameObject != gameObject)
                 EventSystem.current.SetSelectedGameObject(gameObject);
 
-            if (TouchScreenKeyboard.isSupported && shouldHideSoftKeyboard == false)
+            #if UNITY_2019_1_OR_NEWER
+            m_TouchKeyboardAllowsInPlaceEditing = !s_IsQuestDevice && TouchScreenKeyboard.isInPlaceEditingAllowed;
+            #endif
+
+            if (TouchScreenKeyboardShouldBeUsed() && shouldHideSoftKeyboard == false)
             {
                 if (inputSystem != null && inputSystem.touchSupported)
                 {
@@ -4093,8 +4282,8 @@ namespace FUI{
                 if (shouldHideSoftKeyboard == false && m_ReadOnly == false)
                 {
                     m_SoftKeyboard = (inputType == InputType.Password) ?
-                        TouchScreenKeyboard.Open(m_Text, keyboardType, false, multiLine, true, false, "", characterLimit) :
-                        TouchScreenKeyboard.Open(m_Text, keyboardType, inputType == InputType.AutoCorrect, multiLine, false, false, "", characterLimit);
+                        TouchScreenKeyboard.Open(m_Text, keyboardType, false, multiLine, true, isAlert, "", characterLimit) :
+                        TouchScreenKeyboard.Open(m_Text, keyboardType, inputType == InputType.AutoCorrect, multiLine, false, isAlert, "", characterLimit);
 
                     OnFocus();
 
@@ -4108,15 +4297,10 @@ namespace FUI{
                     //}
                 }
 
-                // Cache the value of isInPlaceEditingAllowed, because on UWP this involves calling into native code
-                // The value only needs to be updated once when the TouchKeyboard is opened.
-                #if UNITY_2019_1_OR_NEWER
-                m_TouchKeyboardAllowsInPlaceEditing = TouchScreenKeyboard.isInPlaceEditingAllowed;
-                #endif
             }
             else
             {
-                if (!TouchScreenKeyboard.isSupported && m_ReadOnly == false && inputSystem != null)
+                if (!TouchScreenKeyboardShouldBeUsed() && m_ReadOnly == false && inputSystem != null)
                     inputSystem.imeCompositionMode = IMECompositionMode.On;
 
                 OnFocus();
@@ -4129,13 +4313,14 @@ namespace FUI{
             UpdateLabel();
         }
 
-        public override void OnSelect(BaseEventData eventData) {
+        public override void OnSelect(BaseEventData? eventData) {
             //Debug.Log("OnSelect()");
 
             base.OnSelect(eventData);
             SendOnFocusChanged(true);
 
-            ActivateInputField();
+            if (shouldActivateOnSelect)
+                ActivateInputField();
         }
 
         public virtual void OnPointerClick(PointerEventData eventData)
@@ -4181,7 +4366,7 @@ namespace FUI{
 
             if (m_TextComponent != null && IsInteractable())
             {
-                if (m_WasCanceled && m_RestoreOriginalTextOnEscape)
+                if (m_WasCanceled && m_RestoreOriginalTextOnEscape && !m_IsKeyboardBeingClosedInHoloLens)
                     text = m_OriginalText;
 
                 if (m_SoftKeyboard != null)
@@ -4192,7 +4377,7 @@ namespace FUI{
 
                 m_SelectionStillActive = true;
 
-                if (m_ResetOnDeActivation || m_ReleaseSelection)
+                if (m_ResetOnDeActivation || m_ReleaseSelection || clearSelection)
                 {
                     //m_StringPosition = m_StringSelectPosition = 0;
                     //m_CaretPosition = m_CaretSelectPosition = 0;
@@ -4204,19 +4389,21 @@ namespace FUI{
 
                 if (inputSystem != null)
                     inputSystem.imeCompositionMode = IMECompositionMode.Auto;
+
+                m_IsKeyboardBeingClosedInHoloLens = false;
             }
 
             MarkGeometryAsDirty();
         }
 
-        public override void OnDeselect(BaseEventData eventData) {
+        public override void OnDeselect(BaseEventData? eventData) {
             DeactivateInputField();
 
             base.OnDeselect(eventData);
             SendOnFocusChanged(false);
         }
 
-        public virtual void OnSubmit(BaseEventData eventData)
+        public virtual void OnSubmit(BaseEventData? eventData)
         {
             //Debug.Log("OnSubmit()");
 
@@ -4227,6 +4414,21 @@ namespace FUI{
                 m_ShouldActivateNextUpdate = true;
 
             SendOnSubmit();
+            DeactivateInputField();
+            eventData?.Use();
+        }
+
+        public virtual void OnCancel(BaseEventData? eventData)
+        {
+            if (!IsActive() || !IsInteractable())
+                return;
+
+            if (!isFocused)
+                m_ShouldActivateNextUpdate = true;
+
+            m_WasCanceled = true;
+            DeactivateInputField();
+            eventData?.Use();
         }
 
         //public virtual void OnLostFocus(BaseEventData eventData)
@@ -4327,9 +4529,9 @@ namespace FUI{
                 return;
 
             if (multiLine)
-                m_TextComponent.enableWordWrapping = true;
+                m_TextComponent.textWrappingMode = TextWrappingModes.Normal;
             else
-                m_TextComponent.enableWordWrapping = false;
+                m_TextComponent.textWrappingMode = TextWrappingModes.PreserveWhitespaceNoWrap;
         }
 
         // Control Rich Text option on the text component.
@@ -4473,7 +4675,7 @@ namespace FUI{
         /// <param name="pointSize"></param>
         public void SetGlobalPointSize(float pointSize)
         {
-            TMP_Text placeholderTextComponent = m_Placeholder as TMP_Text;
+            TMP_Text? placeholderTextComponent = m_Placeholder as TMP_Text;
 
             if (placeholderTextComponent != null) placeholderTextComponent.fontSize = pointSize;
             textComponent.fontSize = pointSize;
@@ -4485,7 +4687,7 @@ namespace FUI{
         /// <param name="fontAsset"></param>
         public void SetGlobalFontAsset(TMP_FontAsset fontAsset)
         {
-            TMP_Text placeholderTextComponent = m_Placeholder as TMP_Text;
+            TMP_Text? placeholderTextComponent = m_Placeholder as TMP_Text;
 
             if (placeholderTextComponent != null) placeholderTextComponent.font = fontAsset;
             textComponent.font = fontAsset;

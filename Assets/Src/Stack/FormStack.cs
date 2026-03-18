@@ -12,7 +12,10 @@ namespace FUI {
         public static FormStack Instance {
             get {
                 if (_instance == null) {
-                    _instance = FindObjectOfType<FormStack>();
+                    var instances = FindObjectsByType<FormStack>(FindObjectsSortMode.None);
+                    if (instances.Length > 0) {
+                        _instance = instances[0];
+                    }
                 }
                 if (_instance == null) {
                     throw new Exception("No FormStack instance found in scene");
@@ -62,13 +65,12 @@ namespace FUI {
             rectTransform.sizeDelta = new Vector2(0, 0);
 
             return form;
-        }
-         
+        }         
 
         public void Pop() {
             var top = Top;
             if (top != null) {
-                DestroyImmediate(top.gameObject);
+                UnityEngine.Object.DestroyImmediate(top.gameObject);
             }
             top = Top;
             if (top != null) {

@@ -5,7 +5,7 @@ using static FUI.Shortcuts;
 using static FUI.Basic;
 using FUI.Modifiers;
 
-internal class ColorPickerForm : Form {
+public class ColorPickerForm : Form {
 
     public string Hint;
     public Vector2 HueSaturation;
@@ -13,7 +13,7 @@ internal class ColorPickerForm : Form {
     static Vector2 ColorPickerHueSaturation(Vector2 value, Positioner positioner, bool extraIteration = false) {
         var form = Form.Current;
         var theme = form.Theme;
-        var background = Element(null
+        var background = Element(null, true
             ,new AddComponent<RoundedRectangle>()
             ,new AddComponent<Slider>()
             ,new SetCustomShader("UI/HueSaturationRect")
@@ -22,7 +22,7 @@ internal class ColorPickerForm : Form {
         positioner(background, form.CurrentBorders, ()=>new Vector2(80, theme.LineHeight));
 
         form.BeginControls(background);
-        var handle = Element(null
+        var handle = Element(null, false
             , new AddComponent<RoundedRectangle>()
             , new SetColor(Color.black)
             , new SetRaycastTarget(false)
@@ -41,12 +41,12 @@ internal class ColorPickerForm : Form {
             slider.Value = value;
         }*/
 
-        handle.anchorMin = value;
+        /*handle.anchorMin = value;
         handle.anchorMax = value;
         handle.pivot = value;
         handle.anchoredPosition = Vector2.zero;
         handle.sizeDelta = new Vector2(4, 4);
-        return value;
+        return value;*/
     }
 
     static Vector2 ToGrid(Vector2 value, Vector2Int grid) {

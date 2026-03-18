@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace FUI {
-    internal class SimpleRoundedRectangle : AbstractRoundedRectangle{
+    public class SimpleRoundedRectangle : AbstractRoundedRectangle{
         public float Radius = 10f;
 
 

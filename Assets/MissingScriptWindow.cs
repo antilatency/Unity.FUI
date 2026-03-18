@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
+
 public class MissingScriptWindow : EditorWindow
 {
     [SerializeField]
@@ -80,10 +81,9 @@ public class MissingScriptWindow : EditorWindow
         return result;
     }
 
-    private void FindMissingScriptsInCurrentScene()
-    {
+    private void FindMissingScriptsInCurrentScene() {
         _objectsWithMissingScriptsInCurrentScene.Clear();
-        var allObjects = FindObjectsOfType<GameObject>();
+        var allObjects = FindObjectsByType<GameObject>(FindObjectsSortMode.None);
         foreach (var go in allObjects)
         {
             if (go.transform.parent == null) // Only start with root objects
@@ -93,8 +93,7 @@ public class MissingScriptWindow : EditorWindow
         }
     }
 
-    private void FindMissingScriptsInGameObjectAndChildren(GameObject go)
-    {
+    private void FindMissingScriptsInGameObjectAndChildren(GameObject go) {
         var components = go.GetComponents<Component>();
         var hasMissingScript = components.Any(c => c == null);
         if (hasMissingScript)
@@ -107,8 +106,8 @@ public class MissingScriptWindow : EditorWindow
         }
     }
 
-    private void FindMissingScriptsInAssets()
-    {
+    private void FindMissingScriptsInAssets() {
+    
         _missingAssets.Clear();
         var allAssets = AssetDatabase.GetAllAssetPaths();
         foreach (var assetPath in allAssets)

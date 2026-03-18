@@ -140,8 +140,6 @@ public class ThemeTest : Form {
             bool hasNamespace = !string.IsNullOrEmpty(rootNamespace);
             var namespaceIndent = hasNamespace ? "    " : "";
             Debug.Log($"Root namespace: {rootNamespace}");
-            var indents = 0;
-            string Indent() => new string(' ', indents * 4);
 
             string code = $@"
 using UnityEngine;

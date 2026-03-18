@@ -43,9 +43,9 @@ public struct LinearPosition {
 public class LinearPositionTest : MonoBehaviour {
 
 
-    public RectTransform rectTransform;
+    public RectTransform? rectTransform;
 
-    public RectTransform PositionDisplay;
+    public RectTransform? PositionDisplay;
 
     //public LinearPosition linearPosition;
     void Update() {

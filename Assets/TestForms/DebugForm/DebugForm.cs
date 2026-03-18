@@ -8,7 +8,7 @@ using static FUI.Shortcuts;
 using static FUI.Basic;
 using FUI.Modifiers;
 
-internal class DebugForm : Form {
+public class DebugForm : Form {
 
     //public ArtNetLightingDeviceDefinition.Model Data = new();
 
@@ -91,7 +91,7 @@ internal class DebugForm : Form {
 
 
 
-            using (Panel(P.Left(50))) {
+            using (Group(P.Left(50))) {
 
                 for (int i = 0; i < palette.Length; i++) {
                     var item = palette[i];
@@ -205,7 +205,7 @@ internal class DebugForm : Form {
                 for (int i = 0; i < Items.Count; i++) {
                     int index = i;
                     var item = Items[i];
-                    using (Panel(P.Up(24), 4)) {
+                    using (Group(P.Up(24))) {
                         GapLeft(4);
                         Label(item.Icon, P.Left(20));
                         GapLeft(10);

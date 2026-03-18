@@ -34,7 +34,7 @@ namespace FUI {
         }
 
         private void BroadcastToScene() {
-            foreach (GameObject gameobject in GameObject.FindObjectsOfType<GameObject>()) {
+            foreach (GameObject gameobject in GameObject.FindObjectsByType<GameObject>(FindObjectsSortMode.None)) {
                 foreach (var component in gameobject.GetComponents<MonoBehaviour>()) {
                     if (component is IThemeListener themeListener) {
                         themeListener.ThemeChanged(this);
@@ -95,29 +95,6 @@ namespace FUI {
 
         public float Radius = 4;
 
-
-        [Header("Hover")]
-        public float HoverBrightness = 1.1f;
-        public float HoverSaturation = 1.1f;
-        public Color HoverColor(Color baseColor) {
-            return baseColor.MultiplySaturationBrightness(HoverSaturation, HoverBrightness);
-        }
-
-        [Header("Pressed")]
-        public float PressedBrightness = 1.3f;
-        public float PressedSaturation = 1.3f;
-        public Color PressedColor(Color baseColor) {
-            return baseColor.MultiplySaturationBrightness(PressedSaturation, PressedBrightness);
-        }
-
-
-
-        public Color TransparentButtonColor = Color.white.Alpha(0);
-        public Color TransparentButtonColorHovered = Color.white.Alpha(0.1f);
-        public Color TransparentButtonColorPressed = Color.white.Alpha(0.2f);
-
-
-        public Color PanelBackgroundColor = Color.white.Alpha(0.1f);
         public float LineHeight = 20;
         public float DefaultGap = 4;
         public float OutlineThickness = 1;

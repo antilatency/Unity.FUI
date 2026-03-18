@@ -438,17 +438,6 @@ namespace FUI {
         }
 
 
-
-
-        public static Disposable<RectTransform> Panel(Positioner positioner, float radius = 0) {
-            var form = Form.Current;
-            var theme = form.Theme;
-            return Group(positioner
-                , new AddComponent<RoundedRectangle>()
-                , new SetRectangleCorners(radius)
-                , new SetColor(theme.PanelBackgroundColor)
-                );
-        }
         public static Disposable<RectTransform> WindowBackground(Positioner? positioner = null) {
             var form = Form.Current;
             var theme = form.Theme;

@@ -55,7 +55,7 @@ public class Viewport3DTest : Form {
 
         using (WindowBackground()) {
 
-            using (Panel(P.Left(80))) {
+            using (Group(P.Left(80))) {
                 Button("Button 1", () => { });
             }
 
