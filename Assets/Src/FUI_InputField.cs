@@ -1,5 +1,32 @@
 ﻿//#define TMP_DEBUG_MODE
 
+/*
+SYNC INSTRUCTIONS FOR FUTURE AI AGENTS
+
+This file is a maintained fork of TMPro.TMP_InputField, not a thin wrapper.
+When pulling changes from newer Unity package versions, do not overwrite this file blindly.
+Start from the newer upstream TMP_InputField.cs and then re-apply the FUI-specific changes listed below.
+
+Intentional FUI-specific differences that must be preserved:
+1. This type lives in namespace FUI and is exposed as FUI_InputField without a custom add-component menu entry (no AddComponentMenu attribute).
+2. The callback model is intentionally simplified for code-driven runtime UI:
+    - TextDelegate onEndEdit
+    - TextDelegate onSubmit
+    - TextDelegate onValueChanged
+    - FocusDelegate onFocusChanged
+    FUI code assigns these delegates directly. Do not replace them with upstream UnityEvent-only APIs unless all call sites are migrated together.
+3. Focus propagation is customized for FUI. Preserve SendOnFocusChanged(...), the IFocusHandler dispatch on the same GameObject, and the custom OnSelect / OnDeselect behavior that invokes it.
+4. This fork is optimized for declarative runtime composition from FUI helpers such as Basic.InputField(...), rather than inspector-driven event wiring.
+
+Guidance when syncing from newer TMP_InputField.cs versions:
+1. Prefer to pull upstream bug fixes for text editing, selection, caret handling, soft keyboard behavior, and platform-specific compatibility.
+2. Treat missing newer upstream features such as ICancelHandler support, shouldActivateOnSelect, keepTextSelectionVisible, newer touchscreen keyboard helpers, and newer platform branches as likely drift unless the current FUI behavior clearly depends on their absence.
+3. Keep the public FUI-facing API stable unless the corresponding FUI helpers, modifiers, and forms are updated in the same change.
+4. After every merge, re-check Assets/Src/Basic.cs plus any modifiers or highlighters that interact with FUI_InputField.
+
+In short: preserve the FUI callback/focus API, but aggressively consider upstream correctness and platform fixes.
+*/
+
 using System;
 using System.Collections;
 using System.Threading;
@@ -16,7 +43,7 @@ namespace FUI{
     /// <summary>
     /// Editable text input field.
     /// </summary>
-    [AddComponentMenu("UI/FUI - Input Field")]
+    //[AddComponentMenu("UI/FUI - Input Field")]
     public class FUI_InputField : Selectable,
         IUpdateSelectedHandler,
         IBeginDragHandler,
@@ -94,7 +121,7 @@ namespace FUI{
         [Serializable]
         public class TouchScreenKeyboardEvent : UnityEvent<TouchScreenKeyboard.Status> { }
 
-        protected TouchScreenKeyboard m_SoftKeyboard;
+        protected TouchScreenKeyboard? m_SoftKeyboard;
         static private readonly char[] kSeparators = { ' ', '.', ',', '\t', '\r', '\n' };
 
         #region Exposed properties

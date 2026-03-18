@@ -22,7 +22,7 @@ namespace FUI {
 
         public static void Image(Positioner positioner, Texture texture, Vector4 multiplier, Vector4 increment, bool toSrgb) {
             var form = Form.Current;
-            var element = Element(null
+            var element = Element(null, false
                 , new AddComponent<RoundedRectangle>()
                 , new SetCustomShader("FUI/Image"
                     , ("Texture", texture)

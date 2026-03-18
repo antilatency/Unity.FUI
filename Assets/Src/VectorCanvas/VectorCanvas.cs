@@ -36,7 +36,9 @@ namespace FUI {
     public static partial class Shortcuts {
 
         public static RectTransform VectorCanvas(Action<VectorCanvasContext> drawingDelegate, Positioner? positioner = null) {
-            var element = Element(positioner ?? P.Fill, null, new AddVectorCanvas(drawingDelegate), new SetRaycastTarget(false));
+            var element = Element(positioner ?? P.Fill, null, false
+                , new AddVectorCanvas(drawingDelegate)
+                , new SetRaycastTarget(false));
             return element;
         }
     }

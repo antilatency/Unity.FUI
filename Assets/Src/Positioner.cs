@@ -2,7 +2,7 @@
 
 namespace FUI {
 #nullable enable
-    public delegate void Positioner(UnityEngine.RectTransform rectTransform, Borders borders, System.Func<UnityEngine.Vector2> sizeGetter);
+    public delegate void Positioner(UnityEngine.RectTransform rectTransform, Borders borders, System.Func<UnityEngine.Vector2>? sizeGetter);
 
     public static class P {
         public static Positioner Left(float? size = null, float fraction = 0, bool keepBorders = false) {
@@ -112,7 +112,7 @@ namespace FUI {
                 anchor ??= vectorHalf;
 
                 Vector2 size = default;
-                if (width == null || height == null) {
+                if ((width == null || height == null) && sizeGetter != null) {
                     size = sizeGetter();
                 }
                 if (width.HasValue)

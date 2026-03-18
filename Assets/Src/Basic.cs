@@ -20,19 +20,26 @@ namespace FUI {
         public static Positioner DefaultControlPositioner => P.Up(Form.Current.Theme.LineHeight);
 
         public class ElementSeed {
+            public static string ContainerPrefix = "#";
             public GameObject? Original;
+            public bool IsContainer { get; }
             public ModifiersList? Modifiers { get; }
+            
             public string Identifier;
 
             public GameObject? Found = null;
             public GameObject? Created = null;
 
-            public ElementSeed(GameObject? original, ModifiersList? modifiers = null) {
+            public ElementSeed(GameObject? original, bool isContainer = false, ModifiersList? modifiers = null) {
                 Original = original;
+                IsContainer = isContainer;
                 Modifiers = modifiers ?? new ModifiersList();
                 Identifier = string.Join('~', Modifiers.Select(x => x.Id));
                 if (original != null) {
                     Identifier = original.GetInstanceID().ToString() + Identifier;
+                }
+                if (isContainer) {
+                    Identifier = ContainerPrefix + Identifier;
                 }
             }
 
@@ -52,11 +59,11 @@ namespace FUI {
 
         }
 
-        public static ElementSeed BeginCreateElement(GameObject? original = null, ModifiersList? modifiers = null) {
+        public static ElementSeed BeginCreateElement(GameObject? original, bool isContainer, ModifiersList? modifiers) {
             var form = Form.Current;
             var stackItem = form.Stack.Peek();
             var parent = stackItem.Root;
-            ElementSeed seed = new ElementSeed(original, modifiers);
+            ElementSeed seed = new ElementSeed(original,isContainer, modifiers);
 
             int indexFound = -1;
             Transform? transformFound = null;
@@ -111,18 +118,18 @@ namespace FUI {
             return seed;
         }
 
-        public static RectTransform Element(GameObject? original = null, params Modifier[] modifiers) {
-            return Element(original, new ModifiersList(modifiers));
-        }
-
-        public static RectTransform Element(GameObject? original, ModifiersList modifiers) {
-            var seed = BeginCreateElement(original, modifiers);
+        public static RectTransform Element(GameObject? original, bool isContainer, ModifiersList modifiers) {
+            var seed = BeginCreateElement(original, isContainer, modifiers);
             seed.ApplyModifiers();
             return (RectTransform)(seed.Created ?? seed.Found)!.transform;
         }
 
-        public static RectTransform Element(Positioner positioner, GameObject? original = null, params Modifier[] modifiers) {
-            var result = Element(original, modifiers);
+        public static RectTransform Element(GameObject? original = null, bool isContainer = false, params Modifier[] modifiers) {
+            return Element(original, isContainer, new ModifiersList(modifiers));
+        }
+
+        public static RectTransform Element(Positioner positioner, GameObject? original = null, bool isContainer = false, params Modifier[] modifiers) {
+            var result = Element(original, isContainer, modifiers);
             positioner?.Invoke(result, Form.Current.CurrentBorders, null);
             return result;
         }
@@ -216,7 +223,7 @@ namespace FUI {
 
         public static Disposable<RectTransform> Group(Positioner positioner, params Modifier[] modifiers) {
             var form = Form.Current;
-            var group = Element(null, modifiers);
+            var group = Element(null, true, modifiers);
             form.BeginControls(group);
             return new Disposable<RectTransform>(group, _ => {
                 var innerSize = form.EndControls();
@@ -242,7 +249,7 @@ namespace FUI {
                 Padding(0, 0, h, h);
                 using (var scrollingArea = Group(P.Fill)) {
                     //Padding(0, 0, -h, -h);
-                    var handle = Element(null
+                    var handle = Element(null, false
                         , new AddComponent<RoundedRectangle>()
                         , new SetColor(theme.ButtonColor)
                         , new SetRectangleCorners(theme.Radius)
@@ -265,7 +272,7 @@ namespace FUI {
         public static Disposable<RectTransform> ScrollRectVertical(Positioner positioner) {
             var form = Form.Current;
             var theme = form.Theme;
-            var scrollRect = Element(null
+            var scrollRect = Element(null, true
                 , new AddComponent<UnityEngine.UI.ScrollRect>()
                 , new AddComponent<RoundedRectangle>()
                 , new SetColor(Color.clear)
@@ -278,7 +285,7 @@ namespace FUI {
             scrollRectComponent.verticalScrollbar = scrollBar.GetComponent<UnityEngine.UI.Scrollbar>();
             scrollRectComponent.verticalScrollbarSpacing = 2;
 
-            var viewport = Element(null
+            var viewport = Element(null, true
                 , new AddRectMask()
             );
             viewport.pivot = Vector2.zero;
@@ -287,7 +294,7 @@ namespace FUI {
             form.BeginControls(viewport);
 
 
-            var content = Element();
+            var content = Element(null, true);
             content.pivot = new Vector2(0, 1);
             content.anchorMin = new Vector2(0, 1);
             content.anchorMax = new Vector2(1, 1);
@@ -344,7 +351,7 @@ namespace FUI {
 
 
 
-        public static RectTransform InputField<T>(T value, Action<T> returnAction, Positioner positioner, string toStringFormat = "", Func<string, T>? fromString = null) {
+        public static RectTransform InputField<T>(T value, Action<T> returnAction, Positioner positioner, string toStringFormat = "", Func<string, T>? fromString = null, ModifiersList? additionalModifiers = null) {
             string valueText;
             if (value is IFormattable formattable) {
                 valueText = formattable.ToString(toStringFormat, CultureInfo.CurrentCulture);
@@ -362,13 +369,16 @@ namespace FUI {
                     }
                 }
                 catch { }
-            }, positioner);
+            }, positioner, additionalModifiers);
             return transform;
         }
 
-        public static RectTransform InputField(string value, FUI_InputField.TextDelegate returnAction, Positioner? positioner = null) {
+        public static RectTransform InputField(string value, FUI_InputField.TextDelegate returnAction, Positioner? positioner = null, ModifiersList? additionalModifiers = null) {
 
-            var transform = Element(PrefabLibrary.Instance.InputField, new AddFocusHoverHighlighter());
+            var transform = Element(PrefabLibrary.Instance.InputField, false, new ModifiersList() {
+                new AddFocusHoverHighlighter(),
+                additionalModifiers
+            });
 
             var inputField = transform.GetComponent<FUI_InputField>();
             inputField.onEndEdit = returnAction;
@@ -398,7 +408,7 @@ namespace FUI {
                 additionalModifiers
             };
 
-            var result = Element(null, modifiers);
+            var result = Element(null, false, modifiers);
             (positioner ?? DefaultControlPositioner).Invoke(result, form.CurrentBorders, () => {
                 var component = result.GetComponent<TMP_Text>();
                 var size = component.GetPreferredValues();

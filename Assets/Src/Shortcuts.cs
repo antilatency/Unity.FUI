@@ -385,7 +385,7 @@ namespace FUI {
 
 
         public static RectTransform Rectangle(Positioner positioner, Color color, float radius = 0) {
-            var element = Element(positioner, null
+            var element = Element(positioner, null, false
                 , new AddComponent<RoundedRectangle>()
                 , new SetRectangleCorners(radius)
                 , new SetColor(color)
@@ -394,7 +394,7 @@ namespace FUI {
         }
 
         public static RectTransform Circle(Positioner positioner, Color color, float angle = 1, float startAngle = 0, int numSegments = 64) {
-            var element = Element(positioner, null
+            var element = Element(positioner, null, false
                 , new AddCircle(angle, startAngle, numSegments)
                 , new SetColor(color)
                 );
@@ -402,7 +402,7 @@ namespace FUI {
         }
 
         public static RectTransform CircleOutline(Positioner positioner, Color color, float angle = 1, float startAngle = 0, float innerThickness = 0, float outerThickness = 0, int numSegments = 64) {
-            var element = Element(positioner, null
+            var element = Element(positioner, null, false
                 , new AddCircleOutline(innerThickness, outerThickness, angle, startAngle, numSegments)
                 , new SetColor(color)
                 );
@@ -410,7 +410,7 @@ namespace FUI {
         }
 
         public static RectTransform CircleOutlineScreenSpaceThickness(Positioner positioner, Color color, float angle = 1, float startAngle = 0, float innerThickness = 0, float outerThickness = 0, float screenSpaceThickness = 1, int numSegments = 64) {
-            var element = Element(positioner, null
+            var element = Element(positioner, null, false
                 , new AddCircleOutline(innerThickness, outerThickness, angle, startAngle, numSegments)
                 , new SetColor(color)
                 , new SetCustomShader("FUI/ScreenSpaceOffset", ("Thickness", screenSpaceThickness))
@@ -430,8 +430,7 @@ namespace FUI {
             int numSegments = 64
         ) {
             var form = Form.Current;
-            var element = Element(
-                null,
+            var element = Element( null, false,
                 new AddCubicSpline(pointA, tangentA, pointB, tangentB, innerThickness, outerThickness, numSegments),
                 new SetColor(color)
             );
@@ -471,7 +470,7 @@ namespace FUI {
 
         public static T SubForm<T>(bool setParentTheme = true) where T : Form {
             //var form = Form.Current;
-            var subform = Element(null
+            var subform = Element(null, true
                 , new AddComponent<T>()
             );
 
@@ -507,7 +506,7 @@ namespace FUI {
                 float handleRadius = Mathf.Min(theme.Radius, width / 2);
                 GapLeft(-width * value, value);
 
-                var handle = Element(P.Left(width), null
+                var handle = Element(P.Left(width), null, false
                     , new AddComponent<RoundedRectangle>()
                     , new SetColor(handleColor)
                     , new SetRectangleCorners(handleRadius)
@@ -778,7 +777,7 @@ namespace FUI {
 
         public static Disposable ZoomPanViewport(Positioner positioner, Vector2 contentSize, PointerEventUtils.PointerEventFilter? scrollFilter = null, PointerEventUtils.PointerEventFilter? dragFilter = null) {
             var form = Form.Current;
-            var background = Element(null
+            var background = Element(null, false
                 , new AddComponent<RoundedRectangle>()
                 , new AddMask(false)
                 , new AddClickHandlerEx((go, e) => {
@@ -803,7 +802,7 @@ namespace FUI {
         }
 
         public static RectTransform Viewport3D(Positioner positioner, RenderTexture renderTexture, CameraState cameraState, params Modifier[] additionalModifiers) {
-            return Element(positioner, null
+            return Element(positioner, null, false
                 , new AddComponent<RoundedRectangle>()
                 , new AddRenderTextureResizer(renderTexture)
                 , new AddCameraStateController(cameraState)
@@ -819,7 +818,7 @@ namespace FUI {
 
         public static Disposable FitInside(Positioner positioner, Vector2 contentSize) {
             var form = Form.Current;
-            var background = Element(null
+            var background = Element(null, false
                 , new AddComponent<RoundedRectangle>()
                 , new AddMask(false)
                 , new AddComponent<FitInside>()
@@ -839,7 +838,7 @@ namespace FUI {
         private static Vector2 GetDimension(Positioner? positioner, Dimension.DimensionsMask mask) {
             var form = Form.Current;
 
-            var observer = Element(null
+            var observer = Element(null, false
                 , new AddComponent<Dimension>()
             );
 

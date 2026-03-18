@@ -262,6 +262,11 @@ namespace FUI {
             BeginControls((RectTransform)transform);
         }
         public void BeginControls(RectTransform newRoot) {
+            if (Stack.Count >0 ){// Empty stack means we are starting to populate a form
+                if (!newRoot.name.StartsWith(Basic.ElementSeed.ContainerPrefix)) {
+                    Debug.LogWarning("Trying to add children to an element that is not marked as a container."); 
+                }
+            }
             var newItem = new StackItem(newRoot);
             Stack.Push(newItem);
         }
