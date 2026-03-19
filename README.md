@@ -121,7 +121,6 @@ Label("Remaining area"); // this label will be placed at the top of the remainin
 ```
 There are several built-in group types:
 - `Group` is a simple container with no additional behavior.
-- `Panel` adds a background and padding.
 - `WindowBackground` is a full-screen panel that is used as the root of forms and dialogs.
 
 ## Tree merge
@@ -176,7 +175,7 @@ In FUI, a component is usually just a function that composes lower-level primiti
 - `InputField`, `LabeledInputField`, `LabeledInputFieldSpinbox`
 - `Checkbox`, `ToggleButton`, `ToggleGroupButtons`
 - `Dropdown`, `LabeledDropdown`
-- `Panel`, `WindowBackground`, `ScrollRectVertical`
+- `WindowBackground`, `ScrollRectVertical`
 - `Row`
 
 The recommended project pattern is to keep `Basic` and `Shortcuts` as the foundation, then add your own `LocalUIShortcuts` or domain-specific helpers in your game code.
@@ -443,3 +442,5 @@ Unity.FUI is best understood as a declarative runtime UI layer built around four
 - components are just composable functions.
 
 If you keep those rules in mind, the code stays compact, reusable, and much easier to reason about than a manually curated runtime hierarchy.
+
+

@@ -84,7 +84,10 @@ public class ThemeTest : Form {
             using (Group(P.Left(0, 0.25f))) {
                 Padding(4);
                 Label("Inputs");
+                GapTop();
                 InputField(StringValue, x => AssignAndMakeDirty(ref StringValue, x));
+                GapTop();
+                LabeledInputField("StringValue", StringValue, x => AssignAndMakeDirty(ref StringValue, x));
                 GapTop();
                 LabeledInputField("FloatValue", FloatValue, x => AssignAndMakeDirty(ref FloatValue, x));
                 GapTop();

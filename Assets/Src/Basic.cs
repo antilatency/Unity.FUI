@@ -346,7 +346,18 @@ namespace FUI {
 
 
 
-        public static RectTransform InputField<T>(T value, Action<T> returnAction, Positioner positioner, string toStringFormat = "", Func<string, T>? fromString = null, ModifiersList? additionalModifiers = null) {
+        public static RectTransform InputField<T>(
+            T value, Action<T> returnAction,
+            Positioner? positioner = null,
+            string toStringFormat = "",
+            Func<string, T>? fromString = null,
+            ModifiersList? additionalModifiers = null
+
+            ) {
+            if (value is string s) {
+                return InputFieldString(s, x => returnAction((T)(object)x), positioner, additionalModifiers);
+            }
+
             string valueText;
             if (value is IFormattable formattable) {
                 valueText = formattable.ToString(toStringFormat, CultureInfo.CurrentCulture);
@@ -354,7 +365,7 @@ namespace FUI {
             else {
                 valueText = value?.ToString() ?? "";
             }
-            var transform = InputField(valueText, (s) => {
+            var transform = InputFieldString(valueText, (s) => {
                 try {
                     if (fromString == null) {
                         returnAction(Helpers.ConvertFromString<T>(s));
@@ -368,7 +379,11 @@ namespace FUI {
             return transform;
         }
 
-        public static RectTransform InputField(string value, FUI_InputField.TextDelegate returnAction, Positioner? positioner = null, ModifiersList? additionalModifiers = null) {
+        public static RectTransform InputFieldString(
+            string value,
+            FUI_InputField.TextDelegate returnAction,
+            Positioner? positioner = null,
+            ModifiersList? additionalModifiers = null) {
 
             var transform = Element(PrefabLibrary.Instance.InputField, false, new ModifiersList() {
                 new AddFocusHoverHighlighter(),
