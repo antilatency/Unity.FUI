@@ -100,17 +100,21 @@ public class ThemeTest : Form {
                 LabeledCheckbox("Bool", Selected, x => AssignAndMakeDirty(ref Selected, x));
                 GapTop();
                 Slider(FloatValue / 2, x => AssignAndMakeDirty(ref FloatValue, Mathf.Clamp(2 * x, 0, 2)));
+                GapTop();
+                SubForm<Vector3Form>()
+                    .Execute(Vector3Value, x => AssignAndMakeDirty(ref Vector3Value, x))
+                    .ApplyPositioner(P.Up());
             }
 
             using (ScrollRectVertical(P.Left(0, 0.25f))) {
                 Padding(4);
-                for (int i = 0; i < 10; i++) {
-                    if (i > 0) GapTop();
-                    SubForm<Vector3Form>()
-                    .Execute(Vector3Value, x => AssignAndMakeDirty(ref Vector3Value, x))
-                    .ApplyPositioner(P.Up());
+                Text(
+@"АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ
+абвгдеёжзийклмнопрстуфхцчшщъыьэюя
 
-                }
+ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ
+αβγδεζηθικλμνξοπρστυφχψω ς
+", P.Up());
             }
 
 
