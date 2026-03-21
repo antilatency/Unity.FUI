@@ -1,5 +1,8 @@
 ﻿using System;
 using System.IO;
+
+using CommonMark;
+
 using UnityEngine;
 
 namespace FUI {
@@ -8,6 +11,7 @@ namespace FUI {
         public Color UrlColor = Color.green;
         public Color SeparatorColor = Color.gray;
         public Color CodeBackgroundColor = new Color(0.25f, 0.25f, 0.25f);
+        public bool RenderSoftLineBreaks = false;
 
         int _indent = 0;
 
@@ -114,6 +118,15 @@ namespace FUI {
                     break;
 
 
+                    case CommonMark.Syntax.BlockTag.FencedCode: {
+                        var color = ColorUtility.ToHtmlStringRGBA(CodeBackgroundColor);
+                        writer.Write($"<mark=#{color}>");
+                        writer.Write(block.StringContent);
+                        writer.Write("</mark>");
+                    } break;
+
+
+
                     default:
                     Debug.LogWarning($"not implemented block tag {block.Tag.ToString()}");
                     break;
@@ -156,6 +169,11 @@ namespace FUI {
                     }
                     break;
 
+                    case CommonMark.Syntax.InlineTag.SoftBreak:{
+                        if (RenderSoftLineBreaks)
+                            writer.Write("\n");
+                    }
+                    break;
 
                     default:
                     Debug.LogWarning($"not implemented inline tag {inline.Tag}");

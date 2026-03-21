@@ -115,6 +115,33 @@ public class ThemeTest : Form {
 ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ
 αβγδεζηθικλμνξοπρστυφχψω ς
 ", P.Up());
+
+                var markdown = 
+@"# Heading 1
+## Heading 2
+**Bold Text** and *Italic Text*.
+`Code Inline`
+- List Item 1
+- List Item 2
+
+[Link to Google](https://www.google.com)
+```
+public void HelloWorld() {
+    Console.WriteLine(""Hello, World!"");
+}
+```";
+                
+
+                var unityText = new MarkdownConverter() {
+                    RenderSoftLineBreaks = true
+                }.Convert(markdown);
+                Text(
+                    unityText,
+                    P.Up(),
+                    new SetRichTextEnabled(true),
+                    new SetWordWrapping(TMPro.TextWrappingModes.Normal),
+                    new AddClickHandlerEx(Hyperlink.Handle) //Hyperlink handling
+                );
             }
 
 
